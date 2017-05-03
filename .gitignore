@@ -1,2 +1,5 @@
-/progs
-/tmp
+/progs/
+/tmp/
+/.shards/
+/lib/
+/shard.lock

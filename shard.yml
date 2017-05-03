@@ -1,0 +1,20 @@
+name: megauni.crystal
+version: 0.1.0
+
+authors:
+  - da99 <i-hate-spam-1234567@mailinator.com>
+
+dependencies:
+  kemal:
+    github: kemalcr/kemal
+    branch: master
+  kemal-session:
+    github: kemalcr/kemal-session
+    branch: master
+  mu-html:
+    github: da99/mu-html
+    branch: master
+
+crystal: 0.22.0
+
+license: MIT
