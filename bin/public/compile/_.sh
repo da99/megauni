@@ -7,9 +7,16 @@ compile () {
   mkdir -p tmp
   mkdir -p prod
 
-  echo "=== Compiling for ${TARGET}..."
+  sh_color YELLOW "=== Compiling: {{${TARGET}}} ..."
 
   case "$TARGET" in
+    www)
+      crystal build compile/www.cr
+      rm -f tmp/www
+      mv www tmp/www
+      exit 0
+      ;;
+
     dev)
       crystal build src/${APP_NAME}.cr
       ;;
