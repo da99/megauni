@@ -1,21 +1,24 @@
 #!/usr/bin/env mksh
 #
 #
-THE_ARGS="$@"
-THIS_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
+
+set -u -e -o pipefail
+
+local +x THE_ARGS="$@"
+local +x THIS_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
+
 PATH="$PATH:$THIS_DIR/../mksh_setup/bin"
 PATH="$PATH:$THIS_DIR/../sh_color/bin"
+PATH="$PATH:$THIS_DIR/../my_crystal/bin"
 PATH="$PATH:$THIS_DIR/bin"
-PATH="$PATH:$THIS_DIR/../my_crystal_lang/progs/latest-crystal/bin"
-PATH="$PATH:$THIS_DIR/../my_crystal_lang/progs/latest-shards/bin"
-APP_NAME="$(basename "$THIS_DIR")"
 
-ACTION="[none]"
+local +x APP_NAME="$(basename "$THIS_DIR")"
+
+local +x ACTION="[none]"
 if [[ ! -z "$@" ]]; then
   ACTION="$1"; shift
 fi
 
-set -u -e -o pipefail
 
 case $ACTION in
 
@@ -26,24 +29,17 @@ case $ACTION in
 
   *)
 
-    FUNC_FILE="$THIS_DIR/bin/public/${ACTION}/_.sh"
-
+    local +x FUNC_FILE="$THIS_DIR/bin/public/${ACTION}/_.sh"
     if [[ -s  "$FUNC_FILE"  ]]; then
-
-      export THIS_FILE="$FUNC_FILE"
-      export THIS_FUNC="$ACTION"
-      export THIS_FUNC_DIR="$THIS_DIR/bin/public/${ACTION}"
-
-      source "$THIS_FILE"
-      "$THIS_FUNC" "$@"
+      source "$FUNC_FILE"
+      "$ACTION" "$@"
       exit 0
     fi
 
-    BIN_FILE="$THIS_DIR/bin/lib/${ACTION}.sh"
-    if [[ -s "$BIN_FILE" ]]; then
-      source "$BIN_FILE"
-      "$ACTION" "$@"
-      exit 0
+    local +x SH_FILE="$THIS_DIR/sh/${ACTION}/_"
+    if [[ -s "$SH_FILE" ]]; then
+      source "$SH_FILE"
+      return 0
     fi
 
     # === Check progs/bin:

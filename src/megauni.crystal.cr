@@ -1,4 +1,3 @@
-require "./megauni.crystal/version"
 
 require "kemal"
 require "kemal-session"
