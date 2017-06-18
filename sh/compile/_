@@ -1,6 +1,5 @@
 #!/usr/bin/env mksh
-# === {{CMD}}  dev
-# === {{CMD}}  prod
+# === {{CMD}}  dev|prod|www
 
 local +x PATH="$PATH:$THIS_DIR/../my_crystal/bin"
 local +x TARGET="$1"; shift
@@ -10,18 +9,24 @@ mkdir -p prod
 
 sh_color YELLOW "=== Compiling: {{${TARGET}}} ..."
 
+if command -v crystal &>/dev/null ; then
+  local +x CRYSTAL="crystal"
+else
+  local +x CRYSTAL="my_crystal"
+fi
+
 case "$TARGET" in
   www)
-    crystal build compile/www.cr -o tmp/www
+    "$CRYSTAL" build compile/www.cr -o tmp/www
     exit 0
     ;;
 
   dev)
-    crystal build src/${APP_NAME}.cr
+    "$CRYSTAL" build src/${APP_NAME}.cr
     ;;
 
   prod)
-    crystal build --release src/${APP_NAME}.cr
+    "$CRYSTAL" build --release src/${APP_NAME}.cr
     ;;
 
   *)

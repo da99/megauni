@@ -1,7 +1,7 @@
 #!/usr/bin/env mksh
 
 # === {{CMD}}
-# === {{CMD}}  "my cmd --with --args"
+# === {{CMD}}  dev|prod|www
 case "$@" in
   "run "*)
     shift
@@ -26,13 +26,13 @@ case "$@" in
     ;;
 
   *)
-    if [[ -z "$@" ]]; then
-      sh_color RED "!!! {{No option given}}."
-      exit 2
-    fi
+    local +x ARGS="$(echo $@)"
+    ARGS="${ARGS:-dev}"
 
-    $APP_NAME watch run $@
-    mksh_setup watch "-r src -r bin -r spec -r compile" "$APP_NAME watch run $@"
+    $APP_NAME watch run $ARGS || :
+    mksh_setup watch \
+      "-r src -r bin -r spec -r compile" \
+      "$APP_NAME watch run $ARGS"
     ;;
 esac
 
