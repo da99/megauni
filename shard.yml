@@ -1,4 +1,4 @@
-name: megauni.crystal
+name: megauni
 version: 0.1.0
 license: MIT
 
@@ -9,7 +9,10 @@ dependencies:
   kemal-session:
     github: kemalcr/kemal-session
     branch: master
-  mu-www:
-    github: da99/mu-www
+  da_html:
+    github: da99/da_html.cr
+    branch: master
+  da_style:
+    github: da99/da_style.cr
     branch: master
 
