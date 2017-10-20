@@ -30,15 +30,15 @@ module MU
 
     def self.fulfill(ctx)
       route(ctx) do
-        get("/", Scratch, :root)
-        get("/hello/world", Scratch, :hello)
-        get("/hello/the/entire/world", Scratch, :hello_more)
+        get("/", MU::Router, :root)
+        get("/hello/world", MU::Router, :hello)
+        get("/hello/the/entire/world", MU::Router, :hello_more)
 
         ctx.response.status_code = 404
         ctx.response << "missing: #{ ctx.request.method } #{ctx.request.path}"
       end
     end
 
-  end # === class Scratch
+  end # === class Router
 
 end # === module MU

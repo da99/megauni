@@ -1,7 +1,6 @@
 #!/usr/bin/env zsh
 
 # === {{CMD}}  watch|run
-# === Used soley for development.
 if [[ -z "$@" ]]; then
   local +x ACTION="watch"
 else
@@ -14,17 +13,18 @@ case "$ACTION" in
     mkdir -p tmp/in tmp/out
 
     sh_color ORANGE "=== {{Compiling}}..."
-    my_crystal __ build src/server -o tmp/out/megauni.server
+    my_crystal __ build src/server.cr -o tmp/out/megauni.server
 
     sh_color ORANGE "=== {{Terminating}} previous server..."
-    pkill -f "tmp/out/megauni.server"
+    pkill -f "tmp/out/megauni.server" || :
 
     sh_color ORANGE "=== {{Running}}..."
     tmp/out/megauni.server &
+    my_network inspect "http://localhost:3000/"
     ;;
 
   watch)
-    local +x CMD="$APP_NAME watch run"
+    local +x CMD="$APP_NAME dev run"
     ${=CMD} || :
     process watch "-r src -r bin -r sh -r specs" "$CMD"
     ;;
