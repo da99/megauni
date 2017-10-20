@@ -21,11 +21,6 @@ case "$TARGET" in
     exit 0
     ;;
 
-  dev)
-    mkdir -p tmp/out
-    "$CRYSTAL" build src/megauni.cr -o tmp/out/megauni
-    ;;
-
   prod)
     "$CRYSTAL" build --release src/${APP_NAME}.cr
     ;;
