@@ -1,38 +1,28 @@
-#!/usr/bin/env mksh
+#!/usr/bin/env zsh
 
-# === {{CMD}}
-# === {{CMD}}  dev|prod|www
-case "$@" in
-  "run "*)
-    shift
-    case "$@" in
-      "www")
-        $APP_NAME compile www
-        sh_color YELLOW "=== Running: {{tmp/www}} ..."
-        tmp/www
-        ;;
+# === {{CMD}}  watch|run
+# === Used soley for development.
+if [[ -z "$@" ]]; then
+  local +x ACTION="watch"
+else
+  local +x ACTION="$1"; shift
+fi
 
-      "dev")
-        $APP_NAME server grace
-        $APP_NAME compile dev
-        $APP_NAME server dev &
-        ;; 
+case "$ACTION" in
+  run)
+    $APP_NAME server grace
+    $APP_NAME compile dev
+    $APP_NAME server dev &
+    ;;
 
-      *)
-        sh_color RED "!!! {{Invalid option given}} for run: $@"
-        exit 2
-        ;;
-    esac
+  watch)
+    $APP_NAME watch run $ARGS || :
+    process watch "-r src -r bin -r spec -r compile" "$APP_NAME watch run"
     ;;
 
   *)
-    local +x ARGS="$(echo $@)"
-    ARGS="${ARGS:-dev}"
-
-    $APP_NAME watch run $ARGS || :
-    mksh_setup watch \
-      "-r src -r bin -r spec -r compile" \
-      "$APP_NAME watch run $ARGS"
+    sh_color RED "=== Unknown command: {{$ACTION $@}}"
+    exit 2
     ;;
 esac
 

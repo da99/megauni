@@ -22,7 +22,8 @@ case "$TARGET" in
     ;;
 
   dev)
-    "$CRYSTAL" build src/${APP_NAME}.cr
+    mkdir -p tmp/out
+    "$CRYSTAL" build src/megauni.cr -o tmp/out/megauni
     ;;
 
   prod)

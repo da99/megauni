@@ -1,15 +1,15 @@
-#!/usr/bin/env mksh
+#!/usr/bin/env zsh
 #
 #
-
 set -u -e -o pipefail
 
 local +x THE_ARGS="$@"
 local +x THIS_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
 
-PATH="$PATH:$THIS_DIR/../mksh_setup/bin"
 PATH="$PATH:$THIS_DIR/../sh_color/bin"
+PATH="$PATH:$THIS_DIR/../process/bin"
 PATH="$PATH:$THIS_DIR/../my_crystal/bin"
+PATH="$PATH:$THIS_DIR/../my_zsh/bin"
 PATH="$PATH:$THIS_DIR/bin"
 
 local +x APP_NAME="$(basename "$THIS_DIR")"
@@ -23,19 +23,10 @@ fi
 case $ACTION in
 
   help|--help|-h)
-    PATH="$PATH:$THIS_DIR/../mksh_setup/bin"
-    mksh_setup print-help $0 "$@"
+    my_zsh print-help $0 "$@"
     ;;
 
   *)
-
-    local +x FUNC_FILE="$THIS_DIR/bin/public/${ACTION}/_.sh"
-    if [[ -s  "$FUNC_FILE"  ]]; then
-      source "$FUNC_FILE"
-      "$ACTION" "$@"
-      exit 0
-    fi
-
     local +x SH_FILE="$THIS_DIR/sh/${ACTION}/_"
     if [[ -s "$SH_FILE" ]]; then
       source "$SH_FILE"
@@ -43,14 +34,14 @@ case $ACTION in
     fi
 
     # === Check progs/bin:
-    if [[ -f "$THIS_DIR/progs/bin/$ACTION" ]]; then
-      export PATH="$THIS_DIR/progs/bin:$PATH"
-      "$THIS_DIR"/progs/bin/$ACTION "$@"
+    if [[ -f "$THIS_DIR/tmp/bin/$ACTION" ]]; then
+      export PATH="$THIS_DIR/tmp/bin:$PATH"
+      "$THIS_DIR"/tmp/bin/$ACTION "$@"
       exit 0
     fi
 
     # === It's an error:
-    echo "!!! Unknown action: $ACTION" 1>&2
+    echo "!!! Unknown action: $ACTION" >&2
     exit 1
     ;;
 

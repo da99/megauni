@@ -3,11 +3,8 @@ version: 0.1.0
 license: MIT
 
 dependencies:
-  kemal:
-    github: kemalcr/kemal
-    branch: master
-  kemal-session:
-    github: kemalcr/kemal-session
+  da_router:
+    github: da99/da_router.cr
     branch: master
   da_html:
     github: da99/da_html.cr

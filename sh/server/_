@@ -12,9 +12,17 @@ case "$@" in
     fi
     ;;
 
+  dev!)
+    rm -f "tmp/out/megauni"
+    megauni.cr server dev
+    ;;
+
   dev)
+    if [[ ! -f "tmp/out/megauni" ]]; then
+      megauni.cr compile dev
+    fi
     sh_color YELLOW "=== Running server: {{$@}} ..."
-    tmp/$APP_NAME
+    tmp/out/megauni
     ;;
 
   *)

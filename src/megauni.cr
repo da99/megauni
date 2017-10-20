@@ -1,9 +1,11 @@
 
-require "kemal"
-require "kemal-session"
+require "http"
+require "./router"
 
-get "/" do
-  "hello"
+server = HTTP::Server.new(3000) do |ctx|
+  MU::Router.fulfill(ctx)
 end
 
-Kemal.run
+server.listen
+
+
