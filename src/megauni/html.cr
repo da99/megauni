@@ -8,7 +8,7 @@ class MU_HTML
   def self.write(file : String)
     page = new
     with page yield
-    new_html_file = "Public" + file.sub(__DIR__, "").sub(/\.cr$/, "")
+    new_html_file = "Public" + file.gsub(/#{__DIR__}|\.cr$/, "")
     Dir.mkdir_p(File.dirname(new_html_file))
     File.write(new_html_file, page.to_html)
 
