@@ -13,7 +13,7 @@ struct MU_DEV_ROUTER
   end # === def get_root
 
   def get_file(folder : String, filename : String)
-    ctx.request.path = ctx.request.path.sub("/megauni/static", "")
+    ctx.request.path = ctx.request.path.sub("/megauni/files", "")
     @@file_handler.call(ctx)
   end
 

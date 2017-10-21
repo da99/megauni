@@ -40,7 +40,7 @@ class MU_ROUTER
     route(ctx) do
       {% if env("DEVELOPMENT") %}
         get("/", MU_DEV_ROUTER, :homepage)
-        get("/megauni/static/:folder/:filename", MU_DEV_ROUTER, :file)
+        get("/megauni/files/:folder/:filename", MU_DEV_ROUTER, :file)
       {% end %}
 
       get("/hello/world", MU_ROUTER, :hello)

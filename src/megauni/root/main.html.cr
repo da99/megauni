@@ -4,6 +4,7 @@ MU_HTML.write(__FILE__) {
   html {
     head {
       title "Homepage"
+      stylesheet
     }
     body {
       p { "main"}
