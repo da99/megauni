@@ -13,10 +13,10 @@ class MU_HTML
   end # === def self.folder_action
 
   macro stylesheet
-    %pieces = __FILE__.split("/")
+    %pair = MU_HTML.folder_action(__FILE__)
     io.write_closed_tag(
       "link",
-      {"href",  "/megauni/files/#{%pieces[-2]}/#{%pieces.last.sub(".html.cr", ".css")}" },
+      {"href",  "/megauni/files/#{%pair.first}/#{%pair.last}.css" },
       {"rel",   "stylesheet" },
       {"title", "Default"}
     )
