@@ -8,12 +8,17 @@ else
 fi
 
 case "$ACTION" in
+  static)
+    ASSET_COMPILE="yes" my_crystal __ build src/megauni.cr -o tmp/out/megauni.static
+    tmp/out/megauni.static
+    ;;
+
   run)
     reset
     mkdir -p tmp/in tmp/out
 
-    sh_color ORANGE "=== {{Compiling}} html..."
-    megauni.cr html
+    sh_color ORANGE "=== {{Compiling}} static assets..."
+    megauni.cr dev static
 
     sh_color ORANGE "=== {{Compiling}} server..."
     my_crystal __ build src/megauni/server.cr -o tmp/out/megauni.server

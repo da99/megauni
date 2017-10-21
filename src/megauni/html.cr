@@ -17,10 +17,4 @@ class MU_HTML
 
 end # === struct MU_HTML
 
-{% if env("HTML_COMPILE") %}
-  {% for name in `find #{__DIR__}/ -mindepth 2 -maxdepth 2 -type f -name *.html.cr`.split %}
-    require "./{{name.gsub(/#{__DIR__}|\.cr$/, "").id}}"
-  {% end %}
-{% end %}
-
 
