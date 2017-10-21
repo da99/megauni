@@ -12,8 +12,11 @@ case "$ACTION" in
     reset
     mkdir -p tmp/in tmp/out
 
-    sh_color ORANGE "=== {{Compiling}}..."
-    my_crystal __ build src/server.cr -o tmp/out/megauni.server
+    sh_color ORANGE "=== {{Compiling}} html..."
+    megauni.cr html
+
+    sh_color ORANGE "=== {{Compiling}} server..."
+    my_crystal __ build src/megauni/server.cr -o tmp/out/megauni.server
 
     sh_color ORANGE "=== {{Terminating}} previous server..."
     pkill -f "tmp/out/megauni.server" || :

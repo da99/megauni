@@ -1,4 +1,4 @@
 
-require "./server"
 
+require "./megauni/server"
 

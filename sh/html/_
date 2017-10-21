@@ -1,0 +1,30 @@
+#!/usr/bin/env zsh
+#
+# === {{CMD}} [run]
+# === Compiles HTML files into Public/
+#
+set -u -e -o pipefail
+
+local +x ORIGINAL_ARGS="$@"
+if [[ -z "$@" ]]; then
+  local +x ACTION=run
+else
+  local +x ACTION=$1; shift
+fi
+
+case "$ACTION" in
+
+  run)
+    cd "$THIS_DIR"
+    mkdir -p tmp/out
+    HTML_COMPILE="yes" my_crystal __ build src/megauni/html.cr -o tmp/out/megauni.html
+    tmp/out/megauni.html
+    ;;
+
+  *)
+    echo "!!! Unknown arguments: $ORIGINAL_ARGS" >&2
+    exit 1
+    ;;
+
+esac
+
