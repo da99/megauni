@@ -21,7 +21,7 @@ case "$ACTION" in
     megauni.cr dev static
 
     sh_color ORANGE "=== {{Compiling}} server..."
-    my_crystal __ build src/megauni/server.cr -o tmp/out/megauni.server
+    DEVELOPMENT=yes my_crystal __ build src/megauni/server.cr -o tmp/out/megauni.server
 
     sh_color ORANGE "=== {{Terminating}} previous server..."
     pkill -f "tmp/out/megauni.server" || :
