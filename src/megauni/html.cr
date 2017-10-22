@@ -1,20 +1,14 @@
 
 require "da_html"
+require "./common"
 require "secure_random"
 
 class MU_HTML
 
   include DA_HTML
 
-  def self.folder_action(file : String)
-    pieces = file.split("/")
-    folder = pieces[-2]
-    action = pieces.last.sub(/.html.cr$/, "")
-    { folder, action }
-  end # === def self.folder_action
-
   macro stylesheet
-    %pair = MU_HTML.folder_action(__FILE__)
+    %pair = MU_COMMON.model_and_action(__FILE__)
     io.write_closed_tag(
       "link",
       {"href",  "/megauni/files/#{%pair.first}/#{%pair.last}.css" },
@@ -24,7 +18,7 @@ class MU_HTML
   end # === def stylesheet
 
   def self.write(file : String)
-    pair = folder_action(file)
+    pair = MU_COMMON.model_and_action(file)
 
     page   = new
     with page yield

@@ -1,10 +1,10 @@
 
 require "da_router"
 require "./html"
-require "./root/router"
+require "./model/root/router"
 
 {% if env("DEVELOPMENT") %}
-  require "./dev/router"
+  require "./model/dev/router"
 {% end %}
 
 class MU_ROUTER

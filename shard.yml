@@ -1,6 +1,5 @@
 name: megauni
 version: 0.1.0
-license: MIT
 
 dependencies:
   da_router:
@@ -8,9 +7,7 @@ dependencies:
     branch: master
   da_html:
     github: da99/da_html.cr
-    branch: master
   da_style:
     github: da99/da_style.cr
-    branch: master
   kemal-session:
     github: kemalcr/kemal-session
