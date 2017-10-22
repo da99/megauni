@@ -27,7 +27,7 @@ case "$ACTION" in
     pkill -f "tmp/out/megauni.server" || :
 
     sh_color ORANGE "=== {{Running}}..."
-    tmp/out/megauni.server &
+    HTTP_SERVER_SESSION_SECRET="0x340x46nasfiermoe$(date +%s)" tmp/out/megauni.server &
     my_network inspect "http://localhost:3000/"
     my_network inspect "http://localhost:3000/megauni/files/root/main.css"
     ;;

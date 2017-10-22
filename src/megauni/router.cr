@@ -11,13 +11,9 @@ class MU_ROUTER
 
   include DA_ROUTER
 
-  getter :ctx
-  def initialize(@ctx : HTTP::Server::Context)
+  getter ctx : HTTP::Server::Context
+  def initialize(@ctx)
   end # === def initialize
-
-  def write(s)
-    ctx.response << s
-  end
 
   macro write_html
     ctx.response.content_type = "text/html; charset=utf-8"
@@ -29,11 +25,11 @@ class MU_ROUTER
   end
 
   def get_hello
-    write "Hello, World: #{ ctx.request.method }"
+    write_html { p { "Hello, World: #{ ctx.request.method }" } }
   end # === def get_hello
 
   def get_hello_more
-    write "Hello, The Entire World: #{ ctx.request.method }"
+    write_html { p { "Hello, The Entire World: #{ ctx.request.method }" } }
   end # === def get_hello_more
 
   def self.fulfill(ctx)
@@ -41,6 +37,8 @@ class MU_ROUTER
       {% if env("DEVELOPMENT") %}
         get("/", MU_DEV_ROUTER, :homepage)
         get("/megauni/files/:folder/:filename", MU_DEV_ROUTER, :file)
+        get("/write", MU_DEV_ROUTER, :write_session)
+        get("/read", MU_DEV_ROUTER, :read_session)
       {% end %}
 
       get("/hello/world", MU_ROUTER, :hello)

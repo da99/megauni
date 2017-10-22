@@ -1,5 +1,6 @@
 
 require "da_html"
+require "secure_random"
 
 class MU_HTML
 

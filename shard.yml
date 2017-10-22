@@ -12,4 +12,5 @@ dependencies:
   da_style:
     github: da99/da_style.cr
     branch: master
-
+  kemal-session:
+    github: kemalcr/kemal-session
