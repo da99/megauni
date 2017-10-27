@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+HTML5-Reset@murtaugh/HTML5-Reset:
+  version "2.1.7"
+  resolved "https://codeload.github.com/murtaugh/HTML5-Reset/tar.gz/f5b50790f0410254f871f4f2513d6c2c4c1bc35c"
+
 da_standard@da99/da_standard.jspp:
   version "7.0.1"
   resolved "https://codeload.github.com/da99/da_standard.jspp/tar.gz/6c88d7cc5e177327f32d9d6e1b8dc9d6eddd4e14"

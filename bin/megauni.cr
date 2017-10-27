@@ -11,6 +11,7 @@ PATH="$PATH:$THIS_DIR/../process/bin"
 PATH="$PATH:$THIS_DIR/../my_crystal/bin"
 PATH="$PATH:$THIS_DIR/../my_zsh/bin"
 PATH="$PATH:$THIS_DIR/../my_network/bin"
+PATH="$PATH:$THIS_DIR/../my_jspp/bin"
 PATH="$PATH:$THIS_DIR/bin"
 
 local +x APP_NAME="$(basename "$THIS_DIR")"

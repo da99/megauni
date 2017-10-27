@@ -4,10 +4,11 @@ MU_HTML.write(__FILE__) {
   html {
     head {
       title "Homepage"
-      stylesheet
+      stylesheet!
     }
     body {
       p { "main"}
     }
+    script!
   }
 }

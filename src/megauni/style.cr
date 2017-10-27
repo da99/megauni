@@ -8,6 +8,11 @@ class MU_STYLE
   create_property "font-weight"
   create_keyword "bold"
 
+  def initialize
+    io.raw! File.read("#{__DIR__}/../../node_modules/HTML5-Reset/assets/css/reset.css")
+    io.raw! File.read("#{__DIR__}/../../node_modules/HTML5-Reset/assets/css/style.css")
+  end
+
   def self.to_css
     sheet = new
     with sheet yield

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "HTML5-Reset": "murtaugh/HTML5-Reset",
     "da_standard": "da99/da_standard.jspp"
   }
 }

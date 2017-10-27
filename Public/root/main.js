@@ -1,0 +1,3 @@
+// Compiled with JS++ v.0.7.0
+
+!function(){var System;System={};System.Console={};System.Console.jsLog=function(){if(typeof console!=="undefined"&&typeof console.log==="function"){return(console.log);}else if(typeof print==="function"){return(print);}else {return((function(){}));}}();System.Console.jsConsoleThis=function(){if(typeof console!=="undefined"&&typeof console.log==="function"){return(console);}else {return(void 0);}}();!function(){System.Console.jsLog.apply(System.Console.jsConsoleThis,["loaded root"]);}();}();

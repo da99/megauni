@@ -7,7 +7,16 @@ class MU_HTML
 
   include DA_HTML
 
-  macro stylesheet
+  macro script!
+    io.write_tag("script") do
+      %pair = MU_COMMON.model_and_action(__FILE__)
+      io.write_attr "type", "application/javascript"
+      io.write_attr "src", "/megauni/files/#{%pair.first}/#{%pair.last}.js"
+      io.write_content { }
+    end
+  end # === macro script
+
+  macro stylesheet!
     %pair = MU_COMMON.model_and_action(__FILE__)
     io.write_closed_tag(
       "link",
