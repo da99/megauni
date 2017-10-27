@@ -6,6 +6,10 @@ class MU_STYLE
   include DA_STYLE
 
   create_property "font-weight"
+  create_property "background"
+  create_property "color"
+  create_property "margin"
+  create_property "padding"
   create_keyword "bold"
 
   def initialize
