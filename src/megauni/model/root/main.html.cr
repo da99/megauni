@@ -15,11 +15,24 @@ MU_HTML.write(__FILE__) {
       section {
         h2 "Log-In"
         form {
+          fieldset {
+            label { "Screen Name" }
+            screen_name_input
+          }
+
+          fieldset {
+            label {
+              span { "Pass Phrase" }
+              span("sub") { "(spaces allowed)" }
+            }
+            pass_phrase_input
+          }
+
           nav {
             button("submit") { "Log-In" }
           }
-        }
-      }
+        } # === form
+      } # === section
 
       section {
         h2 "Create A New Account"
@@ -32,7 +45,7 @@ MU_HTML.write(__FILE__) {
           fieldset {
             label {
               span { "Pass Phrase" }
-              sub { "(spaces allowed)" }
+              span("sub") { "(spaces allowed)" }
             }
             pass_phrase_input
           }

@@ -1,16 +1,25 @@
 
 require "da_style"
+require "./common"
 
 class MU_STYLE
 
   include DA_STYLE
 
-  create_property "font-weight"
-  create_property "background"
-  create_property "color"
-  create_property "margin"
-  create_property "padding"
+  def grey
+    hex("#F3F3F3")
+  end
+
+  {% for name in %w(display text-align font-weight font-size background-color color margin padding float) %}
+    def {{name.gsub(/-/,"_").id}}(*args)
+      io.write_property({{name}}, *args)
+    end
+  {% end %}
+
   create_keyword "bold"
+  create_keyword "left"
+  create_keyword "right"
+  create_keyword "block"
 
   def initialize
     io.raw! File.read("#{__DIR__}/../../node_modules/HTML5-Reset/assets/css/reset.css")

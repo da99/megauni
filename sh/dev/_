@@ -8,16 +8,35 @@ else
 fi
 
 case "$ACTION" in
-  static)
-    ASSET_COMPILE="yes" my_crystal __ build src/megauni.cr -o tmp/out/megauni.static
-    tmp/out/megauni.static
+  css)
+    sh_color ORANGE "=== {{Compiling}} css..."
+    CSS_COMPILE="yes" my_crystal __ build src/megauni.cr -o tmp/out/megauni.static.css
+    tmp/out/megauni.static.css
+    ;;
 
+  html)
+    sh_color ORANGE "=== {{Compiling}} html..."
+    HTML_COMPILE="yes" my_crystal __ build src/megauni.cr -o tmp/out/megauni.static.html
+    tmp/out/megauni.static.html
+    ;;
+
+  js)
+    sh_color ORANGE "=== {{Compiling}} js..."
     my_jspp __ src/megauni/model/root/main.jspp node_modules/da_standard/src/*.jspp -o Public/root/main.js
+    ;;
+
+  static)
+    megauni.cr dev css
+    megauni.cr dev html
+    megauni.cr dev js
     ;;
 
   run)
     reset
     mkdir -p tmp/in tmp/out
+
+    megauni.cr dev html
+    return 0
 
     sh_color ORANGE "=== {{Compiling}} static assets..."
     megauni.cr dev static
@@ -49,4 +68,5 @@ case "$ACTION" in
     exit 2
     ;;
 esac
+
 
