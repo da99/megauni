@@ -24,6 +24,19 @@ case "$ACTION" in
     process watch "-r sh -r specs -r src" "$CMD"
     ;;
 
+  restart-server)
+    reset
+    if megauni.cr server is-running ; then
+      sh_color ORANGE "=== {{Stopping}} server..."
+      megauni.cr server stop
+    fi
+    sh_color ORANGE "=== {{Running}} server..."
+    ( megauni.cr server start ) &
+    sleep 1
+    curl http://localhost:3000/
+    echo "====================="
+    ;;
+
   run)
     cd "$THIS_DIR"
     mkdir -p tmp/in tmp/out
@@ -35,12 +48,11 @@ case "$ACTION" in
       *".cr")
         sh_color ORANGE "=== {{Compiling}} server..."
         SERVER="yes" my_crystal __ build src/megauni/server.cr -o tmp/out/server
-        if megauni.cr server is-running ; then
-          sh_color ORANGE "=== {{Stopping}} server..."
-          megauni.cr server stop
-        fi
-        sh_color ORANGE "=== {{Running}} server..."
-        ( megauni.cr server start ) &
+        megauni.cr specs restart-server
+        ;;
+
+      *.html)
+        megauni.cr specs restart-server
         ;;
 
       *)

@@ -1,5 +1,6 @@
 
 require "http"
+require "./mu_html"
 require "./router"
 require "kemal-session"
 

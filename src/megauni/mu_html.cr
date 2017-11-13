@@ -1,23 +1,32 @@
 
 require "../megauni"
 require "da_html"
-require "./common"
-require "secure_random"
+# require "secure_random"
 
 class MU_HTML
 
-  {% begin %}
-    PUBLIC_DIR = "{{ system("pwd").strip.id }}/Public"
-  {% end %}
-
   include DA_HTML::Printer
+
+  # new_from_da_html("")
+
+  def self.parse(model, action)
+    { MU_HTML::Parser.new(File.read("src/megauni/model/#{model}/#{action}/markup.html")).parse, model, action}
+  end # === macro parse
+
+  # macro file_read!(model, action)
+  #   begin
+  #     {{ system("cat src/megauni/model/#{model}/#{action}/markup.html").strip.stringify }}
+  #   end
+  # end # === macro read!
+
+  PUBLIC_DIR = "#{File.expand_path "#{__DIR__}/../.."}/Public"
 
   class Parser
     include DA_HTML::Parser
 
     def allow(name : String, x : XML::Node)
       case name
-      when "doctype", "html"
+      when "doctype!", "html"
         allow_document_tag(x)
       when "script"
         allow_html_tag(x)
@@ -25,11 +34,19 @@ class MU_HTML
         allow_head_tag(x)
       when "body", "p", "div", "h1", "h2", "h3"
         allow_body_tag(x)
-      when "fieldset", "label", "button"
+      when "pass_phrase_input"
+        in_tree! x, "form"
+        allow_body_tag(x, confirm: //)
+      when "fieldset", "label", "screen_name_input"
         in_tree! x, "form"
         allow_body_tag(x)
-      when "nav", "sub", "legend", "section"
+      when "span", "button"
+        in_tree! x, "form"
+        allow_body_tag(x, class: DA_HTML::SEGMENT_ATTR_CLASS)
+      when "header", "nav", "sub", "legend", "section", "form"
         allow_body_tag(x)
+      when "span"
+        allow_body_tag(x, class: DA_HTML::SEGMENT_ATTR_CLASS)
       end # === case name
     end # === def allow
   end # === class Parser
@@ -64,7 +81,7 @@ class MU_HTML
     when i.open_tag?("pass_phrase_input")
       prefix = if doc.current.attr?
                  attr = doc.grab_current
-                 attr.attr_content
+                 attr.attr_name
                else
                  ""
                end
@@ -88,24 +105,34 @@ class MU_HTML
 
   property data = {} of String => String | Int32
 
-  def self.to_html(html : String, data : Hash(String, String | Int32) = {} of String => String | Int32)
-    page = new(html, PUBLIC_DIR)
+  def self.to_html(
+    html : String,
+    data : Hash(String, String | Int32) = {} of String => String | Int32
+  )
+    page = MU_HTML.new(html, PUBLIC_DIR)
     page.data = {"site_name" => "megaUNI"}.merge(data)
     page.to_html
   end # === def self.to_html
 
-  def self.write_from_frile(file : String, *args)
+  def self.to_html(model : String, action : String, data : Hash(String, String | Int32) = {} of String => String | Int32)
+    file = "src/megauni/model/#{model}/#{action}/index.html"
+    html = File.read(file)
+    page = MU_HTML.new(html, PUBLIC_DIR)
+    page.data = {"site_name" => "megaUNI"}.merge(data)
+    page.to_html
+  end # === def self.to_html
+
+  def self.write_from_file(file : String, *args)
     model, action = MU_COMMON.model_and_action(file)
     html = File.read(file)
     write(mode, action, html, *args)
   end # === def self.write
 
   def self.write(model : String, action : String, html : String, raw_data = {} of String => String | Int32)
-
     data = {
       "model!" => model,
       "action!" => action
-    }.merge(raw_data)
+    }.merge!(raw_data)
 
     new_html_file = "Public/#{model}/#{action}.html"
     new_html = to_html(html, data)
@@ -115,5 +142,18 @@ class MU_HTML
 
     puts "=== wrote: #{new_html_file}"
   end # === def self.write
+
+  module INIT
+    def initialize(doc, model, action)
+      @file_dir = PUBLIC_DIR
+      @doc = DA_HTML::Doc.new(doc)
+      @data = {} of String => String | Int32
+      @data["model!"] = model
+      @data["action!"] = action
+    end # === def initialize
+  end # === module INIT
+
+  include INIT
+
 end # === struct MU_HTML
 

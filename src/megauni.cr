@@ -8,6 +8,14 @@ module MEGAUNI
 
 end # === module MEGAUNI
 
+{% if env("IS_DEV") %}
+  def inspect!(*args)
+    puts(args.map { |x|
+      x.inspect
+    }.join(", "))
+  end # === macro inspect!
+{% end %}
+
 {% if env("CSS_COMPILE") %}
   require "./megauni/style"
 

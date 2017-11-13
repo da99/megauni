@@ -1,43 +1,51 @@
 
 require "da_router"
-require "./html"
+
+module MU_ROUTER
+
+  include DA_ROUTER
+  macro included
+    include DA_ROUTER
+  end # === macro included
+
+  getter ctx : HTTP::Server::Context
+  def initialize(@ctx)
+  end # === def initialize
+
+  def html(model : String, action : String, *args)
+    ctx.response.content_type = "text/html; charset=utf-8"
+    ctx.response << (
+      MU_HTML.to_html( model, action, *args )
+    )
+  end # === macro html
+
+  def html(doc : DA_HTML::DOC, model : String, action : String)
+    ctx.response.content_type = "text/html; charset=utf-8"
+    ctx.response << (
+      MU_HTML.new(doc, model, action).to_html
+    )
+  end # === def html
+
+  def raw_html(raw : String)
+    ctx.response.content_type = "text/html; charset=utf-8"
+    ctx.response << (
+      MU_HTML.to_html(raw)
+    )
+  end # === macro html
+
+end # === class MU_ROUTER
+
 require "./model/root/router"
 
 {% if env("IS_DEV") %}
   require "./model/dev/router"
 {% end %}
 
-class MU_ROUTER
-
-  include DA_ROUTER
-
-  getter ctx : HTTP::Server::Context
-  def initialize(@ctx)
-  end # === def initialize
-
-  macro html(raw)
-    ctx.response.content_type = "text/html; charset=utf-8"
-    ctx.response << (
-      MU_HTML.to_html(
-        {{raw}}
-      )
-    )
-  end
-
-  get "/hello/world" do
-    html "<p>Hello, World: #{ ctx.request.method }</p>"
-  end # === def get_hello
-
-  get("/hello/the/entire/world") do
-    html "<p>Hello, The Entire World: #{ ctx.request.method }</p>"
-  end # === def get_hello_more
-
+module MU_ROUTER
   def self.fulfill(ctx)
     DA_ROUTER.route!(ctx)
-
     ctx.response.status_code = 404
     ctx.response << "missing: #{ ctx.request.method } #{ctx.request.path}"
   end
-
-end # === class MU_ROUTEr
+end # === module MU_ROUTER
 
