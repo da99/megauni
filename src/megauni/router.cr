@@ -12,13 +12,6 @@ module MU_ROUTER
   def initialize(@ctx)
   end # === def initialize
 
-  def html(model : String, action : String, *args)
-    ctx.response.content_type = "text/html; charset=utf-8"
-    ctx.response << (
-      MU_HTML.to_html( model, action, *args )
-    )
-  end # === macro html
-
   def html(doc : DA_HTML::DOC, model : String, action : String)
     ctx.response.content_type = "text/html; charset=utf-8"
     ctx.response << (
