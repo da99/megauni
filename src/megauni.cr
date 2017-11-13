@@ -29,6 +29,3 @@ end # === module MEGAUNI
 {% end %}
 
 
-{% if env("PRODUCTION") %}
-  require "./megauni/server"
-{% end %}

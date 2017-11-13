@@ -1,14 +1,40 @@
-#!/usr/bin/env mksh
+#!/usr/bin/env zsh
 
 # === {{CMD}} dev
-# === {{CMD}} grace
+# === {{CMD}} grace|stop|quit
+local +x cmd="megauni.cr server start"
 case "$@" in
 
-  grace)
-    local +x cmd="tmp/$APP_NAME"
-    pkill -f "$cmd" || :
-    if pgrep $cmd ; then
-      echo "=== Could not pkill: $cmd";
+  is-running)
+    pgrep "$cmd" 
+    ;;
+
+  is-stopped)
+    ! megauni.cr is-running
+    ;;
+
+  grace|stop|quit)
+    if megauni.cr server is-running ; then
+      sh_color ORANGE "=== No {{server}} found."
+    else
+      pkill -f "$cmd" || {
+        stat="$?"
+        sh_color RED "!!! Could not kill server process. Exited: $stat"
+      }
+
+      process run-every-until 1s megauni.cr server is-stopped
+      if megauni.cr server is-running ; then
+        echo "=== Could not pkill: $cmd";
+      fi
+    fi
+    ;;
+
+  start)
+    if [[ -z "$IS_DEV" ]]; then
+      sh_color RED "!!! server binary not found."
+      exit 2
+    else
+      HTTP_SERVER_SESSION_SECRET="$(date)$(date)" tmp/out/server
     fi
     ;;
 

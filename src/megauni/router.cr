@@ -15,21 +15,21 @@ class MU_ROUTER
   def initialize(@ctx)
   end # === def initialize
 
-  macro write_html
+  macro html(raw)
     ctx.response.content_type = "text/html; charset=utf-8"
     ctx.response << (
-      MU_HTML.to_html {
-        {{yield}}
-      }
+      MU_HTML.to_html(
+        {{raw}}
+      )
     )
   end
 
   get "/hello/world" do
-    write_html { p { "Hello, World: #{ ctx.request.method }" } }
+    html "<p>Hello, World: #{ ctx.request.method }</p>"
   end # === def get_hello
 
   get("/hello/the/entire/world") do
-    write_html { p { "Hello, The Entire World: #{ ctx.request.method }" } }
+    html "<p>Hello, The Entire World: #{ ctx.request.method }</p>"
   end # === def get_hello_more
 
   def self.fulfill(ctx)

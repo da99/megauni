@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>{site_name}: Home</title>
+      <stylesheet>
+  </head>
+  <body>
+      <header>
+        <h1>{site_name}</h1>
+      </header>
+      <section>
+        <h2>Log-In</h2>
+        <form>
+          <fieldset>
+            <label>Screen Name</label>
+            <screen_name_input>
+          </fieldset>
+
+          <fieldset>
+            <label>
+              <span>Pass Phrase</span>
+              <span class="sub">(spaces allowed)</span>
+            </label>
+            <pass_phrase_input>
+          </fieldset>
+
+          <nav>
+            <button class="submit">Log-In</button>
+          </nav>
+        </form>
+      </section>
+
+      <section>
+        <h2>Create A New Account</h2>
+        <form>
+          <fieldset>
+            label { "Screen Name" }
+            screen_name_input
+          </fieldset>
+
+          <fieldset>
+            <label>
+              <span>Pass Phrase</span>
+              <span class="sub">(spaces allowed)</span>
+            </label>
+            <pass_phrase_input>
+          </fieldset>
+
+          <fieldset>
+            label { "Confirm Pass Phrase" }
+            pass_phrase_input("confirm")
+          </fieldset>
+
+          <nav>
+            button("submit") { "Create" }
+          </nav>
+        </form> # === form
+      </section>
+  </body>
+  <script>
+</html>
+

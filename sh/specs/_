@@ -1,0 +1,58 @@
+#!/usr/bin/env zsh
+#
+# === {{CMD}}
+#
+set -u -e -o pipefail
+
+local +x ORIGINAL_ARGS="$@"
+if [[ -z "$@" ]]; then
+local +x ACTION="watch"
+else
+  local +x ACTION=$1; shift
+fi
+
+case "$ACTION" in
+
+  watch)
+    if [[ -z "${IS_DEV:-}" ]]; then
+      sh_color RED "!!! Run only on a {{DEV}} machine."
+      exit 2
+    fi
+
+    local +x CMD="megauni.cr specs run"
+    ${=CMD} || :
+    process watch "-r sh -r specs -r src" "$CMD"
+    ;;
+
+  run)
+    cd "$THIS_DIR"
+    mkdir -p tmp/in tmp/out
+    case "${CHANGED_FILE:-any.cr}" in
+      *"/_")
+        CHANGED_FILE=any.cr megauni.cr specs run
+        ;;
+
+      *".cr")
+        sh_color ORANGE "=== {{Compiling}} server..."
+        SERVER="yes" my_crystal __ build src/megauni/server.cr -o tmp/out/server
+        if megauni.cr server is-running ; then
+          sh_color ORANGE "=== {{Stopping}} server..."
+          megauni.cr server grace
+        fi
+        sh_color ORANGE "=== {{Running}} server..."
+        ( megauni.cr server start ) &
+        ;;
+
+      *)
+        sh_color ORANGE "=== Don't know what to do about file: $CHANGED_FILE"
+        ;;
+    esac
+    ;;
+
+  *)
+    echo "!!! Unknown arguments: $ORIGINAL_ARGS" >&2
+    exit 1
+    ;;
+
+esac
+

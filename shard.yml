@@ -4,7 +4,6 @@ version: 0.1.0
 dependencies:
   da_router:
     github: da99/da_router.cr
-    branch: master
   da_style:
     github: da99/da_style.cr
   kemal-session:
