@@ -6,23 +6,44 @@ local +x cmd="megauni.cr server start"
 case "$@" in
 
   is-running)
-    pgrep "$cmd" 
+    if pgrep -f "$cmd" &>/dev/null; then
+      exit 0
+    fi
+    exit 1
     ;;
 
   is-stopped)
-    ! megauni.cr is-running
+    if megauni.cr server is-running &>/dev/null; then
+      exit 1
+    fi
+    exit 0
     ;;
 
   grace|stop|quit)
-    if megauni.cr server is-running ; then
+    if ! megauni.cr server is-running ; then
       sh_color ORANGE "=== No {{server}} found."
     else
-      pkill -f "$cmd" || {
-        stat="$?"
-        sh_color RED "!!! Could not kill server process. Exited: $stat"
-      }
+      local +x pid="$( pgrep -f "$cmd" || : )"
 
-      process run-every-until 1s megauni.cr server is-stopped
+      if [[ -z "$pid" ]]; then
+        sh_color ORANGE "=== No {{server}} found."
+        exit 0
+      fi
+
+      if [[ "$(echo "$pid" | wc -l)" -gt "1" ]]; then
+        sh_color RED "!!! Too many server pids found."
+        exit 2
+      fi
+
+      for cpid in $(process child-pids $pid); do
+        kill -TERM ${cpid} || {
+          stat="$?"
+          sh_color RED "!!! Could not kill -$cpid. Exited: $stat"
+        }
+      done
+      kill -TERM $pid
+
+      process loop every 1 max 10 or until megauni.cr server is-stopped
       if megauni.cr server is-running ; then
         echo "=== Could not pkill: $cmd";
       fi

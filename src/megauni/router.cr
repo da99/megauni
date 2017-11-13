@@ -3,7 +3,7 @@ require "da_router"
 require "./html"
 require "./model/root/router"
 
-{% if env("DEVELOPMENT") %}
+{% if env("IS_DEV") %}
   require "./model/dev/router"
 {% end %}
 
