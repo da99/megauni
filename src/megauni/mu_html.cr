@@ -5,9 +5,17 @@ require "da_html"
 
 class MU_HTML
 
+  PATTERN_VAR       = /\{\{[A-Z0-9\_]+\}\}/
+  PATTERN_VAR_SPLIT = /(#{PATTERN_VAR})/
+  PATTERN_IS_VAR    = /^#{PATTERN_VAR}$/
+
   include DA_HTML::Printer
 
-  # new_from_da_html("")
+  def self.default_data
+    {
+      "SITE_NAME" => "megaUNI"
+    } of String => String | Int32
+  end # === def self.default_data
 
   def self.parse(model, action)
     { MU_HTML::Parser.new(File.read("src/megauni/model/#{model}/#{action}/markup.html")).parse, model, action}
@@ -45,6 +53,18 @@ class MU_HTML
         allow_body_tag(x, class: DA_HTML::SEGMENT_ATTR_CLASS)
       when "header", "nav", "sub", "legend", "section", "form"
         allow_body_tag(x)
+      when "text!"
+        raw = x.content
+        return raw if !(raw.index("{{") && raw.index("}}"))
+        raw.split(PATTERN_VAR_SPLIT).each { |str|
+          if str =~ PATTERN_IS_VAR
+            doc.instruct "VAR!", str.strip("{}")
+          else
+            doc.instruct "text", str
+          end
+        }
+        :done
+
       when "span"
         allow_body_tag(x, class: DA_HTML::SEGMENT_ATTR_CLASS)
       end # === case name
@@ -52,12 +72,24 @@ class MU_HTML
   end # === class Parser
 
   def to_html(i : DA_HTML::Instruction)
-    %[<meta charset="UTF-8">]
     case
+    when i.open_tag?("head")
+      super
+      io.raw! %[<meta charset="UTF-8">]
+
     when i.open_tag?("script")
-      io.open_tag "script"
-      io.write_attr "type", "application/javascript"
-      io.write_attr "src", "/megauni/files/#{data["model!"]}/#{data["action!"]}.js"
+      io.open_attrs "script" do
+        io.write_attr "type", "application/javascript"
+        io.write_attr "src", "/megauni/files/#{data["model!"]}/#{data["action!"]}.js"
+      end
+
+    when i.is?("VAR!")
+      key = i.last
+      if data[key]?
+        io.write_text data[key].to_s
+      else
+        io.write_text "{{#{key}}}"
+      end
 
     when i.open_tag?("stylesheet")
       io.write_closed_tag(
@@ -144,10 +176,9 @@ class MU_HTML
   end # === def self.write
 
   module INIT
-    def initialize(doc, model, action)
+    def initialize(@doc, model, action)
       @file_dir = PUBLIC_DIR
-      @doc = DA_HTML::Doc.new(doc)
-      @data = {} of String => String | Int32
+      @data     = self.class.default_data
       @data["model!"] = model
       @data["action!"] = action
     end # === def initialize

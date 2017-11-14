@@ -12,7 +12,7 @@ module MU_ROUTER
   def initialize(@ctx)
   end # === def initialize
 
-  def html(doc : DA_HTML::DOC, model : String, action : String)
+  def html(doc : DA_HTML::Doc, model : String, action : String)
     ctx.response.content_type = "text/html; charset=utf-8"
     ctx.response << (
       MU_HTML.new(doc, model, action).to_html
