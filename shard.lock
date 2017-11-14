@@ -1,0 +1,34 @@
+version: 1.0
+shards:
+  da_html:
+    github: da99/da_html.cr
+    version: 2.3.3
+
+  da_html_escape:
+    github: da99/da_html_escape.cr
+    version: 3.0.1
+
+  da_router:
+    github: da99/da_router.cr
+    version: 2.0.1
+
+  da_string:
+    github: da99/da_string.cr
+    commit: 6d4f284c3cb85e1b12b6ba6ba6ad88efa6266983
+
+  da_style:
+    github: da99/da_style.cr
+    version: 2.2.0
+
+  da_uri:
+    github: da99/da_uri.cr
+    commit: e979a8a19220d21ad691630e6d1925b65d9d5e29
+
+  kemal-session:
+    github: kemalcr/kemal-session
+    version: 0.8.0
+
+  myhtml:
+    github: kostya/myhtml
+    commit: 69c8043590ca8bad58c84ab465e89f40dfbad07e
+
