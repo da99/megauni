@@ -176,7 +176,8 @@ class MU_HTML
   end # === def self.write
 
   module INIT
-    def initialize(@doc, model, action)
+    def initialize(doc, model, action)
+      @doc = doc.dup
       @file_dir = PUBLIC_DIR
       @data     = self.class.default_data
       @data["model!"] = model

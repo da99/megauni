@@ -14,8 +14,9 @@ module MU_ROUTER
 
   def html(doc : DA_HTML::Doc, model : String, action : String)
     ctx.response.content_type = "text/html; charset=utf-8"
+    html = MU_HTML.new(doc, model, action).to_html
     ctx.response << (
-      MU_HTML.new(doc, model, action).to_html
+      html
     )
   end # === def html
 
