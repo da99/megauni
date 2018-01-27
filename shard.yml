@@ -4,9 +4,15 @@ version: 0.1.0
 dependencies:
   da_router:
     github: da99/da_router.cr
-  da_style:
-    github: da99/da_style.cr
   kemal-session:
     github: kemalcr/kemal-session
   da_html:
     github: da99/da_html.cr
+  da_css:
+    github: da99/da_css.cr
+
+development_dependencies:
+  da_spec:
+    github: da99/da_spec.cr
+  inspect_bang:
+    github: da99/inspect_bang.cr
