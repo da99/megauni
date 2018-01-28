@@ -2,12 +2,14 @@ name: megauni
 version: 0.1.0
 
 dependencies:
-  da_router:
-    github: da99/da_router.cr
+  kemal:
+    github: kemalcr/kemal
   kemal-session:
     github: kemalcr/kemal-session
-  da_html:
-    github: da99/da_html.cr
+  html_builder:
+    github: crystal-lang/html_builder
+  da_router:
+    github: da99/da_router.cr
   da_css:
     github: da99/da_css.cr
 

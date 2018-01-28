@@ -52,11 +52,11 @@ case "$@" in
 
   start)
     if [[ -z "$IS_DEV" ]]; then
-      sh_color RED "!!! server binary not found."
+      sh_color RED "!!! Not on a dev machine."
       exit 2
-    else
-      HTTP_SERVER_SESSION_SECRET="$(date)$(date)" tmp/out/server
     fi
+    sh_color ORANGE "=== {{Starting}} server..."
+    HTTP_SERVER_SESSION_SECRET="$(date)$(date)" tmp/out/server
     ;;
 
   *)

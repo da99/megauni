@@ -8,32 +8,13 @@ module MEGAUNI
 
 end # === module MEGAUNI
 
-{% if env("IS_DEV") %}
-  def inspect!(*args)
-    puts(args.map { |x|
-      x.inspect
-    }.join(", "))
-  end # === macro inspect!
+require "./megauni/screen_name"
+require "./megauni/css"
+
+{% if env("INCLUDE_SPECS") %}
+  require "../specs/specs"
 {% end %}
 
-{% if env("CSS_COMPILE") %}
-  require "./megauni/style"
-
-  {% for name in `find #{__DIR__}/megauni/model -mindepth 2 -maxdepth 2 -type f -name *.cr`.split %}
-    {% if name =~ /\.(css)\.cr$/ %}
-      require ".{{name.gsub(/#{__DIR__}|\.cr$/, "").id}}"
-    {% end %}
-  {% end %}
+{% if env("INCLUDE_SERVER") %}
+  require "./megauni/server"
 {% end %}
-
-{% if env("HTML_COMPILE") %}
-  require "./megauni/html"
-
-  {% for name in `find #{__DIR__}/megauni/model -mindepth 2 -maxdepth 2 -type f -name *.cr`.split %}
-    {% if name =~ /\.(html)\.cr$/ %}
-      require ".{{name.gsub(/#{__DIR__}|\.cr$/, "").id}}"
-    {% end %}
-  {% end %}
-{% end %}
-
-

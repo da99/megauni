@@ -1,36 +1,40 @@
 
-struct MU_DEV_ROUTER
+module MEGAUNI
 
-  include MU_ROUTER
+  struct DEV_ROUTER
 
-  @@file_handler = HTTP::StaticFileHandler.new("Public", false, true)
+    include Router
 
-  get "/hello/world" do
-    raw_html "<p>Hello, World: #{ ctx.request.method }</p>"
-  end # === def get_hello
+    @@file_handler = HTTP::StaticFileHandler.new("Public", false, true)
 
-  get("/hello/the/entire/world") do
-    raw_html "<p>Hello, The Entire World: #{ ctx.request.method }</p>"
-  end # === def get_hello_more
+    get "/hello/world" do
+      raw_html "<p>Hello, World: #{ ctx.request.method }</p>"
+    end # === def get_hello
+
+    get("/hello/the/entire/world") do
+      raw_html "<p>Hello, The Entire World: #{ ctx.request.method }</p>"
+    end # === def get_hello_more
 
 
-  get "/megauni/files/:folder/:filename" do |folder, filename|
-    ctx.request.path = ctx.request.path.sub("/megauni/files", "")
-    @@file_handler.call(ctx)
-  end
+    get "/megauni/files/:folder/:filename" do |folder, filename|
+      ctx.request.path = ctx.request.path.sub("/megauni/files", "")
+      @@file_handler.call(ctx)
+    end
 
-  get "/session-write" do
-    ctx.session.string("number", SecureRandom.hex)
-    raw_html %[
+    get "/session-write" do
+      ctx.session.string("number", Random::Secure.hex)
+      raw_html %[
       <p>Your BRAND NEW session number: #{ctx.session.string("number")}</p>
-    ]
-  end # === def get_write_session
+      ]
+    end # === def get_write_session
 
-  get "/session-read" do
-    raw_html %[
+    get "/session-read" do
+      raw_html %[
       <p>Your session number: #{ctx.session.string("number")}</p>
-    ]
-  end # === def get_write_session
+      ]
+    end # === def get_write_session
 
-end # === struct MU_DEV_ROUTER
+  end # === struct MU_DEV_ROUTER
+
+end # === module MEGAUNI
 

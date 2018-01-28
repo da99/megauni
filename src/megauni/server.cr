@@ -1,8 +1,9 @@
 
-require "http"
-require "./mu_html"
-require "./router"
+require "kemal"
 require "kemal-session"
+
+require "html_builder"
+require "./router"
 
 Kemal::Session.config do |config|
   config.cookie_name = "session_id"
@@ -10,10 +11,12 @@ Kemal::Session.config do |config|
   config.gc_interval = 2.minutes # 2 minutes
 end
 
-server = HTTP::Server.new(3000) do |ctx|
-  MU_ROUTER.fulfill(ctx)
+PORT = 3000
+server = HTTP::Server.new(PORT) do |ctx|
+  MEGAUNI::Router.fulfill(ctx)
 end
 
+puts "=== Starting server on port #{PORT}"
 server.listen
 
 

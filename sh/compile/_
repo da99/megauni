@@ -4,25 +4,21 @@
 local +x PATH="$PATH:$THIS_DIR/../my_crystal/bin"
 local +x TARGET="$1"; shift
 cd "$THIS_DIR"
-mkdir -p tmp
+mkdir -p tmp/out
 mkdir -p prod
 
 sh_color YELLOW "=== Compiling: {{${TARGET}}} ..."
 
-if command -v crystal &>/dev/null ; then
-  local +x CRYSTAL="crystal"
-else
-  local +x CRYSTAL="my_crystal"
-fi
 
 case "$TARGET" in
-  www)
-    "$CRYSTAL" build compile/www.cr -o tmp/www
+  dev)
+    my_crystal __ build src/megauni/server.cr -o tmp/out/${APP_NAME}.tmp
+    mv tmp/out/${APP_NAME}.tmp tmp/out/server
     exit 0
     ;;
 
   prod)
-    "$CRYSTAL" build --release src/${APP_NAME}.cr
+    my_crystal __ build --release src/${APP_NAME}.cr
     ;;
 
   *)

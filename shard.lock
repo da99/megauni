@@ -4,41 +4,37 @@ shards:
     github: da99/da_css.cr
     version: 3.0.1
 
-  da_html:
-    github: da99/da_html.cr
-    version: 2.3.3
-
-  da_html_escape:
-    github: da99/da_html_escape.cr
-    version: 3.0.2
-
   da_router:
     github: da99/da_router.cr
     version: 2.0.1
 
   da_spec:
     github: da99/da_spec.cr
-    version: 0.3.1
+    version: 0.4.0
 
-  da_string:
-    github: da99/da_string.cr
-    version: 1.0.2
-
-  da_uri:
-    github: da99/da_uri.cr
-    commit: 52648dce6eb2a88899cd2458c2e0a5af1bb028ad
+  html_builder:
+    github: crystal-lang/html_builder
+    version: 0.2.2
 
   inspect_bang:
     github: da99/inspect_bang.cr
     version: 1.0.1
 
+  kemal:
+    github: kemalcr/kemal
+    version: 0.22.0
+
   kemal-session:
     github: kemalcr/kemal-session
     version: 0.9.0
 
-  myhtml:
-    github: kostya/myhtml
-    version: 0.27
+  kilt:
+    github: jeromegn/kilt
+    version: 0.4.0
+
+  radix:
+    github: luislavena/radix
+    version: 0.3.8
 
   terminal_table:
     github: benoist/terminal_table.cr
