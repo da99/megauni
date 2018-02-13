@@ -18,29 +18,21 @@ module MEGAUNI
         route
 
       when route.path == "/hello/world/"
-      if_defined(MEGAUNI) do
-        puts "Kemal has been defined."
-      end
         route.html! "<p>Hello, World: #{ request.method }</p>"
 
       when route.path == "/hello/the/entire/world"
         route.html! "<p>Hello, The Entire World: #{ request.method }</p>"
 
+      # when route.path == "/session-write"
+      #     route.ctx.session.string("number", Random::Secure.hex)
+      #     route.html! %[
+      #       <p>Your BRAND NEW session number: #{route.ctx.session.string("number")}</p>
+      #     ]
 
-      when route.path == "/session-write"
-        if_defined(Kemal::Session) do
-          route.ctx.session.string("number", Random::Secure.hex)
-          route.html! %[
-            <p>Your BRAND NEW session number: #{route.ctx.session.string("number")}</p>
-          ]
-        end
-
-      when route.path == "/session-read"
-        if_defined(Kemal::Session) do
-          route.html! %[
-            <p>Your session number: #{route.ctx.session.string("number")}</p>
-          ]
-        end
+      # when route.path == "/session-read"
+      #     route.html! %[
+      #       <p>Your session number: #{route.ctx.session.string("number")}</p>
+      #     ]
 
       else
         return false

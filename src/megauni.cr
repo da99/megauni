@@ -24,13 +24,6 @@ require "./megauni/CSS"
 {% if env("IS_DEV") %}
   require "inspect_bang"
 {% end %}
-macro if_defined(path, &blok)
-  {% if path.resolve? %}
-    {{blok.body}}
-  {% else %}
-    puts "Not defined: {{path.id}} "
-  {% end %}
-end # === macro if_defined
 
 {% if env("RUN_SPECS") %}
   require "../specs/specs"
