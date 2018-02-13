@@ -8,7 +8,11 @@ module MEGAUNI
       case
 
       when path == "/"
-        route.text! "#{route.ctx.request.path} from ROOT"
+        route.html!(
+          DA_HTML.to_html do
+            a(href: "http://crystal-lang.org") { "crystal is awesome" }
+          end
+        )
 
       when path == "/hello/world"
         route.text! "#{route.ctx.request.path} Hello world!"
