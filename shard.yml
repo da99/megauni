@@ -6,10 +6,8 @@ dependencies:
     github: kemalcr/kemal
   kemal-session:
     github: kemalcr/kemal-session
-  html_builder:
-    github: crystal-lang/html_builder
-  da_router:
-    github: da99/da_router.cr
+  da_html:
+    github: da99/da_html.cr
   da_css:
     github: da99/da_css.cr
 

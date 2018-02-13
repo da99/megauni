@@ -12,6 +12,28 @@ module MEGAUNI
     # Class
     # =============================================================================
 
+  def self.write(file : String)
+    pair = MU_COMMON.model_and_action(file)
+
+    sheet = new
+    with sheet yield
+    new_css = "Public/#{pair.first}/#{pair.last}.css"
+
+    Dir.mkdir_p(File.dirname(new_css))
+    File.write(new_css, sheet.to_css)
+
+    puts "=== wrote: #{new_css}"
+  end # === def self.write
+
+    def reset!
+      io.raw! File.read("#{__DIR__}/../../node_modules/HTML5-Reset/assets/css/reset.css")
+      io.raw! File.read("#{__DIR__}/../../node_modules/HTML5-Reset/assets/css/style.css")
+    end
+
+    def grey
+      hex("#F3F3F3")
+    end
+
     def self.to_css(screen_name , b)
       MEGAUNI::Screen_Name.valid!(screen_name)
       io = IO::Memory.new

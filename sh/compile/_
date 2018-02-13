@@ -2,7 +2,12 @@
 # === {{CMD}}  dev|prod|www
 
 local +x PATH="$PATH:$THIS_DIR/../my_crystal/bin"
-local +x TARGET="$1"; shift
+if [[ -z "$@" ]]; then
+  local +x TARGET="dev"
+else
+  local +x TARGET="$1"; shift
+fi
+
 cd "$THIS_DIR"
 mkdir -p tmp/out
 mkdir -p prod

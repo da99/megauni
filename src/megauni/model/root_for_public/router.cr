@@ -3,21 +3,17 @@ module MEGAUNI
 
   struct Root_For_Public
 
-    include Router
-
-    getter :ctx
-    def initialize(@ctx : HTTP::Server::Context)
+    getter ctx : HTTP::Server::Context
+    def initialize(@ctx)
     end # === def initialize
 
-    # MAIN_DOC = MEGAUNI::HTML.parse("root", "main")
-
-    get("/") do
+    def root
       # html(*MAIN_DOC)
-      raw_html(::HTML.build do
+      DA_HTML.to_html do
         a(href: "http://crystal-lang.org") do
           text "crystal is awesome"
         end
-      end)
+      end
     end # === get
 
   end # === module Root_For_Public
