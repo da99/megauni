@@ -16,6 +16,14 @@ shards:
     github: da99/da_html_unescape.cr
     version: 1.0.0
 
+  da_path:
+    github: da99/da_path.cr
+    version: 0.1.1
+
+  da_session:
+    github: da99/da_session.cr
+    version: 0.1.1
+
   da_spec:
     github: da99/da_spec.cr
     version: 0.4.1
@@ -32,25 +40,9 @@ shards:
     github: da99/inspect_bang.cr
     version: 1.0.1
 
-  kemal:
-    github: kemalcr/kemal
-    version: 0.22.0
-
-  kemal-session:
-    github: kemalcr/kemal-session
-    version: 0.9.0
-
-  kilt:
-    github: jeromegn/kilt
-    version: 0.4.0
-
   myhtml:
     github: kostya/myhtml
     version: 0.27
-
-  radix:
-    github: luislavena/radix
-    version: 0.3.8
 
   terminal_table:
     github: benoist/terminal_table.cr

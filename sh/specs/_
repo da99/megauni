@@ -70,7 +70,7 @@ case "$ACTION" in
     esac
 
     sh_color ORANGE "=== {{Compiling}}..."
-    INCLUDE_SPECS=yes INCLUDE_SERVER=yes my_crystal __ build src/megauni.cr -o tmp/out/specs
+    INCLUDE_SPECS=yes INCLUDE_SERVER=yes my_crystal __ build specs/specs.cr -o tmp/out/specs
 
     sh_color ORANGE "=== {{Running}}..."
     RUN_SPECS=yes tmp/out/specs $(cat tmp/in/args 2>/dev/null || :)

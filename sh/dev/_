@@ -31,6 +31,12 @@ case "$ACTION" in
     megauni.cr dev js
     ;;
 
+  watch)
+    local +x CMD="$APP_NAME dev run"
+    ${=CMD} || :
+    process watch "-r src -r bin -r sh -r specs" "$CMD"
+    ;;
+
   run)
     reset
     mkdir -p tmp/in tmp/out
@@ -41,18 +47,19 @@ case "$ACTION" in
     # sh_color ORANGE "=== {{Compiling}} static assets..."
     # megauni.cr dev static
 
+    local +x out="tmp/out/megauni-server"
     sh_color ORANGE "=== {{Compiling}} server..."
-    RUN_SERVER=yes DEVELOPMENT=yes my_crystal __ build src/megauni.cr -o tmp/out/megauni.server
+    RUN_SERVER=yes DEVELOPMENT=yes my_crystal __ build src/megauni-server.cr -o "$out"
 
     sh_color ORANGE "=== {{Terminating}} previous server..."
-    pkill -f "tmp/out/megauni.server" || :
+    pkill -f "$out" || :
 
     sh_color ORANGE "=== {{Running}}..."
-    HTTP_SERVER_SESSION_SECRET="0x340x46nasfiermoe$(date +%s)" tmp/out/megauni.server &
+    HTTP_SERVER_SESSION_SECRET="I ate Mr. Moe's Homework on $(date +%s)" $out &
     process loop every 1 max 4 or until "my_network url-is-up http://localhost:3000/" &>/dev/null
 
     inspect () {
-      my_network inspect $@ | head -n9
+      my_network inspect $@ | head -n7
     }
     {
       inspect "http://localhost:3000/"
@@ -61,12 +68,6 @@ case "$ACTION" in
       inspect "http://localhost:3000/megauni/files/root/main.css"
       inspect "http://localhost:3000/megauni/files/root/main.js"
     }
-    ;;
-
-  watch)
-    local +x CMD="$APP_NAME dev run"
-    ${=CMD} || :
-    process watch "-r src -r bin -r sh -r specs" "$CMD"
     ;;
 
   *)

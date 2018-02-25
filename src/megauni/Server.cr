@@ -1,11 +1,4 @@
 
-
-# Kemal::Session.config do |config|
-#   config.cookie_name = "session_id"
-#   config.secret = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
-#   config.gc_interval = 2.minutes # 2 minutes
-# end
-
 module MEGAUNI
 
   class Server
