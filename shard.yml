@@ -10,8 +10,12 @@ dependencies:
     github: da99/da_session.cr
   da_path:
     github: da99/da_path.cr
+  my_git:
+    github: da99/my_git.cr
 
 development_dependencies:
+  da_dev:
+    github: da99/da_dev
   da_spec:
     github: da99/da_spec.cr
   inspect_bang:

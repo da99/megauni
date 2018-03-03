@@ -4,6 +4,10 @@ shards:
     github: da99/da_css.cr
     version: 4.1.1
 
+  da_dev:
+    github: da99/da_dev
+    version: 0.1.0
+
   da_html:
     github: da99/da_html.cr
     version: 3.0.0
@@ -20,13 +24,17 @@ shards:
     github: da99/da_path.cr
     version: 0.1.1
 
+  da_process:
+    github: da99/da_process.cr
+    version: 1.2.2
+
   da_session:
     github: da99/da_session.cr
     version: 0.1.1
 
   da_spec:
     github: da99/da_spec.cr
-    version: 0.4.1
+    version: 0.4.2
 
   da_string:
     github: da99/da_string.cr
@@ -39,6 +47,10 @@ shards:
   inspect_bang:
     github: da99/inspect_bang.cr
     version: 1.0.1
+
+  my_git:
+    github: da99/my_git.cr
+    version: 0.1.0
 
   myhtml:
     github: kostya/myhtml
