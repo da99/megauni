@@ -6,7 +6,7 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.1.0
+    version: 0.2.0
 
   da_html:
     github: da99/da_html.cr
@@ -26,7 +26,11 @@ shards:
 
   da_process:
     github: da99/da_process.cr
-    version: 1.2.2
+    version: 1.2.3
+
+  da_redis:
+    github: da99/da_redis.cr
+    version: 0.2.2
 
   da_session:
     github: da99/da_session.cr
