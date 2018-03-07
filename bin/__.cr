@@ -1,6 +1,7 @@
 
 require "inspect_bang"
 require "da_dev"
+require "../src/megauni"
 
 full_cmd = ARGV.join(' ')
 args = ARGV.dup
@@ -15,18 +16,20 @@ when full_cmd == "this_dir"
 
 when {"-h", "help", "--help"}.includes?(full_cmd)
   # === {{CMD}} help|-h|--help
-  divider = "# #{"=" * 3}"
-  contents = File.read(__FILE__)
-  contents.each_line { |l|
-    next if !(l[divider]? && l["{{"]?)
-    pieces = l.split(/#{divider}/)
-    next if pieces.size < 2
-    pieces.shift
-    l = pieces.join(divider)
+  DA_Dev::Documentation.print_help([__FILE__])
 
-    l = l.gsub("{{CMD}}", "{{#{APP_NAME}}}").split.join(' ')
-    DA_Dev.bold! l
-  }
+when full_cmd == "server start"
+  Signal::INT.trap do
+    STDERR.puts "=== INT signal received. Exiting gracefully and with 0..."
+    exit 0 # run at_exit handlers to close DB and other resources.
+  end
+
+  MEGAUNI::Server.new.listen
+
+when full_cmd == "server is-running"
+  count = MEGAUNI::Server.running_servers
+  exit 0 if count.size > 0
+  exit 1
 
 else
   system(File.join(THIS_DIR, "bin/__megauni.sh"), ARGV)

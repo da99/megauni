@@ -1,2 +1,0 @@
-
-require "my_git"

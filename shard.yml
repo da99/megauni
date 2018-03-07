@@ -2,20 +2,18 @@ name: megauni
 version: 0.1.0
 
 dependencies:
-  da_html:
-    github: da99/da_html.cr
-  da_css:
-    github: da99/da_css.cr
+  da_dev:
+    github: da99/da_dev
   da_session:
     github: da99/da_session.cr
   da_path:
     github: da99/da_path.cr
-  my_git:
-    github: da99/my_git.cr
+  da_css:
+    github: da99/da_css.cr
+  da_html:
+    github: da99/da_html.cr
 
 development_dependencies:
-  da_dev:
-    github: da99/da_dev
   da_spec:
     github: da99/da_spec.cr
   inspect_bang:

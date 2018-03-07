@@ -6,7 +6,7 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.2.0
+    version: 0.2.2
 
   da_html:
     github: da99/da_html.cr
@@ -51,10 +51,6 @@ shards:
   inspect_bang:
     github: da99/inspect_bang.cr
     version: 1.0.1
-
-  my_git:
-    github: da99/my_git.cr
-    version: 0.1.0
 
   myhtml:
     github: kostya/myhtml
