@@ -1,5 +1,0 @@
-
-import DA_STANDARD.COMMON;
-import System.Console;
-
-Console.log("loaded root");

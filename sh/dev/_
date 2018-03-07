@@ -22,7 +22,7 @@ case "$ACTION" in
 
   js)
     sh_color ORANGE "=== {{Compiling}} js..."
-    my_jspp __ src/megauni/model/root/main.jspp node_modules/da_standard/src/*.jspp -o Public/root/main.js
+    my_jspp __ src/megauni/root/main.jspp node_modules/da_standard/src/*.jspp -o Public/root/main.js
     ;;
 
   static)

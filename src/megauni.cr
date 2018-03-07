@@ -21,10 +21,10 @@ require "./megauni/Route"
 require "./megauni/Server"
 
 {% if env("IS_DEV") %}
-  require "./megauni/model/Public/Public"
+  require "./megauni/Public_Files/__"
 {% end %}
-require "./megauni/model/Root/Root"
-require "./megauni/model/Not_Found/Not_Found"
-# require "./model/root_for_public/router"
+require "./megauni/Stranger_Root/__"
+require "./megauni/Not_Found/__"
+# require "./route/root_for_public/router"
 
 
