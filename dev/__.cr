@@ -2,23 +2,37 @@
 require "da_dev"
 
 args = ARGV.dup
+full_cmd = args.join(' ')
 THIS_DIR = File.expand_path("#{__DIR__}/..")
 cmd = args.shift?
 
-case
-when cmd == "compile" && args.size == 1 && args.first[/.jspp$/]?
+require "./*"
+
+if cmd == "compile"
   if File.expand_path(Dir.current) != THIS_DIR
     DA_Dev.red! "!!! {{Invalid current directory}}: BOLD{{#{Dir.current}}}"
     exit 1
   end
+end
 
-  jspp       = args.shift
-  route_name = File.basename(File.dirname(jspp))
-  js         = "Public/public/#{route_name}/script.js"
+case
+when full_cmd == "compile all"
+  Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
+    JSPP_File.new(jspp).compile!
+  }
 
-  Dir.mkdir_p(File.dirname(js))
-  my_jspp = "#{THIS_DIR}/../my_jspp/bin/my_jspp"
-  Process.exec(my_jspp, "__ #{jspp} -o #{js}".split)
+  Dir.glob("./src/megauni/*/*.scss").each { |scss|
+    SCSS_File.new(scss).compile!
+  }
+
+when cmd == "compile" && args.size == 1 && args.first[/.jspp$/]?
+  jspp = JSPP_File.new(args.shift)
+  jspp.compile!
+
+when cmd == "compile" && args.size == 1 && args.first[/.scss$/]?
+  scss = SCSS_File.new(args.shift)
+  scss.compile!
+
 else
   DA_Dev.red! "!!! {{Invalid options}}: BOLD{{#{ARGV.map(&.inspect).join " "}}}"
 end

@@ -1,4 +1,5 @@
 /progs/
 /tmp/
 /.shards/
-/node_modules
+/.js_packages/
+/node_modules/
