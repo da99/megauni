@@ -70,19 +70,10 @@ when cmd == "compile" && args.size == 1 && args.first[/.scss$/]?
   scss.compile!
 
 when full_cmd == "upgrade"
-  DA_Dev.orange! "=== {{Pulling}} BOLD{{#{DA_Process.new("git remote get-url origin").success!.output.to_s.strip}}}"
-  DA_Process.success!("git", "pull".split)
-
-  DA_Dev.orange! "=== {{yarn upgrade}}"
-  DA_Process.success!("yarn", "upgrade".split)
-
-  DA_Dev.orange! "=== {{Upgrading}}: crystal shards"
-  DA_Dev.deps
-  DA_Dev.green! "=== {{Done}}: BOLD{{upgrading}} ==="
+  MEGAUNI::Dev.upgrade
 
 else
-  system(File.join(THIS_DIR, "bin/__megauni.sh"), ARGV)
-  stat = $?
-  exit stat.exit_code if !stat.exit_code.zero?
+  DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
+  exit 1
 
 end # === case
