@@ -2,12 +2,21 @@
 require "inspect_bang"
 require "da_dev"
 require "../src/megauni"
+require "../src/megauni/Dev/*"
 
 full_cmd = ARGV.join(' ')
 args     = ARGV.dup
 cmd      = args.shift
 THIS_DIR = File.expand_path(File.join(__DIR__, ".."))
 APP_NAME = File.basename(THIS_DIR)
+
+if cmd == "compile"
+  if File.expand_path(Dir.current) != THIS_DIR
+    DA_Dev.red! "!!! {{Invalid current directory}}: BOLD{{#{Dir.current}}}"
+    exit 1
+  end
+end
+
 
 case
 
@@ -36,6 +45,23 @@ when full_cmd == "server is-running"
   count = MEGAUNI::Server.running_servers
   exit 0 if count.size > 0
   exit 1
+
+when full_cmd == "compile all"
+  Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
+    MEGAUNI::Dev::JSPP_File.new(jspp).compile!
+  }
+
+  Dir.glob("./src/megauni/*/*.scss").each { |scss|
+    MEGAUNI::Dev::SCSS_File.new(scss).compile!
+  }
+
+when cmd == "compile" && args.size == 1 && args.first[/.jspp$/]?
+  jspp = MEGAUNI::Dev::JSPP_File.new(args.shift)
+  jspp.compile!
+
+when cmd == "compile" && args.size == 1 && args.first[/.scss$/]?
+  scss = MEGAUNI::Dev::SCSS_File.new(args.shift)
+  scss.compile!
 
 else
   system(File.join(THIS_DIR, "bin/__megauni.sh"), ARGV)
