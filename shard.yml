@@ -14,6 +14,10 @@ dependencies:
     github: da99/da_html.cr
 
 development_dependencies:
+  my_js:
+    github: da99/my_js
+  my_css:
+    github: da99/my_css
   da_spec:
     github: da99/da_spec.cr
   inspect_bang:

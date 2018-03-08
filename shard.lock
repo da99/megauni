@@ -6,7 +6,7 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.2.2
+    version: 0.2.7
 
   da_html:
     github: da99/da_html.cr
@@ -26,7 +26,7 @@ shards:
 
   da_process:
     github: da99/da_process.cr
-    version: 1.2.3
+    version: 1.3.2
 
   da_redis:
     github: da99/da_redis.cr
@@ -51,6 +51,14 @@ shards:
   inspect_bang:
     github: da99/inspect_bang.cr
     version: 1.0.1
+
+  my_css:
+    github: da99/my_css
+    version: 0.0.1
+
+  my_js:
+    github: da99/my_js
+    version: 0.1.1
 
   myhtml:
     github: kostya/myhtml
