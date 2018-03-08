@@ -17,6 +17,9 @@ if cmd == "compile"
   end
 end
 
+{% if env("IS_DEV") %}
+  ENV["HTTP_SERVER_SESSION_SECRET"]="a key FOR development ONLY $(date)$(date)"
+{% end %}
 
 case
 
@@ -37,7 +40,7 @@ when full_cmd == "server start"
   MEGAUNI::Server.new.listen
 
 when full_cmd == "server stop"
-  # === {{CMD}} server stop
+  # === {{CMD}} server stop # Graceful shutdown of all servers.
   MEGAUNI::Server.stop_all
 
 when full_cmd == "server is-running"
