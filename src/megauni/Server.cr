@@ -15,6 +15,7 @@ module MEGAUNI
     def self.check(port : Int32)
       check(port, "/")
       check(port, "/public/Stranger_Root/style.css")
+      check(port, "/something-not-found")
     end
 
     def self.check(port : Int32, address : String)
@@ -23,12 +24,10 @@ module MEGAUNI
       body = r.body.to_s
       has_body = !body.strip.empty?
       if code < 400 && has_body && r.success?
-        DA_Dev.green! "=== BOLD{{#{r.status_code}}} {{#{r.status_message}}}  - BOLD{{#{port}:#{address}}}"
+        DA_Dev.green! "=== BOLD{{#{r.status_code}}} {{#{r.status_message}}}: BOLD{{#{port}:#{address}}}"
       else
         DA_Dev.red! "=== {{#{r.status_code}}} BOLD{{#{r.status_message}}} success: #{r.success?.inspect} - BOLD{{#{port}:#{address}}}"
-        STDERR.puts "=== BODY:"
-        STDERR.puts body.inspect
-        STDERR.puts "=== END BODY ==="
+        STDERR.puts "=== #{body.inspect}"
       end
     end
 
