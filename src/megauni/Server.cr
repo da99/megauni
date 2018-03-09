@@ -12,13 +12,24 @@ module MEGAUNI
     # Class:
     # =============================================================================
 
-    def self.check
+    def self.check(port : Int32)
       check(port, "/")
+      check(port, "/public/Stranger_Root/style.css")
     end
 
     def self.check(port : Int32, address : String)
       r = HTTP::Client.get("http://localhost:#{port}#{address}")
-      puts r.body
+      code = r.status_code
+      body = r.body.to_s
+      has_body = !body.strip.empty?
+      if code < 400 && has_body && r.success?
+        DA_Dev.green! "=== BOLD{{#{r.status_code}}} {{#{r.status_message}}}  - BOLD{{#{port}:#{address}}}"
+      else
+        DA_Dev.red! "=== {{#{r.status_code}}} BOLD{{#{r.status_message}}} success: #{r.success?.inspect} - BOLD{{#{port}:#{address}}}"
+        STDERR.puts "=== BODY:"
+        STDERR.puts body.inspect
+        STDERR.puts "=== END BODY ==="
+      end
     end
 
     def self.stop_all
@@ -78,7 +89,7 @@ module MEGAUNI
     getter server : HTTP::Server
     getter port : Int32
 
-    def initialize(@port = 3000)
+    def initialize(@port)
       @server = HTTP::Server.new(port) do |ctx|
         Route.new(ctx).run
       end

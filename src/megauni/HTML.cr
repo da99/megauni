@@ -16,26 +16,37 @@ module MEGAUNI
       } of String => String | Int32
     end # === def self.default_data
 
+    def self.to_html
+      page = new
+      with page yield
+      page.to_html
+    end # === def self.to_html
+
     # =============================================================================
     # Instance
     # =============================================================================
 
-    def head
+    macro utf8!
       raw! %[<meta charset="UTF-8">]
-      with self yield self
     end
 
-    def script
-      raw! "script"
-      attr! :type, "application/javascript"
-      attr! :src, "/megauni/files/#{data["model!"]}/#{data["action!"]}.js"
+    macro script!
+      raw! %[
+      <script
+        type="application/javascript"
+        src="/public/#{route_name}/script.js"
+      ></script>
+      ]
     end
 
-    def stylesheet
-      raw! "link"
-      attr! :href,  "/megauni/files/model/action.css"
-      attr! :rel,   "stylesheet"
-      attr! :title, "Default"
+    macro stylesheet!
+      raw! %[
+      <link
+        href="/public/#{route_name}/style.css"
+        rel="stylesheet"
+        title="Default"
+      >
+      ]
     end
 
     def screen_name_input

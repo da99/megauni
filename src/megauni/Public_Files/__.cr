@@ -3,7 +3,7 @@ module MEGAUNI
 
   struct Public_Files
 
-    PUBLIC_DIR = "#{File.expand_path "#{__DIR__}/../../../.."}/Public"
+    PUBLIC_DIR = File.expand_path("#{__DIR__}/../../../Public")
     @@file_handler = HTTP::StaticFileHandler.new(PUBLIC_DIR, false, true)
 
     def self.route!(route)
@@ -12,8 +12,8 @@ module MEGAUNI
 
       case
 
-      when route.path["/megauni/files"]?
-        request.path = request.path.sub("/megauni/files", "")
+      when route.path["/public"]?
+        # request.path = request.path.sub("/megauni/files", "")
         @@file_handler.call(route.ctx)
         route
 

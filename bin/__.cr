@@ -30,12 +30,9 @@ when {"-h", "help", "--help"}.includes?(full_cmd)
   # === {{CMD}} help|-h|--help
   DA_Dev::Documentation.print_help([__FILE__])
 
-when full_cmd == "server start"
-  # === {{CMD}} server start
-  MEGAUNI::Server.new.listen
-
 when cmd == "server" && args.first? == "start" && args.size == 2
   # === {{CMD}} server start port
+  args.shift
   port = begin
            i = args.shift
            begin
@@ -57,12 +54,14 @@ when full_cmd == "server is-running"
   exit 0 if count.size > 0
   exit 1
 
-when full_cmd == "server check"
-  MEGAUNI::Server.check
-
-when cmd == "server" && args.first? == "check"
+when cmd == "server" && args.first? == "check" && args.size == 2
+  # === {{CMD}} server check port
   args.shift
-  MEGAUNI::Server.check(args)
+  MEGAUNI::Server.check(args.shift.not_nil!.to_i32)
+
+when cmd == "server" && args.first? == "check" && args.size == 3
+  # === {{CMD}} server check port /address
+  MEGAUNI::Server.check(args.shift.not_nil!.to_i32, args.shift.not_nil!)
 
 when full_cmd == "compile all"
   Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
