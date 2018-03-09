@@ -9,6 +9,13 @@ module MEGAUNI
   MIN_PASS_PHRASE = 8
   MAX_PASS_PHRASE = 100
 
+  # =============================================================================
+  # Module:
+  # =============================================================================
+  def self.site_name
+    "megaUNI.com"
+  end
+
 end # === module MEGAUNI
 
 require "./megauni/Screen_Name"

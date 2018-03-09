@@ -61,6 +61,7 @@ when cmd == "server" && args.first? == "check" && args.size == 2
 
 when cmd == "server" && args.first? == "check" && args.size == 3
   # === {{CMD}} server check port /address
+  args.shift
   MEGAUNI::Server.check(args.shift.not_nil!.to_i32, args.shift.not_nil!)
 
 when full_cmd == "compile all"

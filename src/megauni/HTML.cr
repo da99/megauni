@@ -42,12 +42,37 @@ module MEGAUNI
     macro stylesheet!
       raw! %[
       <link
+        href="/public/basic_one/reset.css"
+        rel="stylesheet"
+        title="Default"
+      >
+      <link
         href="/public/#{route_name}/style.css"
         rel="stylesheet"
         title="Default"
       >
       ]
     end
+
+    def h1
+      raw! "<h1>"
+      text? {
+        with self yield
+      }
+      raw! "</h1>"
+    end
+
+    def form
+      raw! "<form>"
+      text? { with self yield }
+      raw! "</form>"
+    end # === def form
+
+    def button
+      raw! "<button>"
+      text? { with self yield }
+      raw! "</button>"
+    end # === def button
 
     def screen_name_input
       raw! "<input"

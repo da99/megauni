@@ -46,7 +46,12 @@ module MEGAUNI
               title { "Home" }
             }
             body {
-              a(href: "http://crystal-lang.org") { "crystal is awesome" }
+              h1 { MEGAUNI.site_name }
+              div(".body") {
+                form {
+                  button { "Create Account" }
+                }
+              }
             }
           }
         end
