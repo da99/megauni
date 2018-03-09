@@ -6,7 +6,7 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.2.7
+    version: 0.2.8
 
   da_html:
     github: da99/da_html.cr

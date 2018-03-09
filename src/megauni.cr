@@ -15,8 +15,6 @@ require "./megauni/Screen_Name"
 require "./megauni/HTML"
 require "./megauni/CSS"
 
-
-require "http/server"
 require "./megauni/Route"
 require "./megauni/Server"
 
@@ -25,6 +23,5 @@ require "./megauni/Server"
 {% end %}
 require "./megauni/Stranger_Root/__"
 require "./megauni/Not_Found/__"
-# require "./route/root_for_public/router"
 
 

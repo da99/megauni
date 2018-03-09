@@ -3,16 +3,19 @@ module MEGAUNI
 
   struct Route
 
+    # =============================================================================
+    # Class:
+    # =============================================================================
+
     {% if env("IS_DEV") %}
-      MODELS = Set{Root,Public,Not_Found}
+      MODELS = Set{Public_Files,Stranger_Root,Not_Found}
     {% else %}
-      MODELS = Set{Root,Not_Found}
+      MODELS = Set{Stranger_Root,Not_Found}
     {% end %}
 
-    def self.route!(ctx)
-      r = new(ctx)
-      MODELS.find { |x| x.route!(r) }
-    end # === def self.route!
+    # =============================================================================
+    # Instance:
+    # =============================================================================
 
     getter crumbs  : Token
     getter ctx     : HTTP::Server::Context
@@ -21,8 +24,8 @@ module MEGAUNI
     delegate :request, :response, to: @ctx
 
     def initialize(@ctx)
-      path = ctx.request.path
-      @crumbs = Token.new(path)
+      path     = ctx.request.path
+      @crumbs  = Token.new(path)
       @slashes = if path != "/"
                    @crumbs.split('/')
                  else
@@ -30,9 +33,13 @@ module MEGAUNI
                  end
     end # === def initialize
 
-    {% for x in %w[GET POST HEAD] %}
-      def {{x.downcase.id}}?
-        ctx.request.method == {{x}}
+    def run
+      MODELS.find { |x| x.route!(self) }
+    end
+
+    {% for x in %w[get post head].map(&.id) %}
+      def {{x}}?
+        ctx.request.method == "{{x.upcase}}"
       end
     {% end %}
 

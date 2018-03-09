@@ -1,4 +1,6 @@
 
+require "http/server"
+require "http/client"
 module MEGAUNI
 
   class Server
@@ -10,6 +12,15 @@ module MEGAUNI
     # Class:
     # =============================================================================
 
+    def self.check
+      check(port, "/")
+    end
+
+    def self.check(port : Int32, address : String)
+      r = HTTP::Client.get("http://localhost:#{port}#{address}")
+      puts r.body
+    end
+
     def self.stop_all
       servers = [] of Server::Status
       running_servers.each { |ss|
@@ -20,6 +31,11 @@ module MEGAUNI
           DA_Dev.orange! "=== {{Already closed}}: port BOLD{{#{ss.port}}}, pid BOLD{{#{ss.pid}}}"
         end
       }
+
+      if servers.empty?
+        DA_Dev.orange! "=== {{No servers found}}. ==="
+        return
+      end
 
       limit = 1
       while limit < 50
@@ -64,7 +80,7 @@ module MEGAUNI
 
     def initialize(@port = 3000)
       @server = HTTP::Server.new(port) do |ctx|
-        Route.route!(ctx)
+        Route.new(ctx).run
       end
     end # === def self.start
 
@@ -89,7 +105,7 @@ module MEGAUNI
         exit 1
       end
 
-      File.write(port_file, Process.pid.to_s) unless File.exists?(port_file)
+      File.write(port_file, Process.pid.to_s)
 
       Signal::INT.trap {
         Signal::INT.reset

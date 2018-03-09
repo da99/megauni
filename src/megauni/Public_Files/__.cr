@@ -1,7 +1,7 @@
 
 module MEGAUNI
 
-  struct Public
+  struct Public_Files
 
     PUBLIC_DIR = "#{File.expand_path "#{__DIR__}/../../../.."}/Public"
     @@file_handler = HTTP::StaticFileHandler.new(PUBLIC_DIR, false, true)

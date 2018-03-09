@@ -1,7 +1,7 @@
 
 module MEGAUNI
 
-  class Root
+  class Stranger_Root
 
     def self.route!(route)
       path = route.ctx.request.path

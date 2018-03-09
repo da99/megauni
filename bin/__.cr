@@ -32,12 +32,20 @@ when {"-h", "help", "--help"}.includes?(full_cmd)
 
 when full_cmd == "server start"
   # === {{CMD}} server start
-  Signal::INT.trap do
-    STDERR.puts "=== INT signal received. Exiting gracefully and with 0..."
-    exit 0 # run at_exit handlers to close DB and other resources.
-  end
-
   MEGAUNI::Server.new.listen
+
+when cmd == "server" && args.first? == "start" && args.size == 2
+  # === {{CMD}} server start port
+  port = begin
+           i = args.shift
+           begin
+             i.to_i32
+           rescue e
+             DA_Dev.red! "!!! {{Invalid port}}: BOLD{{#{i.inspect}}}"
+             exit 1
+           end
+         end
+  MEGAUNI::Server.new(port).listen
 
 when full_cmd == "server stop"
   # === {{CMD}} server stop # Graceful shutdown of all servers.
@@ -48,6 +56,13 @@ when full_cmd == "server is-running"
   count = MEGAUNI::Server.running_servers
   exit 0 if count.size > 0
   exit 1
+
+when full_cmd == "server check"
+  MEGAUNI::Server.check
+
+when cmd == "server" && args.first? == "check"
+  args.shift
+  MEGAUNI::Server.check(args)
 
 when full_cmd == "compile all"
   Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
@@ -71,6 +86,7 @@ when cmd == "compile" && args.size == 1 && args.first[/.scss$/]?
 
 when full_cmd == "upgrade"
   MEGAUNI::Dev.upgrade
+
 
 else
   DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
