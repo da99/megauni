@@ -10,6 +10,13 @@ header {
 header h1 {
   font-weight: bold;
 }
+div.hidden {
+  display: none;
+}
+#intro.block {
+  border: 0;
+  max-width: 200px;
+}
 
 section {
   padding: 1em;

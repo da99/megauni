@@ -6,11 +6,11 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.2.8
+    version: 0.2.11
 
   da_html:
     github: da99/da_html.cr
-    version: 3.0.0
+    version: 3.1.2
 
   da_html_escape:
     github: da99/da_html_escape.cr
@@ -34,7 +34,7 @@ shards:
 
   da_session:
     github: da99/da_session.cr
-    version: 0.1.1
+    version: 0.1.3
 
   da_spec:
     github: da99/da_spec.cr
