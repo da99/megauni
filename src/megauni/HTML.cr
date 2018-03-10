@@ -70,8 +70,8 @@ module MEGAUNI
       }
     end # === def form
 
-    def fieldset
-      tag("fieldset") {
+    def fieldset(*args)
+      tag("fieldset", *args) {
         with self yield self
       }
     end
@@ -82,13 +82,18 @@ module MEGAUNI
       }
     end
 
-    def meta(**args)
-      inspect! args
-      tag("meta") #, **args)
+    def meta(name : String, content : String)
+      tag("meta", name: name, content: content) #, **args)
     end
 
-    def header
-      tag("header") {
+    def header(*args)
+      tag("header", *args) {
+        with self yield self
+      }
+    end
+
+    def footer(*args)
+      tag("footer", *args) {
         with self yield self
       }
     end
