@@ -41,6 +41,10 @@ module MEGAUNI
       def {{x}}?
         ctx.request.method == "{{x.upcase}}"
       end
+
+      def {{x}}?(str : String)
+        {{x}}? && path == str
+      end
     {% end %}
 
 

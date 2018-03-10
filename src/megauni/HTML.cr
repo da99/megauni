@@ -26,8 +26,13 @@ module MEGAUNI
     # Instance
     # =============================================================================
 
-    macro utf8!
+    def utf8!
       raw! %[<meta charset="UTF-8">]
+    end
+
+    macro head_defaults!
+      utf8!
+      link_shortcut_icon
     end
 
     macro script!
@@ -40,18 +45,14 @@ module MEGAUNI
     end
 
     macro stylesheet!
-      raw! %[
-      <link
-        href="/public/basic_one/reset.css"
-        rel="stylesheet"
-        title="Default"
-      >
-      <link
-        href="/public/#{route_name}/style.css"
-        rel="stylesheet"
-        title="Default"
-      >
-      ]
+      link("basic_one/reset.css")
+
+      # link("vanilla.reset.css")
+      link("fonts.css")
+      link("otfpoc.css")
+      link("MUE/style.css")
+
+      link("/public/#{route_name}/style.css")
     end
 
     {% for x in %w[h1 h2 h3].map(&.id) %}
@@ -84,6 +85,30 @@ module MEGAUNI
 
     def meta(name : String, content : String)
       tag("meta", name: name, content: content) #, **args)
+    end
+
+    def meta_no_cache
+      tag(
+        "meta",
+        "http-equiv": "Cache-Control",
+        content: "no-cache, max-age=0, must-revalidate, no-store, max-stale=0, post-check=0, pre-check=0"
+      )
+    end
+
+    def link_shortcut_icon
+      tag("link", rel: "shortcut icon", href: "/favicon.ico")
+    end
+
+    def link(css : String)
+      href = (css[0]? == '/') ? css : "/public/styles/#{css}"
+      tag(
+        "link",
+        href: href,
+        media: "all",
+        rel: "stylesheet",
+        title: "Default",
+        type: "text/css"
+      )
     end
 
     def header(*args)

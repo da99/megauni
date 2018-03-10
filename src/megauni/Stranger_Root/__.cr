@@ -10,21 +10,12 @@ module MEGAUNI
     # =============================================================================
 
     def self.route!(route)
-      path = route.ctx.request.path
-      case
-
-      when path == "/"
+      if route.get?("/")
         new(route).root
+        return true
+      end
 
-      when path == "/hello/world"
-        route.text! "#{route.ctx.request.path} Hello world!"
-
-      else
-        return false
-
-      end # === case
-
-      true
+      false
     end # def self.route
 
     # =============================================================================
@@ -38,7 +29,34 @@ module MEGAUNI
     end # === def initialize
 
     def root
-      route.html!( markup_stranger_root ) # === route.html!
+      route.html!(
+        ::MEGAUNI::HTML.to_html do
+          doctype!
+          html {
+
+            head {
+              head_defaults!
+              stylesheet!
+              title { "#{MEGAUNI.site_name}: Home" }
+              meta("Description", "Sign-In or Create an Account if you don't have one.")
+            }
+
+            body {
+
+              header {
+                h1 { MEGAUNI.site_name }
+              }
+
+              markup_log_in
+              markup_create_a_new_account
+              markup_footer
+
+            } # body
+
+            script!
+          } # === html
+        end
+      ) # === route.html!
     end # === def root
 
   end # === class Root
