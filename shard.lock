@@ -58,7 +58,7 @@ shards:
 
   my_js:
     github: da99/my_js
-    version: 0.1.1
+    version: 0.1.2
 
   myhtml:
     github: kostya/myhtml

@@ -66,23 +66,23 @@ when cmd == "server" && args.first? == "check" && args.size == 3
 
 when full_cmd == "compile all"
   Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
-    MEGAUNI::Dev::JSPP_File.new(jspp).compile!
+    MEGAUNI::Dev.compile(jspp)
   }
 
-  Dir.glob("./src/megauni/*/*.scss").each { |scss|
-    MEGAUNI::Dev::SCSS_File.new(scss).compile!
+  Dir.glob("./src/megauni/*/*.sass").each { |sass|
+    MEGAUNI::Dev.compile(sass)
+  }
+
+  Dir.glob("./src/megauni/*/*.styl").each { |styl|
+    MEGAUNI::Dev.compile(styl)
   }
 
 when cmd == "compile" && args.first? == "shard.yml"
   :ignore
 
-when cmd == "compile" && args.size == 1 && args.first[/.jspp$/]?
-  jspp = MEGAUNI::Dev::JSPP_File.new(args.shift)
-  jspp.compile!
+when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
+  MEGAUNI::Dev.compile(args.shift)
 
-when cmd == "compile" && args.size == 1 && args.first[/.scss$/]?
-  scss = MEGAUNI::Dev::SCSS_File.new(args.shift)
-  scss.compile!
 
 when full_cmd == "upgrade"
   MEGAUNI::Dev.upgrade
