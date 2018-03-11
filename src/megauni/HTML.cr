@@ -48,11 +48,17 @@ module MEGAUNI
       link("basic_one/reset.css")
 
       # link("vanilla.reset.css")
-      link("fonts.css")
-      link("otfpoc.css")
-      link("MUE/style.css")
+      link("styles/fonts.css")
+      link("styles/otfpoc.css")
 
       link("/public/#{route_name}/style.css")
+      if route_name["Desktop/"]?
+        link("Desktop/MUE/style.css")
+      end
+    end
+
+    macro desktop_stylesheet!
+      link("Desktop/MUE/style.css")
     end
 
     {% for x in %w[h1 h2 h3].map(&.id) %}
@@ -100,7 +106,7 @@ module MEGAUNI
     end
 
     def link(css : String)
-      href = (css[0]? == '/') ? css : "/public/styles/#{css}"
+      href = (css[0]? == '/') ? css : "/public/#{css}"
       tag(
         "link",
         href: href,
