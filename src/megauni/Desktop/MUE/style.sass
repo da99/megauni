@@ -1,56 +1,35 @@
 @import "__vars"
 
+html
+  height: 100%
+
 body
-  background-color: $bg_color
+  height: 100%
+  background-color: $white_dark
 
 a:link
   color: $black
 
 a:visited
-  color: #616161
+  color: $greyish_medium
 
 a:hover
-  color: #C0002C
+  color: $red_dark
 
-section
-  background-color: #C7C7C7
-  padding: 0 1.5em 1.5em 1.5em
-
-section div.item
-  background-color: #fff
-  padding: 0 1em 1em 1em
-  margin: 1em
-  border: 1px dashed #D5D5D5
-  color: #3d3d3d
-  -moz-border-radius: 5px
-  -webkit-border-radius: 5px
-  border-radius: 5px
-  -khtml-border-radius: 5px
-  max-width: 600px
-
-h1
-  color: #616161
-  font-weight: normal
-
-h1.site
-  font-family: AghjaMedium
-  font-weight: normal
-  font-style: normal
-  color: #000
-  margin: 0.5em 0
+h1.site_name
+    color: $black
+    font-family: AghjaMedium
+    font-weight: normal
+    font-style: normal
+    margin: 0.5em 0
 
 h2, h3
-  color: #8E8E8E
+  color: $black_light
   text-transform: uppercase
   font-size: smaller
   padding: 0.5em 0
   margin: 0
 
-label
-  display: block
-
-label span.sub
-  color: #8E8E8E
 
 p
   margin: 0 0 0.5em 0
@@ -62,27 +41,74 @@ div.loading
   form div.buttons
     display: none
   div.loading_msg
-    background-color: $highlight
+    background-color: $yellow_light
 
-section.form
+
+section
+  padding: 0 1rem 1rem 1rem
+  color: #000
+  background-color: $white
+  font-weight: bold
+  margin: 1em
+  float: left
+  +border-radius( 5px )
+
   div.field_invalid
-    border: 1px dashed $error_highlight
+    border: 1px dashed $red_medium
     padding: 0.5em
+
   div.error_msg
-    color: $error_highlight
+    color: $red_medium
     font-style: italic
     font-size: smaller
+
   div.error_server
     font-size: larger
     padding: 1em 0
 
   div.success_msg
-    background-color: $highlight
+    background-color: $yellow_light
     margin: 0.5em 0 0 0
     padding: 0.5em
-    background-color: $go
-    color: $dark_text_light_bg
+    background-color: $green_medium
+    color: $white
 
+  h2
+    font-weight: bolder
+    font-size: 0.8rem
+    padding: 0.5rem 0 0.5rem 0
+    text-align: center
+
+  form
+    button
+      font-size: 0.7rem
+      text-transform: uppercase
+
+    fieldset
+      padding: 0.5em 0
+
+    label
+      line-height: 1.2rem
+      font-weight: normal
+      font-size: 0.8rem
+      display: block
+
+    label span
+      display: block
+
+    label span.sub
+      color: $greyish_medium
+
+    nav
+      text-align: right
+      padding: 0.5em 0 0 0
+
+input[type="text"], input[type="password"]
+  font-size: 1.3rem
+  font-family: monospace
+
+button
+  cursor: pointer
 
 
 

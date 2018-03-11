@@ -7,14 +7,13 @@ module MEGAUNI
         h2 { "Log-In" }
         form {
           fieldset {
-            label { "Screen Name" }
+            label { "Screen Name:" }
             screen_name_input
           }
 
           fieldset {
             label {
-              span { "Pass Phrase" }
-              span(".sub") { "(spaces allowed)" }
+              span { "Pass Phrase:" }
             }
             pass_phrase_input
           }

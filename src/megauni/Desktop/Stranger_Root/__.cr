@@ -42,16 +42,10 @@ module MEGAUNI
             }
 
             body {
-
-              header("#site") {
-                h1 { MEGAUNI.site_name }
-              }
-
-              markup_footer
+              markup_header
 
               markup_log_in
               markup_create_a_new_account
-
             } # body
 
             script!

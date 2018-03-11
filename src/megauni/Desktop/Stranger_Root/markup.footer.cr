@@ -2,9 +2,9 @@
 module MEGAUNI
   class Desktop_Stranger_Root
 
-    macro markup_footer
-      footer("#intro.block") {
-        h1(".site") {
+    macro markup_header
+      header {
+        h1(".site_name") {
           span(".main") { "mega" }
           span(".sub") { "UNI" }
         }
@@ -23,9 +23,7 @@ module MEGAUNI
 
         div(".disclaimer") {
           p {
-            text! "(c) 2012-"
-            span("#copyright_year_today") { "2016" }
-            text! "megauni.com. Some rights reserved."
+            "(c) 2012-#{Time.now.year} megauni.com. Some rights reserved."
           }
           p { "All other copyrights belong to their respective owners, who have no association to this site:" }
           p {
@@ -42,7 +40,7 @@ module MEGAUNI
           } # === div
         }
       } # div#intro
-    end # === macro markup_footer
+    end # === macro markup_header
 
   end # === class Desktop_Stranger_Root
 end # === module MEGAUNI

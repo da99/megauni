@@ -14,7 +14,7 @@ module MEGAUNI
       colors = {} of String => String
       File.read(file).lines.each { |l|
         pieces = l.split(':').map(&.strip)
-        hex = pieces.last?
+        hex = pieces.last?.try { |x| x.split('/').first? }
         next if !hex
         if hex[/\A\#[A-Za-z0-9]+\Z/]?
             name = pieces.first

@@ -7,16 +7,15 @@ module MEGAUNI
         h2 { "Create A New Account" }
         form(action: "/log-in", method: "post") {
           fieldset {
-            label { "Screen Name" }
+            label { "Screen Name:" }
             screen_name_input
             input_text("screen_name", "")
           }
 
           fieldset(".pswd") {
             label {
-              span { "Pass Phrase" }
+              span { "Pass Phrase:" }
               span(".sub") { " (for better security, use spaces and words)" }
-              span { ":" }
             }
             pass_phrase_input
             input_password("pswd")
