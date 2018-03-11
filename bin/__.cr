@@ -74,6 +74,11 @@ when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
   MEGAUNI::Dev.compile(args.shift)
 
 
+when full_cmd == "hex colors"
+  # === {{CMD}} hex colors
+  # ===   Generate an html file of the color palette.
+  MEGAUNI::Dev.hex_colors_file
+
 when full_cmd == "upgrade"
   MEGAUNI::Dev.upgrade
 

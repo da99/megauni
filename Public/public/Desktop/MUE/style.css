@@ -6,15 +6,15 @@ a:visited { color: #616161; }
 
 a:hover { color: #C0002C; }
 
-div.block { border-right: 1px dashed #C7C7C7; padding: 0 1.5em 1.5em 1.5em; }
+section, footer { background-color: #C7C7C7; padding: 0 1.5em 1.5em 1.5em; }
 
-div.block div.item { background-color: #fff; padding: 0 1em 1em 1em; margin: 1em; border: 1px dashed #D5D5D5; color: #3d3d3d; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -khtml-border-radius: 5px; max-width: 600px; }
-
-h1.site { font-family: AghjaMedium; font-weight: normal; font-style: normal; color: #000; margin: 0.5em 0; }
+section div.item { background-color: #fff; padding: 0 1em 1em 1em; margin: 1em; border: 1px dashed #D5D5D5; color: #3d3d3d; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; -khtml-border-radius: 5px; max-width: 600px; }
 
 h1 { color: #616161; font-weight: normal; }
 
-h3 { color: #8E8E8E; text-transform: uppercase; font-size: smaller; padding: 0.5em 0; margin: 0; }
+h1.site { font-family: AghjaMedium; font-weight: normal; font-style: normal; color: #000; margin: 0.5em 0; }
+
+h2, h3 { color: #8E8E8E; text-transform: uppercase; font-size: smaller; padding: 0.5em 0; margin: 0; }
 
 label { display: block; }
 
@@ -28,10 +28,10 @@ div.loading form div.buttons { display: none; }
 
 div.loading div.loading_msg { background-color: #FFFEE2; }
 
-div.form div.field_invalid { border: 1px dashed #FF2D2D; padding: 0.5em; }
+section.form div.field_invalid { border: 1px dashed #FF2D2D; padding: 0.5em; }
 
-div.form div.error_msg { color: #FF2D2D; font-style: italic; font-size: smaller; }
+section.form div.error_msg { color: #FF2D2D; font-style: italic; font-size: smaller; }
 
-div.form div.error_server { font-size: larger; padding: 1em 0; }
+section.form div.error_server { font-size: larger; padding: 1em 0; }
 
-div.form div.success_msg { background-color: #FFFEE2; margin: 0.5em 0 0 0; padding: 0.5em; background-color: #B8F3A3; color: #363636; }
+section.form div.success_msg { background-color: #FFFEE2; margin: 0.5em 0 0 0; padding: 0.5em; background-color: #B8F3A3; color: #363636; }

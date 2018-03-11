@@ -9,6 +9,51 @@ module MEGAUNI
 
     extend self
 
+    def hex_colors_file
+      file = "src/megauni/Desktop/MUE/__vars.sass"
+      colors = {} of String => String
+      File.read(file).lines.each { |l|
+        pieces = l.split(':').map(&.strip)
+        hex = pieces.last?
+        next if !hex
+        if hex[/\A\#[A-Za-z0-9]+\Z/]?
+            name = pieces.first
+            colors[name] = hex
+        end
+      }
+      new_file = "tmp/out/hex_colors.html"
+      Dir.mkdir_p(File.dirname(new_file))
+      html = IO::Memory.new
+      html << <<-EOF
+      <html>
+        <head>
+          <style>
+          body { font-family: sans-serif; font-size: smaller;  }
+          div.color { padding-top: 10px; float: left; width: 150px; height: 150px }
+          div.hex {
+            background-color: #fff;
+          }
+          div.name {
+            background-color: #fff;
+            font-weight: bolder;
+          }
+          </style>
+        </head>
+        <body>
+      EOF
+      colors.each { |name, hex|
+        html << <<-EOF
+          <div class="color" style="background-color: #{hex};">
+          <div class="hex">#{hex}</div>
+          <div class="name">#{name}</div>
+          </div>
+        EOF
+      }
+      html << "</body></html>"
+      File.write(new_file, html.to_s)
+      DA_Dev.green! "=== {{Wrote}}: BOLD{{#{File.expand_path new_file}}}"
+    end # === def hex_colors_file
+
     def upgrade
       DA_Dev.orange! "=== {{Pulling}} BOLD{{#{DA_Process.new("git remote get-url origin").success!.output.to_s.strip}}}"
       DA_Process.success!("git", "pull".split)

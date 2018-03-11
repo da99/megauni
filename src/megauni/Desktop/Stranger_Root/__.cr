@@ -43,13 +43,14 @@ module MEGAUNI
 
             body {
 
-              header {
+              header("#site") {
                 h1 { MEGAUNI.site_name }
               }
 
+              markup_footer
+
               markup_log_in
               markup_create_a_new_account
-              markup_footer
 
             } # body
 

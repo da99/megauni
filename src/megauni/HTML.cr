@@ -52,7 +52,7 @@ module MEGAUNI
       link("styles/otfpoc.css")
 
       link("/public/#{route_name}/style.css")
-      if route_name["Desktop/"]?
+      if Route.desktop?(self)
         link("Desktop/MUE/style.css")
       end
     end
