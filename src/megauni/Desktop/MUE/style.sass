@@ -1,4 +1,6 @@
 @import "__vars"
+@import "__form"
+@import "__section"
 
 html
   height: 100%
@@ -37,80 +39,10 @@ p
 div.disclaimer
   color: #8E8E8E
 
-div.loading
+section.loading
   form div.buttons
     display: none
   div.loading_msg
     background-color: $yellow_light
-
-
-section
-  padding: 0 1rem 1rem 1rem
-  color: #000
-  background-color: $white
-  font-weight: bold
-  margin: 1em
-  float: left
-  +border-radius( 5px )
-
-  div.field_invalid
-    border: 1px dashed $red_medium
-    padding: 0.5em
-
-  div.error_msg
-    color: $red_medium
-    font-style: italic
-    font-size: smaller
-
-  div.error_server
-    font-size: larger
-    padding: 1em 0
-
-  div.success_msg
-    background-color: $yellow_light
-    margin: 0.5em 0 0 0
-    padding: 0.5em
-    background-color: $green_medium
-    color: $white
-
-  h2
-    font-weight: bolder
-    font-size: 0.8rem
-    padding: 0.5rem 0 0.5rem 0
-    text-align: center
-
-  form
-    button
-      font-size: 0.7rem
-      text-transform: uppercase
-
-    fieldset
-      padding: 0.5em 0
-
-    label
-      line-height: 1.2rem
-      font-weight: normal
-      font-size: 0.8rem
-      display: block
-
-    label span
-      display: block
-
-    label span.sub
-      color: $greyish_medium
-
-    nav
-      text-align: right
-      padding: 0.5em 0 0 0
-
-input[type="text"], input[type="password"]
-  font-size: 1.3rem
-  font-family: monospace
-
-button
-  cursor: pointer
-
-
-
 
 
