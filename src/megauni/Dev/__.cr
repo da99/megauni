@@ -21,6 +21,23 @@ module MEGAUNI
       DA_Dev.green! "=== {{Done}}: BOLD{{upgrading}} ==="
     end
 
+    def tell_human_file_size(file : String)
+      size = File.stat(file).size
+      if size < 50
+        DA_Dev.orange! "=== BOLD{{Wrote}}: #{file} -- {{#{human_file_size size}}}"
+      else
+        DA_Dev.green! "=== {{Wrote}}: #{file} (#{human_file_size size})"
+      end
+    end
+
+    def human_file_size(i)
+      if i < 1024
+        "#{i} bytes"
+      else
+        "#{(i.to_f/1024.0).round(2)} Kb"
+      end
+    end
+
     def compile(file)
       ext = File.extname(file)
       case ext
@@ -31,7 +48,7 @@ module MEGAUNI
         new_file = "Public/public/#{jspp.dir}/#{jspp.name}.js"
         output = jspp.compile(new_file)
         if output.success?
-          DA_Dev.green! "=== {{Wrote}}: BOLD{{#{new_file}}} (size: #{File.stat(new_file).size})"
+          tell_human_file_size(new_file)
         else
           STDERR.puts output.error
           exit output.stat.exit_code
@@ -42,7 +59,7 @@ module MEGAUNI
         new_file = "Public/public/#{sassc.dir}/#{sassc.name}.css"
         output   = sassc.compile(new_file)
         if output.success?
-          DA_Dev.green! "=== {{Wrote}}: BOLD{{#{new_file}}} (size: #{File.stat(new_file).size})"
+          tell_human_file_size(new_file)
         else
           STDERR.puts output.error
           exit output.stat.exit_code
