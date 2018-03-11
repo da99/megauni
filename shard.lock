@@ -6,7 +6,7 @@ shards:
 
   da_dev:
     github: da99/da_dev
-    version: 0.2.11
+    version: 0.2.12
 
   da_html:
     github: da99/da_html.cr
@@ -54,11 +54,11 @@ shards:
 
   my_css:
     github: da99/my_css
-    version: 0.0.1
+    version: 0.2.3
 
   my_js:
     github: da99/my_js
-    version: 0.1.2
+    version: 0.2.2
 
   myhtml:
     github: kostya/myhtml
