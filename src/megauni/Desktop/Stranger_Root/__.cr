@@ -3,7 +3,7 @@ require "./*"
 
 module MEGAUNI
 
-  class Stranger_Root
+  class Desktop_Stranger_Root
 
     # =============================================================================
     # Class:
@@ -23,7 +23,7 @@ module MEGAUNI
     # =============================================================================
 
     getter route : Route
-    getter route_name = "Stranger_Root"
+    getter route_name = "Desktop/Stranger_Root"
 
     def initialize(@route)
     end # === def initialize

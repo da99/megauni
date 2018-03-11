@@ -1,6 +1,9 @@
 
 module MEGAUNI
 
+  class Error < Exception
+  end
+
   SECRET      = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
   COOKIE_NAME = "mu_session"
 
@@ -16,6 +19,22 @@ module MEGAUNI
     "megaUNI.com"
   end
 
+  def self.route_name(file : String)
+    pieces = file.split('/')
+    if pieces.size < 3
+      raise Error.new("Not enough pieces for a route name: #{file.inspect}")
+    end
+    "#{pieces[-3]}/#{pieces[-2]}"
+  end
+
+  def self.route_file(file : String)
+    pieces = file.split('/')
+    if pieces.size < 3
+      raise Error.new("Not enough pieces for a route file: #{file.inspect}")
+    end
+    "#{pieces[-3]}/#{pieces[-2]}/#{File.basename(pieces[-1], File.extname(pieces[-1]))}"
+  end
+
 end # === module MEGAUNI
 
 require "./megauni/Screen_Name"
@@ -28,7 +47,7 @@ require "./megauni/Server"
 {% if env("IS_DEV") %}
   require "./megauni/Public_Files/__"
 {% end %}
-require "./megauni/Stranger_Root/__"
+require "./megauni/Desktop/Stranger_Root/__"
 require "./megauni/Not_Found/__"
 
 

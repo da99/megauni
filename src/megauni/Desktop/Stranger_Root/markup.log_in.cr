@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Stranger_Root
+  class Desktop_Stranger_Root
 
     macro markup_log_in
       section {
@@ -34,5 +34,5 @@ module MEGAUNI
       } # === section
     end # === def log_in_markup
 
-  end # === class Stranger_Root
+  end # === class Desktop_Stranger_Root
 end # === module MEGAUNI

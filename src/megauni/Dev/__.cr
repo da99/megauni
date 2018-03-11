@@ -38,14 +38,41 @@ module MEGAUNI
       end
     end
 
+    def compile_all
+      sass_files.each { |f| compile f }
+      jspp_files.each { |f| compile f }
+    end
+
+    def jspp_files
+      files = [] of String
+      %w[Desktop Mobile].each { |dir|
+        Dir.glob("./src/megauni/#{dir}/*/*.jspp").each { |jspp|
+          files.push jspp
+        }
+      }
+      files
+    end
+
+    def sass_files
+      files = [] of String
+      %w[Desktop Mobile].each { |dir|
+        Dir.glob("./src/megauni/#{dir}/*/*.sass").each { |sass|
+          next if File.basename(sass)[/\A__/]?
+          files.push sass
+        }
+      }
+      files
+    end
+
     def compile(file)
       ext = File.extname(file)
+      route_file = MEGAUNI.route_file(file)
       case ext
 
       when ".jspp"
         libs     = Dir.glob(".js_packages/da_standard/src/*.jspp")
         jspp     = My_JS::File.new(libs, file)
-        new_file = "Public/public/#{jspp.dir}/#{jspp.name}.js"
+        new_file = "Public/public/#{route_file}.js"
         output = jspp.compile(new_file)
         if output.success?
           tell_human_file_size(new_file)
@@ -55,8 +82,14 @@ module MEGAUNI
         end
 
       when ".sass"
+        is_partial  = File.basename(file)[/\A__/]?
+        if is_partial
+          sass_files.each { |f| compile f }
+          return
+        end
+
         sassc    = My_CSS::File.new(file)
-        new_file = "Public/public/#{sassc.dir}/#{sassc.name}.css"
+        new_file = "Public/public/#{route_file}.css"
         output   = sassc.compile(new_file)
         if output.success?
           tell_human_file_size(new_file)

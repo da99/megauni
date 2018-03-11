@@ -8,9 +8,9 @@ module MEGAUNI
     # =============================================================================
 
     {% if env("IS_DEV") %}
-      MODELS = Set{Public_Files,Stranger_Root,Not_Found}
+      MODELS = Set{Public_Files,Desktop_Stranger_Root,Not_Found}
     {% else %}
-      MODELS = Set{Stranger_Root,Not_Found}
+      MODELS = Set{Desktop_Stranger_Root,Not_Found}
     {% end %}
 
     # =============================================================================

@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Stranger_Root
+  class Desktop_Stranger_Root
 
     macro markup_footer
       footer("#intro.block") {
@@ -44,5 +44,5 @@ module MEGAUNI
       } # div#intro
     end # === macro markup_footer
 
-  end # === class Stranger_Root
+  end # === class Desktop_Stranger_Root
 end # === module MEGAUNI

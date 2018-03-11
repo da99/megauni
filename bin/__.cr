@@ -65,17 +65,7 @@ when cmd == "server" && args.first? == "check" && args.size == 3
   MEGAUNI::Server.check(args.shift.not_nil!.to_i32, args.shift.not_nil!)
 
 when full_cmd == "compile all"
-  Dir.glob("./src/megauni/*/*.jspp").each { |jspp|
-    MEGAUNI::Dev.compile(jspp)
-  }
-
-  Dir.glob("./src/megauni/*/*.sass").each { |sass|
-    MEGAUNI::Dev.compile(sass)
-  }
-
-  Dir.glob("./src/megauni/*/*.styl").each { |styl|
-    MEGAUNI::Dev.compile(styl)
-  }
+  MEGAUNI::Dev.compile_all
 
 when cmd == "compile" && args.first? == "shard.yml"
   :ignore
