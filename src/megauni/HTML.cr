@@ -44,13 +44,10 @@ module MEGAUNI
       ]
     end
 
-    macro stylesheet!
+    macro default_stylesheets!
       link("/public/basic_one/reset.css")
-
       link("/public/styles/fonts.css")
       link("/public/styles/otfpoc.css")
-
-      link("/public/Route/#{route_name}/style.css")
     end
 
     {% for x in %w[h1 h2 h3].map(&.id) %}
@@ -98,10 +95,15 @@ module MEGAUNI
     end
 
     def link(css : String)
-      href = (css[0]? == '/') ? css : "/public/#{css}"
+      href = case
+             when css[0]? == '/'
+               css
+             else
+               "/public/Route/#{css}"
+             end
       tag(
         "link",
-        href: href,
+        href: href || css,
         media: "all",
         rel: "stylesheet",
         title: "Default",
@@ -109,7 +111,7 @@ module MEGAUNI
       )
     end
 
-    {% for x in %w[header footer nav section button].map(&.id) %}
+    {% for x in %w[ul li header footer nav section button].map(&.id) %}
       def {{x}}(*args)
         tag("{{x}}", *args) {
           with self yield self

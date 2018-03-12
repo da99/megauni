@@ -36,8 +36,9 @@ module MEGAUNI
 
             head {
               head_defaults!
-              stylesheet!
-              link("/public/Route/MUE/desktop.css")
+              default_stylesheets!
+              link("MUE/desktop.css")
+              link("#{route_name}/desktop.css")
               title { "#{MEGAUNI.site_name}: Home" }
               meta("Description", "Sign-In or Create an Account if you don't have one.")
             }

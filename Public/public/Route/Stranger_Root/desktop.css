@@ -1,0 +1,5 @@
+div.hidden { display: none; }
+
+nav { display: table; }
+
+nav footer { display: table-row; vertical-align: bottom; height: 1px; }

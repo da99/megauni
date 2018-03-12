@@ -30,9 +30,11 @@ nav h1 { font-size: 1.5rem; }
 
 nav p { font-size: 0.8rem; line-height: 1rem; }
 
-nav div.disclaimer { color: #616161; }
+nav footer { color: #616161; }
 
-nav ul li { display: block; list-style: none; }
+nav footer p.important { color: #363636; }
+
+nav ul li { display: block; list-style: none; font-size: 0.8rem; padding-bottom: 0.9rem; }
 
 html { height: 100%; }
 
