@@ -8,8 +8,7 @@ module MEGAUNI
         form(action: "/log-in", method: "post") {
           fieldset {
             label { "Screen Name:" }
-            screen_name_input
-            input_text("screen_name", "")
+            input_screen_name
           }
 
           fieldset(".pswd") {
@@ -17,27 +16,18 @@ module MEGAUNI
               span { "Pass Phrase:" }
               span(".sub") { " (for better security, use spaces and words)" }
             }
-            pass_phrase_input
-            input_password("pswd")
+            input_pass_phrase("pswd")
           }
 
           fieldset(".confirm_pass_phrase") {
             label { "Confirm Pass Phrase:" }
-            pass_phrase_input("confirm")
-            input_password("confirm_pass_word")
+            input_pass_phrase("confirm")
           }
 
-          nav {
+          div(".submit") {
             button(".submit") { "Create Account" }
           }
 
-          template(data_do: "template logged-in?") {
-            div(".success_msg") { "You account has been created. Loading..." }
-          }
-
-          template(data_do: "template error-/user") {
-            div(".error_msg") { "\{{msg}}" }
-          }
         } # === form
       } # === section
     end # === macro markup_create_a_new_account

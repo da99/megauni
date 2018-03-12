@@ -8,27 +8,20 @@ module MEGAUNI
         form {
           fieldset {
             label { "Screen Name:" }
-            screen_name_input
+            input_screen_name
           }
 
           fieldset {
             label {
               span { "Pass Phrase:" }
             }
-            pass_phrase_input
+            input_pass_phrase("pswd")
           }
 
-          nav {
+          div(".submit") {
             button(".submit") { "Log-In" }
           }
 
-          template(data_do: "template logged-in?") {
-            div(".success_msg") { "You are now logged in. Loading..." }
-          }
-
-          template(data_do: "template FORM.error_msg") {
-            div(".error_msg") { "\{{msg}}" }
-          }
         } # === form
       } # === section
     end # === def log_in_markup

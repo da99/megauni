@@ -42,7 +42,7 @@ module MEGAUNI
             }
 
             body {
-              markup_header
+              markup_nav
 
               markup_log_in
               markup_create_a_new_account

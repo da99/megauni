@@ -117,31 +117,19 @@ module MEGAUNI
       )
     end
 
-    def header(*args)
-      tag("header", *args) {
-        with self yield self
-      }
-    end
+    {% for x in %w[header footer nav section button].map(&.id) %}
+      def {{x}}(*args)
+        tag("{{x}}", *args) {
+          with self yield self
+        }
+      end
+    {% end %}
 
-    def footer(*args)
-      tag("footer", *args) {
-        with self yield self
-      }
-    end
+    def input_text(name : String, value : String)
+      tag("input", name: name, type: "text", value: "")
+    end # === def input
 
-    def section
-      tag("section") {
-        with self yield self
-      }
-    end
-
-    def button(*args)
-      tag("button", *args) {
-        with self yield
-      }
-    end # === def button
-
-    def screen_name_input
+    def input_screen_name
       tag(
         "input",
         :required,
@@ -153,13 +141,26 @@ module MEGAUNI
       )
     end
 
-    def input_text(name : String, value : String)
-      tag("input", name: name, type: "text", value: "")
+    def input_password(name : String)
+      tag(
+        "input",
+        name: name,
+        type: "password",
+        value: ""
+      )
     end # === def input
 
-    def input_password(name : String)
-      tag("input", name: name, type: "password", value: "")
-    end # === def input
+    def input_pass_phrase(prefix : String? = nil)
+      tag(
+        "input",
+        :required,
+        name:      "#{prefix == "" ? "" : "#{prefix}_"}pass_phrase",
+        type:      "password",
+        minlength: MEGAUNI::MIN_PASS_PHRASE.to_s,
+        maxlength: MEGAUNI::MAX_PASS_PHRASE.to_s,
+        value:     ""
+      )
+    end # === def to_html
 
     def template(**names)
       tag("template", **names) {
@@ -173,12 +174,6 @@ module MEGAUNI
       }
     end # === def span
 
-    def nav
-      tag("nav") {
-        with self yield self
-      }
-    end # === def nav
-
     def button(*args, **names)
       tag("button", *args, **names) {
         text? { with self yield self }
@@ -190,18 +185,6 @@ module MEGAUNI
         text? { with self yield self }
       }
     end # === def div
-
-    def pass_phrase_input(prefix : String? = nil)
-      tag(
-        "input",
-        :required,
-        name:      "#{prefix == "" ? "" : "#{prefix}_"}pass_phrase",
-        type:      "password",
-        minlength: MEGAUNI::MIN_PASS_PHRASE.to_s,
-        maxlength: MEGAUNI::MAX_PASS_PHRASE.to_s,
-        value:     ""
-      )
-    end # === def to_html
 
     def script(src : String)
       tag("script", type: "text/javascript", src: src) {
