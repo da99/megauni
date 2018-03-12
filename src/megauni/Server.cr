@@ -14,6 +14,7 @@ module MEGAUNI
 
     def self.check(port : Int32)
       check(port, "/")
+      check(port, "/inbox")
       check(port, "/public/Route/Stranger_Root/style.css")
       check(port, "/public/basic_one/reset.css")
       check(port, "/something-not-found")

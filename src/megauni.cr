@@ -42,6 +42,7 @@ require "./megauni/Server"
   require "./megauni/Public_Files/__"
 {% end %}
 require "./megauni/Route/Stranger_Root/__"
+require "./megauni/Route/Inbox_All/__"
 require "./megauni/Not_Found/__"
 
 

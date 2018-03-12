@@ -1,5 +1,7 @@
-div.hidden { display: none; }
+nav { border: 0; height: 100%; max-width: 200px; float: left; text-align: right; display: table; }
 
-nav { display: table; }
+nav ul li { display: block; padding-bottom: 0.9rem; }
 
 nav footer { display: table-row; vertical-align: bottom; height: 1px; }
+
+div.hidden { display: none; }

@@ -24,17 +24,17 @@ section div.success_msg { background-color: #FFFEE2; margin: 0.5em 0 0 0; paddin
 
 section h2 { font-weight: bolder; font-size: 0.8rem; padding: 0.5rem 0 0.5rem 0; text-align: center; color: #616161; }
 
-nav { height: 100%; background-color: #fff; border: 0; max-width: 200px; padding: 1em; text-align: right; float: left; }
+nav { background-color: #fff; padding: 1em; }
 
-nav h1 { font-size: 1.5rem; }
+nav h1 { font-size: 1.5rem; color: #000; font-family: AghjaMedium; font-weight: normal; font-style: normal; margin: 0.5em 0; }
 
 nav p { font-size: 0.8rem; line-height: 1rem; }
+
+nav ul li { list-style: none; font-size: 0.8rem; }
 
 nav footer { color: #616161; }
 
 nav footer p.important { color: #363636; }
-
-nav ul li { display: block; list-style: none; font-size: 0.8rem; padding-bottom: 0.9rem; }
 
 html { height: 100%; }
 
@@ -45,8 +45,6 @@ a:link { color: #000; }
 a:visited { color: #8E8E8E; }
 
 a:hover { color: #C0002C; }
-
-h1.site_name { color: #000; font-family: AghjaMedium; font-weight: normal; font-style: normal; margin: 0.5em 0; }
 
 h2, h3 { color: #363636; text-transform: uppercase; font-size: smaller; padding: 0.5em 0; margin: 0; }
 

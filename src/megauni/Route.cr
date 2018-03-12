@@ -7,11 +7,7 @@ module MEGAUNI
     # Struct:
     # =============================================================================
 
-    {% if env("IS_DEV") %}
-      MODELS = Set{Public_Files,Stranger_Root,Not_Found}
-    {% else %}
-      MODELS = Set{Stranger_Root,Not_Found}
-    {% end %}
+    MODELS = Set{Stranger_Root,Inbox_All,Not_Found}
 
     # =============================================================================
     # Instance:
@@ -34,6 +30,9 @@ module MEGAUNI
     end # === def initialize
 
     def run
+      {% if env("IS_DEV") %}
+        return true if Public_Files.route!(self)
+      {% end %}
       MODELS.find { |x| x.route!(self) }
     end
 
