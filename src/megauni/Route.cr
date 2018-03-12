@@ -7,18 +7,10 @@ module MEGAUNI
     # Struct:
     # =============================================================================
 
-    def self.desktop?(x)
-      x.route_name["Desktop/"]?
-    end
-
-    def self.mobile?(x)
-      x.route_name["Mobile/"]?
-    end
-
     {% if env("IS_DEV") %}
-      MODELS = Set{Public_Files,Desktop_Stranger_Root,Not_Found}
+      MODELS = Set{Public_Files,Stranger_Root,Not_Found}
     {% else %}
-      MODELS = Set{Desktop_Stranger_Root,Not_Found}
+      MODELS = Set{Stranger_Root,Not_Found}
     {% end %}
 
     # =============================================================================

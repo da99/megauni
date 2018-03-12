@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Desktop_Stranger_Root
+  class Stranger_Root
 
     macro markup_nav
       nav {
@@ -43,5 +43,5 @@ module MEGAUNI
       } # nav
     end # === macro markup_header
 
-  end # === class Desktop_Stranger_Root
+  end # === class Stranger_Root
 end # === module MEGAUNI

@@ -51,14 +51,12 @@ module MEGAUNI
       link("styles/fonts.css")
       link("styles/otfpoc.css")
 
-      link("/public/#{route_name}/style.css")
-      if Route.desktop?(self)
-        link("Desktop/MUE/style.css")
-      end
+      link("/public/Route/#{route_name}/style.css")
+      link("MUE/style.css")
     end
 
     macro desktop_stylesheet!
-      link("Desktop/MUE/style.css")
+      link("Route/MUE/style.css")
     end
 
     {% for x in %w[h1 h2 h3].map(&.id) %}

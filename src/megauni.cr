@@ -20,19 +20,13 @@ module MEGAUNI
   end
 
   def self.route_name(file : String)
-    pieces = file.split('/')
-    if pieces.size < 3
-      raise Error.new("Not enough pieces for a route name: #{file.inspect}")
-    end
-    "#{pieces[-3]}/#{pieces[-2]}"
+    return File.basename(File.dirname(file))
   end
 
   def self.route_file(file : String)
-    pieces = file.split('/')
-    if pieces.size < 3
-      raise Error.new("Not enough pieces for a route file: #{file.inspect}")
-    end
-    "#{pieces[-3]}/#{pieces[-2]}/#{File.basename(pieces[-1], File.extname(pieces[-1]))}"
+    route_name = self.route_name(file)
+    name = File.basename(file, File.extname(file))
+    "Route/#{route_name}/#{name}"
   end
 
 end # === module MEGAUNI
@@ -47,7 +41,7 @@ require "./megauni/Server"
 {% if env("IS_DEV") %}
   require "./megauni/Public_Files/__"
 {% end %}
-require "./megauni/Desktop/Stranger_Root/__"
+require "./megauni/Route/Stranger_Root/__"
 require "./megauni/Not_Found/__"
 
 

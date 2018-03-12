@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Desktop_Stranger_Root
+  class Stranger_Root
 
     macro markup_create_a_new_account
       section {
@@ -32,5 +32,5 @@ module MEGAUNI
       } # === section
     end # === macro markup_create_a_new_account
 
-  end # === class Desktop_Stranger_Root
+  end # === class Stranger_Root
 end # === module MEGAUNI

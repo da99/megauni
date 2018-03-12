@@ -10,7 +10,7 @@ module MEGAUNI
     extend self
 
     def hex_colors_file
-      file = "src/megauni/Desktop/MUE/__vars.sass"
+      file = "src/megauni/Route/MUE/__vars.sass"
       colors = {} of String => String
       File.read(file).lines.each { |l|
         pieces = l.split(':').map(&.strip)
@@ -90,7 +90,7 @@ module MEGAUNI
 
     def jspp_files
       files = [] of String
-      %w[Desktop Mobile].each { |dir|
+      %w[Route].each { |dir|
         Dir.glob("./src/megauni/#{dir}/*/*.jspp").each { |jspp|
           files.push jspp
         }
@@ -100,7 +100,7 @@ module MEGAUNI
 
     def sass_files
       files = [] of String
-      %w[Desktop Mobile].each { |dir|
+      %w[Route].each { |dir|
         Dir.glob("./src/megauni/#{dir}/*/*.sass").each { |sass|
           next if File.basename(sass)[/\A__/]?
           files.push sass
