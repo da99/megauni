@@ -39,24 +39,18 @@ module MEGAUNI
       raw! %[
       <script
         type="application/javascript"
-        src="/public/#{route_name}/script.js"
+        src="/public/Route/#{route_name}/script.js"
       ></script>
       ]
     end
 
     macro stylesheet!
-      link("basic_one/reset.css")
+      link("/public/basic_one/reset.css")
 
-      # link("vanilla.reset.css")
-      link("styles/fonts.css")
-      link("styles/otfpoc.css")
+      link("/public/styles/fonts.css")
+      link("/public/styles/otfpoc.css")
 
       link("/public/Route/#{route_name}/style.css")
-      link("MUE/style.css")
-    end
-
-    macro desktop_stylesheet!
-      link("Route/MUE/style.css")
     end
 
     {% for x in %w[h1 h2 h3].map(&.id) %}
