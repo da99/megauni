@@ -20,9 +20,7 @@ module MEGAUNI
             }
           }
           li {
-            a(href: "/" ) {
-              raw!("/ &nbsp;")
-            }
+            a(href: "/" ) { MEGAUNI.site_name }
           }
         } # === ul
 

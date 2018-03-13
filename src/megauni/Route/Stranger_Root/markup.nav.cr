@@ -13,11 +13,10 @@ module MEGAUNI
 
         ul {
           li { a(href: "/inbox") { "/inbox" } }
-          li { a(href: "/high") { "/high" } }
-          li { a(href: "/news") { "/news" } }
-          li { a(href: "/unknown") { "/unknown" } }
           li { a(href: "/@username") { "@username" } }
           li { a(href: "/@username/1") { "@username/1" } }
+          li { a(href: "/@username/g1") { "@username/g1" } }
+          li { a(href: "/member@username") { "member@username" } }
           li { a(href: "/@username/@member") { "@username/@member" } }
         }
 

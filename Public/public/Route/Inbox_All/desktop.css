@@ -5,3 +5,19 @@ nav h1 { display: inline-block; }
 nav ul { display: inline-block; padding-left: 0.7rem; }
 
 nav ul li { display: inline-block; padding: 0 0.7rem 0 0.7rem; border-left: 1px dotted #616161; }
+
+section#high h2 { color: #F00919; }
+
+section#other { padding-right: 0; padding-left: 0; }
+
+section#other div.list { border-collapse: collapse; display: table; }
+
+section#other div.folder { font-weight: normal; display: table-row; line-height: 1.5rem; -moz-border-radius: 5px; -webkit-border-radius: 5px; -khtml-border-radius: 5px; border-radius: 5px; }
+
+section#other div.folder:hover { background-color: #F5F5F5; }
+
+section#other div.name { font-size: 0.9rem; padding: 0 0.5rem 0 1rem; display: table-cell; padding-right: 0.5rem; }
+
+section#other div.size { padding: 0 1rem 0 0; display: table-cell; text-align: right; }
+
+section#other div.size a:link { font-size: 0.8rem; display: inline-block; }

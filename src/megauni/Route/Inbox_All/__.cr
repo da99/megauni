@@ -42,6 +42,9 @@ module MEGAUNI
             } # === head
             body {
               markup_nav
+              markup_high
+              markup_other
+              markup_recent_senders
             } # === body
           } # === html
         end # === HTML

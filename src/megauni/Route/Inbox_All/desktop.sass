@@ -2,3 +2,32 @@
 @import "../MUE/__vars"
 @import "../MUE/__nav_bar.top"
 
+section#high
+  h2
+    color: $red_medium
+section#other
+  padding-right: 0
+  padding-left: 0
+  div.list
+    border-collapse:  collapse
+    display:          table
+  div.folder
+    font-weight: normal
+    display:     table-row
+    line-height: 1.5rem
+    +border_radius(5px)
+  div.folder:hover
+      background-color: $white_dark
+  div.name
+    font-size: 0.9rem
+    padding: 0 0.5rem 0 1rem
+    display:        table-cell
+    padding-right:  0.5rem
+  div.size
+    padding: 0 1rem 0 0
+    display:        table-cell
+    text-align: right
+    a:link
+      font-size: 0.8rem
+      display: inline-block
+
