@@ -108,6 +108,13 @@ module MEGAUNI
     end
 
     def listen
+      target_proc_user = "web_app"
+      proc_user = DA_Process.new("whoami").output.to_s.strip
+      if proc_user != target_proc_user
+        DA_Dev.red! "!!! {{Invalid process user}}: {{#{proc_user}}} (expecting #{target_proc_user})"
+        exit 1
+      end
+
       Dir.mkdir_p(PORTS_DIR)
       current = Server.running_servers(port)
       if current.size > 0
