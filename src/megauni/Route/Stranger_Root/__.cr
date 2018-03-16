@@ -2,11 +2,10 @@
 require "./*"
 
 module MEGAUNI
-
-  class Stranger_Root
+  struct Stranger_Root
 
     # =============================================================================
-    # Class:
+    # Struct:
     # =============================================================================
 
     def self.route!(route)
@@ -57,5 +56,4 @@ module MEGAUNI
     end # === def root
 
   end # === class Root
-
 end # === module MEGAUNI

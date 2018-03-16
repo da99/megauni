@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Stranger_Root
+  struct Stranger_Root
 
     macro markup_nav
       nav {

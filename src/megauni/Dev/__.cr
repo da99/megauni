@@ -1,6 +1,7 @@
 
 require "my_js"
 require "my_css"
+require "pg"
 
 module MEGAUNI
   module Dev
@@ -8,6 +9,48 @@ module MEGAUNI
     end
 
     extend self
+
+    def setup
+      begin
+        DB.open "postgres:///megauni_db" do |db|
+          db.query("select NOW();") do |rs|
+            rs.each {
+              puts rs.read(Time).inspect
+            }
+          end
+        end
+      rescue e : DB::ConnectionRefused
+        DA_Dev.red! "!!! Ensure db user BOLD{{#{ENV["USER"]}}} and db BOLD{{#{MEGAUNI.sql_db_name}}} exists."
+        exit 1
+      end
+
+      migrate
+    end
+
+    def sql_files(glob : String)
+      Dir.glob("Model/User/db/*.sql").sort_by { |x|
+        File.basename(x).split("-").first.to_i
+      }
+    end
+
+    def migrate
+      DB.open "postgres:///megauni_db" do |db|
+        db.query("select NOW();") do |rs|
+          rs.each {
+            puts rs.read(Time).inspect
+          }
+        end
+
+        Dir.cd("#{__DIR__}/..") {
+          sql_files("Model/User/db/*.sql").each { |x|
+            sql = File.read(x)
+            DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
+            db.exec sql
+            DA_Dev.green! "=== {{#{x}}} ==="
+          }
+        }
+      end
+    end # === def migrate
 
     def hex_colors_file
       file = "src/megauni/Route/MUE/__vars.sass"

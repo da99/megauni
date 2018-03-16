@@ -12,6 +12,8 @@ dependencies:
     github: da99/da_css.cr
   da_html:
     github: da99/da_html.cr
+  pg:
+    github: will/crystal-pg
 
 development_dependencies:
   my_js:

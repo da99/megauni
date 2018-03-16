@@ -48,6 +48,10 @@ shards:
     github: da99/da_uri.cr
     commit: c470e3c8d1d8e8cff2b3f811528a3c2e8a427dc6
 
+  db:
+    github: crystal-lang/crystal-db
+    version: 0.5.0
+
   inspect_bang:
     github: da99/inspect_bang.cr
     version: 1.0.1
@@ -63,6 +67,10 @@ shards:
   myhtml:
     github: kostya/myhtml
     version: 0.27
+
+  pg:
+    github: will/crystal-pg
+    version: 0.14.1
 
   terminal_table:
     github: benoist/terminal_table.cr

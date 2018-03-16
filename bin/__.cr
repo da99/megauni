@@ -73,6 +73,13 @@ when cmd == "compile" && args.first? == "shard.yml"
 when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
   MEGAUNI::Dev.compile(args.shift)
 
+when full_cmd == "migrate"
+  # === {{CMD}} migrate
+  MEGAUNI::Dev.migrate
+
+when full_cmd == "setup"
+  # === {{CMD}} setup
+  MEGAUNI::Dev.setup
 
 when full_cmd == "hex colors"
   # === {{CMD}} hex colors

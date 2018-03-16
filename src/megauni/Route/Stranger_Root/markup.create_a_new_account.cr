@@ -1,6 +1,6 @@
 
 module MEGAUNI
-  class Stranger_Root
+  struct Stranger_Root
 
     macro markup_create_a_new_account
       section {
