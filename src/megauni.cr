@@ -37,6 +37,25 @@ module MEGAUNI
 
 end # === module MEGAUNI
 
+lib LibC
+  fun setuid(uid_t : Int)
+  fun getuid : Int
+end
+
+module MEGAUNI
+
+  def self.uid(username : String)
+    proc = DA_Process.new("id", ["-u", username])
+    if proc.success?
+      proc.output.to_s.strip.to_i
+    else
+      DA_Dev.red! proc.error.to_s
+      exit proc.stat.exit_code
+    end
+  end # === def uid
+
+end # === module MEGAUNI
+
 require "./megauni/Model/Screen_Name/__"
 require "./megauni/HTML"
 require "./megauni/CSS"

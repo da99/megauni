@@ -108,15 +108,8 @@ module MEGAUNI
     end
 
     def listen
-      target_proc_user = "web_app"
-      proc_user = DA_Process.new("whoami").output.to_s.strip
-      if proc_user != target_proc_user
-        DA_Dev.red! "!!! {{Invalid process user}}: {{#{proc_user}}} (expecting #{target_proc_user})"
-        exit 1
-      end
-
-      Dir.mkdir_p(PORTS_DIR)
       current = Server.running_servers(port)
+
       if current.size > 0
         current.each { |ss|
           DA_Dev.red! "!!! {{Server already running}}: port BOLD{{#{ss.port}}}, pid BOLD{{#{ss.pid}}}"
@@ -125,6 +118,20 @@ module MEGAUNI
       end
 
       File.write(port_file, Process.pid.to_s)
+
+      web_app = "web_app"
+      uid = MEGAUNI.uid(web_app)
+
+      Dir.mkdir_p(PORTS_DIR)
+      File.chown(PORTS_DIR, uid)
+
+      LibC.setuid(uid)
+
+      proc_user = DA_Process.new("whoami").output.to_s.strip
+      if proc_user != web_app
+        DA_Dev.red! "!!! {{Invalid process user}}: {{#{proc_user}}} (expecting #{web_app})"
+        exit 1
+      end
 
       Signal::INT.trap {
         Signal::INT.reset
@@ -138,6 +145,7 @@ module MEGAUNI
         exit 0
       }
 
+      DA_Dev.orange! "=== User: BOLD{{#{proc_user}}}, production?: BOLD{{#{!ENV["IS_DEV"]?}}}"
       DA_Dev.orange! "=== {{Starting}} server on port BOLD{{#{port}}}, pid BOLD{{#{Process.pid}}}"
       @server.listen
     end # === def listen
