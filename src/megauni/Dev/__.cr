@@ -45,6 +45,21 @@ module MEGAUNI
       end
     end # === def migrate
 
+    def migrate_dump
+      proc = DA_Process.new("sudo", "-u production_user pg_dump #{MEGAUNI.sql_db_name}".split)
+
+      if proc.stat.exit_code > 0
+        STDERR.puts proc.error.to_s
+        exit proc.stat.exit_code
+      else
+        Dir.cd(THIS_DIR) {
+          file = "src/megauni/SQL/pg_dump.sql"
+          File.write(file, proc.output.to_s)
+          DA_Dev.green! "=== {{Wrote}}: BOLD{{#{file}}}"
+        }
+      end
+    end # === def migrate_dump
+
     def hex_colors_file
       file = "src/megauni/Route/MUE/__vars.sass"
       colors = {} of String => String

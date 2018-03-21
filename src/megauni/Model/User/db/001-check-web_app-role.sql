@@ -5,6 +5,7 @@ DO $$
 DECLARE
   role_record RECORD;
   col_name VARCHAR;
+  ignored BOOLEAN;
 BEGIN
    SELECT INTO role_record *
      FROM pg_catalog.pg_roles
@@ -19,15 +20,6 @@ BEGIN
     FROM information_schema.columns
     WHERE table_schema = 'pg_catalog' AND table_name = 'pg_roles'
    LOOP
-
-    CASE col_name
-    WHEN 'rolname', 'rolsuper', 'rolinherit', 'rolcreaterole', 'rolcreatedb',
-      'rolcanlogin', 'rolreplication', 'rolbypassrls',
-      'rolconnlimit', 'rolpassword', 'rolvaliduntil', 'rolconfig', 'oid' THEN
-      CONTINUE;
-    ELSE
-      RAISE EXCEPTION 'UNKNOWN value for ROLE web_app: %', col_name;
-    END CASE;
 
     CASE
 
@@ -55,7 +47,15 @@ BEGIN
     WHEN col_name = 'rolbypassrls' AND role_record.rolbypassrls = FALSE THEN
       CONTINUE;
 
+    WHEN col_name = 'rolconnlimit' AND role_record.rolconnlimit = -1 THEN
+      CONTINUE;
+
     ELSE
+      CASE col_name
+      WHEN 'rolconnlimit', 'rolpassword', 'rolvaliduntil', 'rolconfig', 'oid' THEN
+        CONTINUE;
+      END CASE;
+
       RAISE EXCEPTION 'INVALID VALUE value for ROLE web_app: %', col_name;
     END CASE;
    END LOOP;

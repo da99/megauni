@@ -77,6 +77,10 @@ when full_cmd == "migrate"
   # === {{CMD}} migrate
   MEGAUNI::Dev.migrate
 
+when full_cmd == "migrate dump"
+  # === {{CMD}} migrate dump
+  MEGAUNI::Dev.migrate_dump
+
 when full_cmd == "setup"
   # === {{CMD}} setup
   MEGAUNI::Dev.setup
