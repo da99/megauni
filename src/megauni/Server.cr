@@ -1,7 +1,52 @@
 
 require "http/server"
 require "http/client"
+require "pg"
+
 module MEGAUNI
+
+  @@SQL_DB : DB::Database? = nil
+  @@HTTP_SERVER : Server? = nil
+
+  def self.sql_db?
+    @@SQL_DB.nil?
+  end
+
+  def self.sql_db!
+    sql_db = @@SQL_DB
+    if !sql_db
+      sql_connect
+    end
+    sql_db.not_nil!
+  end
+
+  def self.sql_connect
+    # @@SQL_DB = DB.open("postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5")
+    @@SQL_DB = DB.open("postgres:///#{MEGAUNI.sql_db_name}")
+    @@SQL_DB.not_nil!
+  end
+
+  def self.http_server(s : Server)
+    @@HTTP_SERVER = s
+  end
+
+  def self.exit
+    Signal::INT.reset
+    Signal::TERM.reset
+    server = @@HTTP_SERVER
+
+    if server
+      DA_Dev.orange! "=== {{Closing}}: HTTP server..."
+      server.close
+    end
+
+    sql_db = @@SQL_DB
+    if sql_db
+      DA_Dev.orange! "=== {{Closing}}: SQL Database..."
+      sql_db.close
+    end
+    exit 0
+  end
 
   class Server
 
@@ -133,17 +178,12 @@ module MEGAUNI
         exit 1
       end
 
-      Signal::INT.trap {
-        Signal::INT.reset
-        close
-        exit 0
-      }
+      DA_Dev.orange! "=== Connecting to {{database}}..."
+      MEGAUNI.sql_connect
+      MEGAUNI.http_server(self)
 
-      Signal::TERM.trap {
-        Signal::TERM.reset
-        close
-        exit 0
-      }
+      Signal::INT.trap { MEGAUNI.exit }
+      Signal::TERM.trap { MEGAUNI.exit }
 
       DA_Dev.orange! "=== User: BOLD{{#{proc_user}}}, production?: BOLD{{#{!ENV["IS_DEV"]?}}}"
       DA_Dev.orange! "=== {{Starting}} server on port BOLD{{#{port}}}, pid BOLD{{#{Process.pid}}}"
@@ -173,6 +213,5 @@ module MEGAUNI
   end # === module Server
 
 end # === module MEGAUNI
-
 
 

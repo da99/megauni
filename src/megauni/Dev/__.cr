@@ -1,7 +1,6 @@
 
 require "my_js"
 require "my_css"
-require "pg"
 
 module MEGAUNI
   module Dev
@@ -12,7 +11,7 @@ module MEGAUNI
 
     def setup
       begin
-        DB.open "postgres:///megauni_db" do |db|
+        DB.open "postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5" do |db|
           db.query("select NOW();") do |rs|
             rs.each {
               puts rs.read(Time).inspect
@@ -34,13 +33,7 @@ module MEGAUNI
     end
 
     def migrate
-      DB.open "postgres:///megauni_db" do |db|
-        db.query("select NOW();") do |rs|
-          rs.each {
-            puts rs.read(Time).inspect
-          }
-        end
-
+      DB.open "postgres:///#{MEGAUNI.sql_db_name}" do |db|
         Dir.cd("#{__DIR__}/..") {
           sql_files("Model/User/db/*.sql").each { |x|
             sql = File.read(x)
