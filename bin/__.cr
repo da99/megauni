@@ -10,6 +10,10 @@ cmd      = args.shift
 THIS_DIR = File.expand_path(File.join(__DIR__, ".."))
 APP_NAME = File.basename(THIS_DIR)
 
+if cmd == "migrate"
+  MEGAUNI.production_user!
+end
+
 if cmd == "compile"
   if File.expand_path(Dir.current) != THIS_DIR
     DA_Dev.red! "!!! {{Invalid current directory}}: BOLD{{#{Dir.current}}}"
@@ -65,7 +69,21 @@ when cmd == "server" && args.first? == "check" && args.size == 3
   MEGAUNI::Server.check(args.shift.not_nil!.to_i32, args.shift.not_nil!)
 
 when full_cmd == "compile all"
+  # === {{CMD}} compile all
   MEGAUNI::Dev.compile_all
+
+when full_cmd == "dev permissions"
+  # === {{CMD}} dev permissions
+  p1 = DA_Process.new("chmod", "-R g+wX #{THIS_DIR}".split)
+  p2 = DA_Process.new("chown", "production_user -R #{THIS_DIR}".split)
+  if !(p1.success? && p2.success?)
+    DA_Dev.orange! "=== Finish with: BOLD{{chmod -R g+wX .}}"
+    DA_Dev.orange! "=== Finish with: BOLD{{chown production_user -R .}}"
+    exit 1
+  end
+  p1.success!
+  p2.success!
+
 
 when cmd == "compile" && args.first? == "shard.yml"
   :ignore
@@ -80,6 +98,10 @@ when full_cmd == "migrate"
 when full_cmd == "migrate dump"
   # === {{CMD}} migrate dump
   MEGAUNI::Dev.migrate_dump
+
+when full_cmd == "migrate force"
+  # === {{CMD}} migrate force
+  MEGAUNI::Dev.migrate_force
 
 when full_cmd == "setup"
   # === {{CMD}} setup

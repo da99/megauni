@@ -4,6 +4,8 @@ require "my_css"
 
 module MEGAUNI
   module Dev
+    PG_DUMP = "src/megauni/SQL/pg_dump.sql"
+
     class Error < Exception
     end
 
@@ -27,37 +29,70 @@ module MEGAUNI
     end
 
     def sql_files(glob : String)
-      Dir.glob("Model/User/db/*.sql").sort_by { |x|
+      Dir.glob(glob).sort_by { |x|
         File.basename(x).split("-").first.to_i
       }
     end
 
     def migrate
-      DB.open "postgres:///#{MEGAUNI.sql_db_name}" do |db|
-        Dir.cd("#{__DIR__}/..") {
-          sql_files("Model/User/db/*.sql").each { |x|
-            sql = File.read(x)
-            DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
-            db.exec sql
-            DA_Dev.green! "=== {{#{x}}} ==="
-          }
-        }
+      Dir.cd THIS_DIR
+      if !File.exists?(PG_DUMP)
+        STDERR.puts "!!! File not found: #{PG_DUMP}"
+        exit 1
       end
+
+      Dir.mkdir_p "tmp/out"
+      tmp_dump = "tmp/out/pg_dump.sql"
+      File.write(tmp_dump, dump)
+
+      system("diff", "-U3 #{tmp_dump} #{PG_DUMP}".split)
+      DA_Process.success! $?
+
+      DA_Dev.green! "=== PG database {{up-to-date}}. ==="
     end # === def migrate
 
-    def migrate_dump
-      proc = DA_Process.new("sudo", "-u production_user pg_dump #{MEGAUNI.sql_db_name}".split)
-
-      if proc.stat.exit_code > 0
-        STDERR.puts proc.error.to_s
-        exit proc.stat.exit_code
-      else
-        Dir.cd(THIS_DIR) {
-          file = "src/megauni/SQL/pg_dump.sql"
-          File.write(file, proc.output.to_s)
-          DA_Dev.green! "=== {{Wrote}}: BOLD{{#{file}}}"
+    def migrate_force
+      Dir.cd THIS_DIR
+      [
+        sql_files("src/megauni/Model/User/db/*.sql"),
+        sql_files("src/megauni/Model/Screen_Name/db/*.sql")
+      ].each { |files|
+        files.each { |x|
+          DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
+          system("psql", "-v ON_ERROR_STOP=1 #{MEGAUNI.sql_db_name} -f #{x}".split)
+          DA_Process.success! $?
+          DA_Dev.green! "=== {{#{x}}} ==="
         }
+      }
+      migrate_dump
+    end # === def migrate_force
+
+    def migrate_dump
+      if !ENV["IS_DEV"]?
+        STDERR.puts "!!! migrate dump: can only be run on a dev machine."
+        exit 1
       end
+      Dir.cd THIS_DIR
+      File.write(PG_DUMP, dump)
+      DA_Dev.green! "=== {{Wrote}}: BOLD{{PG_DUMP}}"
+    end # === def migrate_dump
+
+    def dump
+      "#{dump_roles}\n#{dump_schema}"
+    end
+
+    def dump_roles
+      sql = "SELECT * FROM pg_catalog.pg_roles WHERE rolname = 'production_user' OR rolname = 'web_app' ORDER BY rolname;"
+      proc = DA_Process.new("psql", [MEGAUNI.sql_db_name, "-c", sql])
+      proc.success!
+      proc.output.to_s.lines.map { |l| l.gsub(/\s*[0-9]+\s*$/, "") }.join('\n')
+    end
+
+    def dump_schema
+      proc = DA_Process.new("pg_dump", "--schema-only #{MEGAUNI.sql_db_name}".split)
+      proc.success!
+
+      proc.output.to_s
     end # === def migrate_dump
 
     def hex_colors_file

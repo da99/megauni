@@ -35,6 +35,13 @@ module MEGAUNI
     "Route/#{route_name}/#{name}"
   end
 
+  def self.production_user!
+    if `whoami`.chomp != "production_user"
+      DA_Dev.red! "!!! Run as BOLD{{production_user}}"
+      exit 1
+    end
+  end # === def self.production_user
+
 end # === module MEGAUNI
 
 lib LibC

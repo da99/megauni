@@ -26,7 +26,7 @@ shards:
 
   da_process:
     github: da99/da_process.cr
-    version: 1.3.2
+    version: 1.3.4
 
   da_redis:
     github: da99/da_redis.cr
