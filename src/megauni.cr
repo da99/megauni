@@ -2,7 +2,6 @@
 module MEGAUNI
 
   THIS_DIR = File.expand_path("#{__DIR__}/..")
-  SQL_DB_NAME = "megauni_db"
   class Error < Exception
   end
 
@@ -21,8 +20,8 @@ module MEGAUNI
     "megaUNI.com"
   end
 
-  def self.sql_db_name
-    SQL_DB_NAME
+  def self.dev?
+    ENV["IS_DEV"]?
   end
 
   def self.route_name(file : String)
@@ -62,6 +61,8 @@ module MEGAUNI
   end # === def uid
 
 end # === module MEGAUNI
+
+require "./megauni/SQL/*"
 
 require "./megauni/Model/Screen_Name/__"
 require "./megauni/HTML"

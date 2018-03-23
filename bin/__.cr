@@ -3,6 +3,7 @@ require "inspect_bang"
 require "da_dev"
 require "../src/megauni"
 require "../src/megauni/Dev/*"
+require "../src/megauni/SQL/*"
 
 full_cmd = ARGV.join(' ')
 args     = ARGV.dup
@@ -10,7 +11,7 @@ cmd      = args.shift
 THIS_DIR = File.expand_path(File.join(__DIR__, ".."))
 APP_NAME = File.basename(THIS_DIR)
 
-if cmd == "migrate"
+if cmd == "migrate" && args.first? != "reset"
   MEGAUNI.production_user!
 end
 
@@ -93,19 +94,27 @@ when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
 
 when full_cmd == "migrate"
   # === {{CMD}} migrate
-  MEGAUNI::Dev.migrate
+  MEGAUNI::SQL.migrate
 
 when full_cmd == "migrate dump"
   # === {{CMD}} migrate dump
-  MEGAUNI::Dev.migrate_dump
+  MEGAUNI::SQL.migrate_dump
 
 when full_cmd == "migrate force"
   # === {{CMD}} migrate force
-  MEGAUNI::Dev.migrate_force
+  MEGAUNI::SQL.migrate_force
+
+when full_cmd == "migrate reset"
+  # === {{CMD}} migrate reset
+  if !MEGAUNI.dev?
+    STDERR.puts "!!! Not in dev. env."
+    exit 1
+  end
+  MEGAUNI::SQL.reset!
 
 when full_cmd == "setup"
   # === {{CMD}} setup
-  MEGAUNI::Dev.setup
+  MEGAUNI::SQL.setup
 
 when full_cmd == "hex colors"
   # === {{CMD}} hex colors

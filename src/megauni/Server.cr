@@ -22,7 +22,7 @@ module MEGAUNI
 
   def self.sql_connect
     # @@SQL_DB = DB.open("postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5")
-    @@SQL_DB = DB.open("postgres:///#{MEGAUNI.sql_db_name}")
+    @@SQL_DB = DB.open("postgres:///#{MEGAUNI::SQL.db_name}")
     @@SQL_DB.not_nil!
   end
 
