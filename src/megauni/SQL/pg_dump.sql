@@ -36,6 +36,40 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: clean_new_label(character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.clean_new_label(INOUT raw_label character varying) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
+    AS $_$
+DECLARE
+  valid_chars VARCHAR;
+BEGIN
+
+  IF raw_label IS NULL THEN
+    RAISE EXCEPTION 'programmer_error: NULL VALUE';
+  END IF;
+  IF char_length(raw_label) < 1 THEN
+    RAISE EXCEPTION 'invalid label: too short: 1';
+  END IF;
+
+  IF char_length(raw_label) > 30 THEN
+    RAISE EXCEPTION 'invalid label: too long: 30';
+  END IF;
+
+  valid_chars := 'A-Za-z\d\-\_\^\%\$\@\*\!\~\+\=';
+  IF raw_label !~ ('\A[' || valid_chars || ']+\Z') THEN
+    RAISE EXCEPTION 'invalid label: invalid chars: %', regexp_replace(raw_label, ('[' || valid_chars || ']+'), '', 'ig');
+  END IF;
+
+
+END
+$_$;
+
+
+ALTER FUNCTION public.clean_new_label(INOUT raw_label character varying) OWNER TO production_user;
+
+--
 -- Name: clean_new_message_folder(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
@@ -226,6 +260,8 @@ BEGIN
   WHEN 'Follow'      THEN RETURN 3;
 
   WHEN 'Page'        THEN RETURN 10;
+  WHEN 'Draft'       THEN RETURN 11;
+  WHEN 'Publish'     THEN RETURN 11;
 
   ELSE
     RAISE EXCEPTION 'programmer_error: name for type_id not found: %', raw_name;
@@ -239,6 +275,40 @@ ALTER FUNCTION public.type_id(raw_name character varying) OWNER TO production_us
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: label; Type: TABLE; Schema: public; Owner: production_user
+--
+
+CREATE TABLE public.label (
+    id bigint NOT NULL,
+    name character varying(30) NOT NULL,
+    CONSTRAINT label_name_check CHECK (((name)::text = (public.clean_new_label(name))::text))
+);
+
+
+ALTER TABLE public.label OWNER TO production_user;
+
+--
+-- Name: label_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user
+--
+
+CREATE SEQUENCE public.label_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.label_id_seq OWNER TO production_user;
+
+--
+-- Name: label_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: production_user
+--
+
+ALTER SEQUENCE public.label_id_seq OWNED BY public.label.id;
+
 
 --
 -- Name: member; Type: TABLE; Schema: public; Owner: production_user
@@ -310,6 +380,27 @@ ALTER SEQUENCE public.member_id_seq OWNED BY public.member.id;
 
 
 --
+-- Name: message; Type: TABLE; Schema: public; Owner: production_user
+--
+
+CREATE TABLE public.message (
+    id bigint NOT NULL,
+    status_id smallint DEFAULT public.type_id('Draft'::character varying) NOT NULL,
+    owner_id bigint NOT NULL,
+    parent_id bigint NOT NULL,
+    parent_type_id smallint NOT NULL,
+    origin_id bigint NOT NULL,
+    origin_type_id smallint NOT NULL,
+    title character varying(140),
+    body text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT title_or_body CHECK (((title IS NOT NULL) OR (body IS NOT NULL)))
+);
+
+
+ALTER TABLE public.message OWNER TO production_user;
+
+--
 -- Name: message_folder; Type: TABLE; Schema: public; Owner: production_user
 --
 
@@ -342,6 +433,27 @@ ALTER TABLE public.message_folder_id_seq OWNER TO production_user;
 --
 
 ALTER SEQUENCE public.message_folder_id_seq OWNED BY public.message_folder.id;
+
+
+--
+-- Name: message_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user
+--
+
+CREATE SEQUENCE public.message_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.message_id_seq OWNER TO production_user;
+
+--
+-- Name: message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: production_user
+--
+
+ALTER SEQUENCE public.message_id_seq OWNED BY public.message.id;
 
 
 --
@@ -404,6 +516,13 @@ ALTER SEQUENCE public.screen_name_id_seq OWNED BY public.screen_name.id;
 
 
 --
+-- Name: label id; Type: DEFAULT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.label ALTER COLUMN id SET DEFAULT nextval('public.label_id_seq'::regclass);
+
+
+--
 -- Name: member id; Type: DEFAULT; Schema: public; Owner: production_user
 --
 
@@ -418,6 +537,13 @@ ALTER TABLE ONLY public.member_block ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: message id; Type: DEFAULT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message ALTER COLUMN id SET DEFAULT nextval('public.message_id_seq'::regclass);
+
+
+--
 -- Name: message_folder id; Type: DEFAULT; Schema: public; Owner: production_user
 --
 
@@ -429,6 +555,22 @@ ALTER TABLE ONLY public.message_folder ALTER COLUMN id SET DEFAULT nextval('publ
 --
 
 ALTER TABLE ONLY public.screen_name ALTER COLUMN id SET DEFAULT nextval('public.screen_name_id_seq'::regclass);
+
+
+--
+-- Name: label label_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.label
+    ADD CONSTRAINT label_name_key UNIQUE (name);
+
+
+--
+-- Name: label label_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.label
+    ADD CONSTRAINT label_pkey PRIMARY KEY (id);
 
 
 --
@@ -453,6 +595,14 @@ ALTER TABLE ONLY public.member
 
 ALTER TABLE ONLY public.message_folder
     ADD CONSTRAINT message_folder_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: message message_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message
+    ADD CONSTRAINT message_pkey PRIMARY KEY (id);
 
 
 --

@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION clean_new_screen_name(INOUT sn varchar)
+CREATE OR REPLACE FUNCTION clean_new_screen_name(INOUT sn VARCHAR)
 AS $$
   BEGIN
     sn := screen_name_canonical(sn);
@@ -13,8 +13,7 @@ AS $$
   END
 $$
 LANGUAGE plpgsql
-IMMUTABLE
-;
+IMMUTABLE;
 
 
 
