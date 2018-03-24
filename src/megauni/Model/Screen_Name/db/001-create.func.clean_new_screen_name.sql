@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION clean_new_screen_name(inout sn varchar)
+CREATE OR REPLACE FUNCTION clean_new_screen_name(INOUT sn varchar)
 AS $$
   BEGIN
     sn := screen_name_canonical(sn);

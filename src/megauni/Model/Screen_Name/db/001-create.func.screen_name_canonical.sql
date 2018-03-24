@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION screen_name_canonical(inout sn varchar)
+CREATE OR REPLACE FUNCTION screen_name_canonical(INOUT sn varchar)
 AS $$
   DECLARE
     valid_chars VARCHAR;

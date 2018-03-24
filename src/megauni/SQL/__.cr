@@ -54,8 +54,13 @@ module MEGAUNI
     def migrate_force
       Dir.cd THIS_DIR
       [
-        files("src/megauni/Model/User/db/*.sql"),
+        files("src/megauni/Model/Common/db/*.sql"),
+        files("src/megauni/Model/Member/db/*.sql"),
         files("src/megauni/Model/Screen_Name/db/*.sql"),
+        files("src/megauni/Model/Member_Block/db/*.sql"),
+        files("src/megauni/Model/Folder/db/*.sql"),
+        files("src/megauni/Model/Message/db/*.sql"),
+        files("src/megauni/Model/Mail/db/*.sql"),
         files("src/megauni/Model/Readable/db/*.sql"),
         files("src/megauni/Model/Writeable/db/*.sql")
       ].each { |files|

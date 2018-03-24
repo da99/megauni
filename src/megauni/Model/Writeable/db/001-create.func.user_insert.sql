@@ -1,8 +1,8 @@
 
-CREATE OR REPLACE FUNCTION user_insert(
+CREATE OR REPLACE FUNCTION member_insert(
   IN  sn_name     varchar,
   IN  pswd_hash   varchar,
-  OUT new_user_id bigint,
+  OUT new_member_id bigint,
   OUT new_screen_name text
 )
 AS $$
@@ -18,15 +18,15 @@ AS $$
     END IF;
 
     INSERT INTO
-    "user" ( id, pswd_hash )
+    "member" ( id, pswd_hash )
     VALUES ( DEFAULT, pswd_hash::BYTEA )
     RETURNING id INTO temp_rec;
 
-    new_user_id := temp_rec.id;
+    new_member_id := temp_rec.id;
 
     SELECT *
     INTO temp_rec
-    FROM screen_name_insert(new_user_id, sn_name);
+    FROM screen_name_insert(new_member_id, sn_name);
 
     new_screen_name := temp_rec.new_screen_name;
   END
