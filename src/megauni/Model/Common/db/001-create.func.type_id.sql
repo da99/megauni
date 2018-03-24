@@ -10,10 +10,12 @@ BEGIN
   WHEN 'Member'      THEN RETURN 1;
   WHEN 'Screen_Name' THEN RETURN 2;
   WHEN 'Follow'      THEN RETURN 3;
+  WHEN 'Contact'     THEN RETURN 4;
+  WHEN 'Message'     THEN RETURN 5;
 
   WHEN 'Page'        THEN RETURN 10;
   WHEN 'Draft'       THEN RETURN 11;
-  WHEN 'Publish'     THEN RETURN 11;
+  WHEN 'Publish'     THEN RETURN 12;
 
   ELSE
     RAISE EXCEPTION 'programmer_error: name for type_id not found: %', raw_name;

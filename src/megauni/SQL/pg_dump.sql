@@ -258,10 +258,12 @@ BEGIN
   WHEN 'Member'      THEN RETURN 1;
   WHEN 'Screen_Name' THEN RETURN 2;
   WHEN 'Follow'      THEN RETURN 3;
+  WHEN 'Contact'     THEN RETURN 4;
+  WHEN 'Message'     THEN RETURN 5;
 
   WHEN 'Page'        THEN RETURN 10;
   WHEN 'Draft'       THEN RETURN 11;
-  WHEN 'Publish'     THEN RETURN 11;
+  WHEN 'Publish'     THEN RETURN 12;
 
   ELSE
     RAISE EXCEPTION 'programmer_error: name for type_id not found: %', raw_name;
@@ -407,6 +409,7 @@ ALTER TABLE public.message OWNER TO production_user;
 CREATE TABLE public.message_folder (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
+    type_id smallint NOT NULL,
     name character varying(30) NOT NULL,
     CONSTRAINT message_folder_name_check CHECK (((name)::text = (public.clean_new_message_folder(name))::text))
 );
@@ -622,10 +625,10 @@ ALTER TABLE ONLY public.screen_name
 
 
 --
--- Name: message_folder_name_unique_idx; Type: INDEX; Schema: public; Owner: production_user
+-- Name: message_folder_name_type_id_unique_idx; Type: INDEX; Schema: public; Owner: production_user
 --
 
-CREATE UNIQUE INDEX message_folder_name_unique_idx ON public.message_folder USING btree (upper((name)::text));
+CREATE UNIQUE INDEX message_folder_name_type_id_unique_idx ON public.message_folder USING btree (upper((name)::text), type_id);
 
 
 --
