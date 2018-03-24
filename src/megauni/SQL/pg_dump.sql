@@ -448,14 +448,6 @@ ALTER TABLE ONLY public.member
 
 
 --
--- Name: message_folder message_folder_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
---
-
-ALTER TABLE ONLY public.message_folder
-    ADD CONSTRAINT message_folder_name_key UNIQUE (name);
-
-
---
 -- Name: message_folder message_folder_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
 --
 
@@ -477,6 +469,13 @@ ALTER TABLE ONLY public.screen_name
 
 ALTER TABLE ONLY public.screen_name
     ADD CONSTRAINT screen_name_screen_name_key UNIQUE (screen_name);
+
+
+--
+-- Name: message_folder_name_unique_idx; Type: INDEX; Schema: public; Owner: production_user
+--
+
+CREATE UNIQUE INDEX message_folder_name_unique_idx ON public.message_folder USING btree (upper((name)::text));
 
 
 --

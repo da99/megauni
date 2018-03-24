@@ -12,6 +12,8 @@ BEGIN
   WHEN 'Follow'      THEN RETURN 3;
 
   WHEN 'Page'        THEN RETURN 10;
+  WHEN 'Draft'       THEN RETURN 11;
+  WHEN 'Publish'     THEN RETURN 11;
 
   ELSE
     RAISE EXCEPTION 'programmer_error: name for type_id not found: %', raw_name;
