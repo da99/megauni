@@ -13,7 +13,6 @@ BEGIN
   WHEN 'Contact'     THEN RETURN 4;
   WHEN 'Message'     THEN RETURN 5;
 
-  WHEN 'Page'        THEN RETURN 10;
   WHEN 'Draft'       THEN RETURN 11;
   WHEN 'Publish'     THEN RETURN 12;
 
