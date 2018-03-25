@@ -11,21 +11,15 @@ module MEGAUNI
       "megauni_db"
     end
 
-    def setup
+    def run
       begin
         DB.open "postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5" do |db|
-          db.query("select NOW();") do |rs|
-            rs.each {
-              puts rs.read(Time).inspect
-            }
-          end
+          yield db
         end
       rescue e : DB::ConnectionRefused
         DA_Dev.red! "!!! Ensure db user BOLD{{#{ENV["USER"]}}} and db BOLD{{#{MEGAUNI::SQL.db_name}}} exists."
         exit 1
       end
-
-      migrate
     end
 
     def files(glob : String)
@@ -102,6 +96,24 @@ module MEGAUNI
 
       proc.output.to_s
     end # === def migrate_dump
+
+    def reset_tables!
+      if !MEGAUNI.dev?
+        STDERR.puts "!!! reset_tables! can only be run in dev. env."
+        exit 1
+      end
+
+      run { |db|
+        db.query("SELECT table_name FROM megauni_tables;") { |rs|
+          rs.each {
+            table_name = rs.read(String)
+            sql = %[DELETE FROM #{table_name};]
+            # DA_Dev.orange! "=== {{SQL}}: BOLD{{#{sql}}}"
+            db.exec sql
+          }
+        }
+      }
+    end # === def reset_tables!
 
     def reset!
       if !MEGAUNI.dev?

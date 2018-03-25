@@ -1,6 +1,7 @@
 
 require "inspect_bang"
 require "da_spec"
+require "da_dev"
 
 extend DA_SPEC
 
@@ -10,4 +11,5 @@ end # === def strip
 
 require "../src/megauni"
 require "./css/*"
+require "./sql/*"
 

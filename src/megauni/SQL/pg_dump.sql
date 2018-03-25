@@ -136,7 +136,7 @@ CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash charac
       RAISE EXCEPTION 'programmer_error: pswd_hash not set';
     END IF;
 
-    IF length(pswd_hash) < 10 THEN
+    IF length(pswd_hash) < 60 THEN
       RAISE EXCEPTION 'programmer_error: invalid pswd_hash';
     END IF;
 
@@ -261,7 +261,6 @@ BEGIN
   WHEN 'Contact'     THEN RETURN 4;
   WHEN 'Message'     THEN RETURN 5;
 
-  WHEN 'Page'        THEN RETURN 10;
   WHEN 'Draft'       THEN RETURN 11;
   WHEN 'Publish'     THEN RETURN 12;
 
@@ -311,6 +310,19 @@ ALTER TABLE public.label_id_seq OWNER TO production_user;
 
 ALTER SEQUENCE public.label_id_seq OWNED BY public.label.id;
 
+
+--
+-- Name: megauni_tables; Type: VIEW; Schema: public; Owner: production_user
+--
+
+CREATE VIEW public.megauni_tables AS
+ SELECT tables.table_name
+   FROM information_schema.tables
+  WHERE (((tables.table_catalog)::text = 'megauni_db'::text) AND ((tables.table_schema)::text = 'public'::text) AND ((tables.table_type)::text = 'BASE TABLE'::text))
+  ORDER BY tables.table_name;
+
+
+ALTER TABLE public.megauni_tables OWNER TO production_user;
 
 --
 -- Name: member; Type: TABLE; Schema: public; Owner: production_user
@@ -409,9 +421,11 @@ ALTER TABLE public.message OWNER TO production_user;
 CREATE TABLE public.message_folder (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
-    type_id smallint NOT NULL,
+    owner_type_id smallint NOT NULL,
     name character varying(30) NOT NULL,
-    CONSTRAINT message_folder_name_check CHECK (((name)::text = (public.clean_new_message_folder(name))::text))
+    display_name character varying(30) NOT NULL,
+    CONSTRAINT message_folder_check CHECK ((((name)::text = (public.clean_new_message_folder(name))::text) AND (upper((display_name)::text) = (name)::text))),
+    CONSTRAINT message_folder_name_check CHECK (((name)::text = (public.clean_new_message_folder((upper((name)::text))::character varying))::text))
 );
 
 
@@ -593,6 +607,14 @@ ALTER TABLE ONLY public.member
 
 
 --
+-- Name: message_folder message_folder_owner_id_owner_type_id_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_folder
+    ADD CONSTRAINT message_folder_owner_id_owner_type_id_name_key UNIQUE (owner_id, owner_type_id, name);
+
+
+--
 -- Name: message_folder message_folder_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
 --
 
@@ -622,13 +644,6 @@ ALTER TABLE ONLY public.screen_name
 
 ALTER TABLE ONLY public.screen_name
     ADD CONSTRAINT screen_name_screen_name_key UNIQUE (screen_name);
-
-
---
--- Name: message_folder_name_type_id_unique_idx; Type: INDEX; Schema: public; Owner: production_user
---
-
-CREATE UNIQUE INDEX message_folder_name_type_id_unique_idx ON public.message_folder USING btree (upper((name)::text), type_id);
 
 
 --

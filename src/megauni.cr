@@ -62,8 +62,9 @@ module MEGAUNI
 
 end # === module MEGAUNI
 
-require "./megauni/SQL/*"
+require "./megauni/SQL/__"
 
+require "./megauni/Model/Member/__"
 require "./megauni/Model/Screen_Name/__"
 require "./megauni/HTML"
 require "./megauni/CSS"

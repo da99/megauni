@@ -92,6 +92,10 @@ when cmd == "compile" && args.first? == "shard.yml"
 when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
   MEGAUNI::Dev.compile(args.shift)
 
+when full_cmd == "migrate reset tables"
+  # === {{CMD}} migrate reset tables
+  MEGAUNI::SQL.reset_tables!
+
 when full_cmd == "migrate"
   # === {{CMD}} migrate
   MEGAUNI::SQL.migrate
@@ -111,10 +115,6 @@ when full_cmd == "migrate reset"
     exit 1
   end
   MEGAUNI::SQL.reset!
-
-when full_cmd == "setup"
-  # === {{CMD}} setup
-  MEGAUNI::SQL.setup
 
 when full_cmd == "hex colors"
   # === {{CMD}} hex colors
