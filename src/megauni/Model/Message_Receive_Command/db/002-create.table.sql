@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS "message_receive_command" (
   id BIGSERIAL PRIMARY KEY,
   owner_id         BIGINT      NOT NULL, -- refers to member or screen_name id
   owner_type_id    SMALLINT    NOT NULL, -- type_id('Member') || type_id('Screen_Name')
+  sender_id        BIGINT      NOT NULL, -- screen_name id
   message_type_id  SMALLINT    NOT NULL,
   folder_id        BIGINT      NOT NULL,
 

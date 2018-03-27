@@ -5,6 +5,9 @@ module MEGAUNI
   class Error < Exception
   end
 
+  class Query_Error < Error
+  end
+
   SECRET      = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
   COOKIE_NAME = "mu_session"
 
