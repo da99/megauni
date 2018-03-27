@@ -19,17 +19,21 @@ module MEGAUNI
       end
       pass_word = Crypto::Bcrypt::Password.create(raw_pass_word, cost: crypt_cost)
 
-      new_member_id   = 0.to_i64
-      new_screen_name = "not set"
+      new_member_id      = 0.to_i64
+      new_screen_name    = "not set"
+      new_screen_name_id = 0.to_i64
 
       MEGAUNI::SQL.run { |db|
-        new_member_id, new_screen_name = db.query_one(
-          %[SELECT new_member_id, new_screen_name FROM member_insert($1, $2);],
+        new_member_id, new_screen_name, new_screen_name_id = db.query_one(
+          %[SELECT new_member_id, new_screen_name, new_screen_name_id FROM member_insert($1, $2);],
           raw_user_name, pass_word,
-          as: {Int64, String}
+          as: {Int64, String, Int64}
         )
       }
-      Screen_Name.new(new_member_id, new_screen_name)
+      if new_member_id == 0.to_i64
+        raise Query_Error.new("member: could not be saved")
+      end
+      Screen_Name.new(new_member_id, new_screen_name, new_screen_name_id)
     end # === def self.create
 
   end # === class Member

@@ -126,7 +126,7 @@ ALTER FUNCTION public.clean_new_screen_name(INOUT sn character varying) OWNER TO
 -- Name: member_insert(character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text) RETURNS record
+CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) RETURNS record
     LANGUAGE plpgsql
     AS $$
   DECLARE
@@ -152,11 +152,12 @@ CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash charac
     FROM screen_name_insert(new_member_id, sn_name);
 
     new_screen_name := temp_rec.new_screen_name;
+    new_screen_name_id := temp_rec.new_screen_name_id;
   END
 $$;
 
 
-ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text) OWNER TO production_user;
+ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) OWNER TO production_user;
 
 --
 -- Name: privacy_id(character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -227,7 +228,7 @@ ALTER FUNCTION public.screen_name_canonical(INOUT sn character varying) OWNER TO
 -- Name: screen_name_insert(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying) RETURNS character varying
+CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying, OUT new_screen_name_id bigint) RETURNS record
     LANGUAGE plpgsql
     AS $$
   DECLARE
@@ -238,13 +239,13 @@ CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name chara
     clean_screen_name := screen_name_canonical(raw_screen_name);
     INSERT INTO screen_name (owner_id, owner_type_id, screen_name)
     VALUES (owner_id, type_id('Member'), clean_screen_name)
-    RETURNING "screen_name".screen_name
-    INTO new_screen_name;
+    RETURNING "screen_name".screen_name, "screen_name".id
+    INTO new_screen_name, new_screen_name_id;
   END
 $$;
 
 
-ALTER FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying) OWNER TO production_user;
+ALTER FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying, OUT new_screen_name_id bigint) OWNER TO production_user;
 
 --
 -- Name: type_id(character varying); Type: FUNCTION; Schema: public; Owner: production_user

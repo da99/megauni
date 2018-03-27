@@ -1,9 +1,10 @@
 
 CREATE OR REPLACE FUNCTION member_insert(
-  IN  sn_name     varchar,
-  IN  pswd_hash   varchar,
-  OUT new_member_id bigint,
-  OUT new_screen_name text
+  IN  sn_name   varchar,
+  IN  pswd_hash varchar,
+  OUT new_member_id      bigint,
+  OUT new_screen_name    text,
+  OUT new_screen_name_id bigint
 )
 AS $$
   DECLARE
@@ -29,6 +30,7 @@ AS $$
     FROM screen_name_insert(new_member_id, sn_name);
 
     new_screen_name := temp_rec.new_screen_name;
+    new_screen_name_id := temp_rec.new_screen_name_id;
   END
 $$ LANGUAGE plpgsql;
 

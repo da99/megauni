@@ -69,6 +69,7 @@ require "./megauni/SQL/__"
 
 require "./megauni/Model/Member/__"
 require "./megauni/Model/Screen_Name/__"
+require "./megauni/Model/Message_Receive_Command/__"
 require "./megauni/HTML"
 require "./megauni/CSS"
 
