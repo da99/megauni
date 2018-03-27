@@ -23,23 +23,14 @@ module MEGAUNI
       new_screen_name = "not set"
 
       MEGAUNI::SQL.run { |db|
-        db.query(
+        new_member_id, new_screen_name = db.query_one(
           %[SELECT new_member_id, new_screen_name FROM member_insert($1, $2);],
-          raw_user_name, pass_word
-        ) { |rs|
-          rs.each {
-            new_member_id = rs.read(Int64)
-            new_screen_name = rs.read(String)
-          }
-        }
+          raw_user_name, pass_word,
+          as: {Int64, String}
+        )
       }
-      new(new_member_id, new_screen_name)
+      Screen_Name.new(new_member_id, new_screen_name)
     end # === def self.create
-
-    getter member_id : Int64
-    getter screen_name : String
-    def initialize(@member_id, @screen_name)
-    end # === def initialize
 
   end # === class Member
 end # === module MEGAUNI
