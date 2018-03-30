@@ -70,37 +70,6 @@ $_$;
 ALTER FUNCTION public.clean_new_label(INOUT raw_label character varying) OWNER TO production_user;
 
 --
--- Name: clean_new_message_folder(character varying); Type: FUNCTION; Schema: public; Owner: production_user
---
-
-CREATE FUNCTION public.clean_new_message_folder(INOUT raw_name character varying) RETURNS character varying
-    LANGUAGE plpgsql IMMUTABLE
-    AS $_$
-DECLARE
-valid_chars VARCHAR;
-BEGIN
-  IF raw_name IS NULL THEN
-    RAISE EXCEPTION 'programmer_error: NULL VALUE';
-  END IF;
-  IF char_length(raw_name) < 1 THEN
-    RAISE EXCEPTION 'invalid message folder: too short: 1';
-  END IF;
-
-  IF char_length(raw_name) > 30 THEN
-    RAISE EXCEPTION 'invalid message folder: too long: 30';
-  END IF;
-
-  valid_chars := 'A-Za-z\d\-\_\^\%\$\@\*\!\~\+\=';
-  IF raw_name !~ ('\A[' || valid_chars || ']+\Z') THEN
-    RAISE EXCEPTION 'invalid message folder: invalid chars: %', regexp_replace(raw_name, ('[' || valid_chars || ']+'), '', 'ig');
-  END IF;
-END
-$_$;
-
-
-ALTER FUNCTION public.clean_new_message_folder(INOUT raw_name character varying) OWNER TO production_user;
-
---
 -- Name: clean_new_screen_name(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
@@ -160,88 +129,134 @@ $$;
 ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) OWNER TO production_user;
 
 --
--- Name: message_receive_command_insert(bigint, bigint, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+-- Name: message_folder(bigint, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, sender_id bigint, message_type character varying, folder character varying, OUT id bigint, OUT message_type_id smallint, OUT message_folder_id smallint) RETURNS record
-    LANGUAGE plpgsql
-    AS $$
-  DECLARE
-  temp RECORD;
-  BEGIN
-    message_type_id   := message_type_id_create(sender_id, message_type);
-    message_folder_id := message_folder_id_create(owner_id, folder);
-
-    INSERT INTO message_receive_command ("id", "owner_id", "sender_id", "message_type_id", "message_folder_id")
-    VALUES (DEFAULT, owner_id, sender_id, message_type_id, message_folder_id)
-    RETURNING "id" INTO id;
-  END
-$$;
-
-
-ALTER FUNCTION public.message_receive_command_insert(owner_id bigint, sender_id bigint, message_type character varying, folder character varying, OUT id bigint, OUT message_type_id smallint, OUT message_folder_id smallint) OWNER TO production_user;
-
---
--- Name: message_type_canonical(character varying); Type: FUNCTION; Schema: public; Owner: production_user
---
-
-CREATE FUNCTION public.message_type_canonical(raw_name character varying) RETURNS character varying
+CREATE FUNCTION public.message_folder(raw_viewer_id bigint, raw_owner_name character varying, raw_name character varying) RETURNS TABLE(id bigint, name character varying, display_name character varying)
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  semi_clean    VARCHAR;
-  invalid_chars VARCHAR;
-  pattern       VARCHAR  := '[A-Z0-9\_\-\.\ \@\!\#\%\^\&\+\~]+';
-  max_length    SMALLINT := 140;
+  canonical_name VARCHAR;
+  owner          RECORD;
 BEGIN
+  canonical_name := message_folder_canonical(raw_name);
+  owner := screen_name(raw_viewer_id, raw_owner_name);
 
-  semi_clean := squeeze_whitespace(upper(raw_name));
+  RETURN QUERY
+  SELECT mf.id, mf.name, mf.display_name
+  FROM message_folder mf
+  WHERE mf.owner_id = owner.id AND mf.name = canonical_name;
 
-  IF char_length(semi_clean) > max_length THEN
-    RAISE EXCEPTION 'invalid message type: too long: %', max_length;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'not found: message folder: %', raw_name;
   END IF;
-
-  invalid_chars := regexp_replace(semi_clean, pattern, '', 'ig');
-  IF bit_length(invalid_chars) > 0 THEN
-    RAISE EXCEPTION 'invalid message type: invalid chars: %', invalid_chars;
-  END IF;
-
-  RETURN semi_clean;
 END
 $$;
 
 
-ALTER FUNCTION public.message_type_canonical(raw_name character varying) OWNER TO production_user;
+ALTER FUNCTION public.message_folder(raw_viewer_id bigint, raw_owner_name character varying, raw_name character varying) OWNER TO production_user;
 
 --
--- Name: message_type_id_create(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+-- Name: message_folder_canonical(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.message_type_id_create(raw_owner_id bigint, raw_name character varying) RETURNS bigint
-    LANGUAGE plpgsql
+CREATE FUNCTION public.message_folder_canonical(raw_name character varying) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
     AS $$
-  DECLARE
-    the_id BIGINT;
-    canonical_name VARCHAR;
-  BEGIN
-    canonical_name := message_type_canonical(raw_name);
-    SELECT id
-    INTO the_id
-    FROM message_type
-    WHERE "owner_id" = raw_owner_id AND name = canonical_name;
+DECLARE
+  original      VARCHAR;
+  invalid_chars VARCHAR;
+  pattern       VARCHAR  := '[a-zA-Z0-9\_\-\.\ \@\!\#\%\^\&\+\~]+';
+  max_length    SMALLINT := 30;
+BEGIN
 
-    IF NOT FOUND THEN
-      INSERT INTO message_type(id, "owner_id", "name")
-      VALUES (DEFAULT, raw_owner_id, canonical_name)
-      RETURNING id INTO the_id;
-    END IF;
+  original := raw_name;
 
-    RETURN the_id;
-  END
+  IF raw_name IS NULL THEN
+    RAISE EXCEPTION 'programmer_error: NULL VALUE';
+  END IF;
+
+  raw_name := squeeze_whitespace(upper(raw_name));
+
+  IF char_length(raw_name) < 1 THEN
+    RAISE EXCEPTION 'invalid message folder: too short: 1';
+  END IF;
+
+  IF char_length(raw_name) > max_length THEN
+    RAISE EXCEPTION 'invalid message folder: too long: %', max_length;
+  END IF;
+
+  invalid_chars := regexp_replace(raw_name, pattern, '', 'g');
+  IF bit_length(invalid_chars) > 0 THEN
+    RAISE EXCEPTION 'invalid message folder: invalid chars: %', invalid_chars;
+  END IF;
+
+  RETURN raw_name;
+END
 $$;
 
 
-ALTER FUNCTION public.message_type_id_create(raw_owner_id bigint, raw_name character varying) OWNER TO production_user;
+ALTER FUNCTION public.message_folder_canonical(raw_name character varying) OWNER TO production_user;
+
+--
+-- Name: message_folder_insert(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.message_folder_insert(raw_owner_id bigint, raw_name character varying) RETURNS TABLE(id bigint, name character varying, display_name character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  temp_rec RECORD;
+  canonical_name VARCHAR;
+BEGIN
+
+  canonical_name := message_folder_canonical(raw_name);
+
+  RETURN QUERY
+  SELECT mf.id, mf.name, mf.display_name
+  FROM message_folder AS mf
+  WHERE mf.owner_id = raw_owner_id AND mf.name = canonical_name;
+
+  IF NOT FOUND THEN
+    RETURN QUERY
+    INSERT INTO
+    "message_folder" AS mf ( "id", "owner_id", "name", "display_name" )
+    VALUES (DEFAULT, raw_owner_id, UPPER(canonical_name), canonical_name)
+    RETURNING mf.id, mf.name, mf.display_name;
+  END IF;
+
+END
+$$;
+
+
+ALTER FUNCTION public.message_folder_insert(raw_owner_id bigint, raw_name character varying) OWNER TO production_user;
+
+--
+-- Name: message_receive_command_insert(bigint, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, raw_sender character varying, raw_folder_source character varying, raw_folder_dest character varying) RETURNS TABLE(id bigint, folder_id_source bigint, folder_id_dest bigint)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  source_folder RECORD;
+  dest_folder   RECORD;
+  sender        RECORD;
+BEGIN
+  sender        := screen_name(owner_id, raw_sender);
+  source_folder := message_folder(owner_id, sender.screen_name, raw_folder_source);
+  dest_folder   := message_folder_insert(owner_id, raw_folder_dest);
+
+  RETURN QUERY
+  INSERT INTO
+  message_receive_command AS mrc ("id", "owner_id", "sender_id", "folder_id_source", "folder_id_dest")
+  VALUES (DEFAULT, owner_id, sender.id, source_folder.id, dest_folder.id)
+  RETURNING mrc.id, mrc.folder_id_source, mrc.folder_id_dest;
+END
+$$;
+
+
+ALTER FUNCTION public.message_receive_command_insert(owner_id bigint, raw_sender character varying, raw_folder_source character varying, raw_folder_dest character varying) OWNER TO production_user;
 
 --
 -- Name: privacy_id(character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -272,6 +287,26 @@ $$;
 
 
 ALTER FUNCTION public.privacy_id(raw_name character varying) OWNER TO production_user;
+
+--
+-- Name: screen_name(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.screen_name(raw_view_id bigint, raw_screen_name character varying) RETURNS TABLE(id bigint, screen_name character varying)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+
+BEGIN
+  RETURN QUERY
+  SELECT sn.id, sn.screen_name
+  FROM screen_name sn
+  WHERE sn.screen_name = screen_name_canonical(raw_screen_name);
+END
+$$;
+
+
+ALTER FUNCTION public.screen_name(raw_view_id bigint, raw_screen_name character varying) OWNER TO production_user;
 
 --
 -- Name: screen_name_canonical(character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -525,11 +560,11 @@ ALTER TABLE public.message OWNER TO production_user;
 CREATE TABLE public.message_folder (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
-    owner_type_id smallint NOT NULL,
     name character varying(30) NOT NULL,
     display_name character varying(30) NOT NULL,
-    CONSTRAINT message_folder_check CHECK ((((name)::text = (public.clean_new_message_folder(name))::text) AND (upper((display_name)::text) = (name)::text))),
-    CONSTRAINT message_folder_name_check CHECK (((name)::text = (public.clean_new_message_folder((upper((name)::text))::character varying))::text))
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT message_folder_check CHECK ((((name)::text = (public.message_folder_canonical(name))::text) AND (upper((display_name)::text) = (name)::text))),
+    CONSTRAINT message_folder_name_check CHECK (((name)::text = (public.message_folder_canonical((upper((name)::text))::character varying))::text))
 );
 
 
@@ -585,8 +620,8 @@ CREATE TABLE public.message_receive_command (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
     sender_id bigint NOT NULL,
-    message_type_id smallint NOT NULL,
-    message_folder_id bigint NOT NULL
+    folder_id_source bigint NOT NULL,
+    folder_id_dest bigint NOT NULL
 );
 
 
@@ -611,42 +646,6 @@ ALTER TABLE public.message_receive_command_id_seq OWNER TO production_user;
 --
 
 ALTER SEQUENCE public.message_receive_command_id_seq OWNED BY public.message_receive_command.id;
-
-
---
--- Name: message_type; Type: TABLE; Schema: public; Owner: production_user
---
-
-CREATE TABLE public.message_type (
-    id bigint NOT NULL,
-    owner_id bigint NOT NULL,
-    name character varying(140),
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT message_type_name_check CHECK (((name)::text = (public.message_type_canonical(name))::text))
-);
-
-
-ALTER TABLE public.message_type OWNER TO production_user;
-
---
--- Name: message_type_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user
---
-
-CREATE SEQUENCE public.message_type_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.message_type_id_seq OWNER TO production_user;
-
---
--- Name: message_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: production_user
---
-
-ALTER SEQUENCE public.message_type_id_seq OWNED BY public.message_type.id;
 
 
 --
@@ -751,13 +750,6 @@ ALTER TABLE ONLY public.message_receive_command ALTER COLUMN id SET DEFAULT next
 
 
 --
--- Name: message_type id; Type: DEFAULT; Schema: public; Owner: production_user
---
-
-ALTER TABLE ONLY public.message_type ALTER COLUMN id SET DEFAULT nextval('public.message_type_id_seq'::regclass);
-
-
---
 -- Name: screen_name id; Type: DEFAULT; Schema: public; Owner: production_user
 --
 
@@ -797,11 +789,11 @@ ALTER TABLE ONLY public.member
 
 
 --
--- Name: message_folder message_folder_owner_id_owner_type_id_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+-- Name: message_folder message_folder_owner_id_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
 --
 
 ALTER TABLE ONLY public.message_folder
-    ADD CONSTRAINT message_folder_owner_id_owner_type_id_name_key UNIQUE (owner_id, owner_type_id, name);
+    ADD CONSTRAINT message_folder_owner_id_name_key UNIQUE (owner_id, name);
 
 
 --
@@ -821,11 +813,11 @@ ALTER TABLE ONLY public.message
 
 
 --
--- Name: message_receive_command message_receive_command_owner_id_sender_id_message_type_id_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+-- Name: message_receive_command message_receive_command_owner_id_sender_id_folder_id_source_key; Type: CONSTRAINT; Schema: public; Owner: production_user
 --
 
 ALTER TABLE ONLY public.message_receive_command
-    ADD CONSTRAINT message_receive_command_owner_id_sender_id_message_type_id_key UNIQUE (owner_id, sender_id, message_type_id);
+    ADD CONSTRAINT message_receive_command_owner_id_sender_id_folder_id_source_key UNIQUE (owner_id, sender_id, folder_id_source);
 
 
 --
@@ -834,22 +826,6 @@ ALTER TABLE ONLY public.message_receive_command
 
 ALTER TABLE ONLY public.message_receive_command
     ADD CONSTRAINT message_receive_command_pkey PRIMARY KEY (id);
-
-
---
--- Name: message_type message_type_owner_id_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
---
-
-ALTER TABLE ONLY public.message_type
-    ADD CONSTRAINT message_type_owner_id_name_key UNIQUE (owner_id, name);
-
-
---
--- Name: message_type message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
---
-
-ALTER TABLE ONLY public.message_type
-    ADD CONSTRAINT message_type_pkey PRIMARY KEY (id);
 
 
 --

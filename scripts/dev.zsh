@@ -10,7 +10,7 @@ case "$1" in
     ;;
 
   reset)
-    bin/megauni reset
+    bin/megauni migrate reset
     exec sudo -u production_user --preserve-env bin/megauni migrate force
     ;;
 

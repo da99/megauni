@@ -12,14 +12,13 @@ module MEGAUNI
     end
 
     def run
-      begin
-        DB.open "postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5" do |db|
-          yield db
-        end
-      rescue e : DB::ConnectionRefused
-        DA_Dev.red! "!!! Ensure db user BOLD{{#{ENV["USER"]}}} and db BOLD{{#{MEGAUNI::SQL.db_name}}} exists."
-        exit 1
-      end
+      db = DB.open("postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5")
+      yield db
+    rescue e : DB::ConnectionRefused
+      DA_Dev.red! "!!! Ensure db user BOLD{{#{ENV["USER"]}}} and db BOLD{{#{MEGAUNI::SQL.db_name}}} exists."
+      exit 1
+    ensure
+      db.close if db
     end
 
     def files(glob : String)
