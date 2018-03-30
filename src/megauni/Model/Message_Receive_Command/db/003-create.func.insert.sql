@@ -7,8 +7,8 @@ CREATE OR REPLACE FUNCTION message_receive_command_insert(
 )
 RETURNS TABLE(
   id BIGINT,
-  folder_id_source BIGINT,
-  folder_id_dest BIGINT
+  source_folder_id BIGINT,
+  dest_folder_id BIGINT
 )
 AS $$
 DECLARE
@@ -22,8 +22,8 @@ BEGIN
 
   RETURN QUERY
   INSERT INTO
-  message_receive_command AS mrc ("id", "owner_id", "sender_id", "folder_id_source", "folder_id_dest")
+  message_receive_command AS mrc ("id", "owner_id", "sender_id", "source_folder_id", "dest_folder_id")
   VALUES (DEFAULT, owner_id, sender.id, source_folder.id, dest_folder.id)
-  RETURNING mrc.id, mrc.folder_id_source, mrc.folder_id_dest;
+  RETURNING mrc.id, mrc.source_folder_id, mrc.dest_folder_id;
 END
 $$ LANGUAGE plpgsql;

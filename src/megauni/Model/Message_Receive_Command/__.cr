@@ -10,7 +10,7 @@ module MEGAUNI
       command = nil
       SQL.run { |db|
         sql = <<-SQL
-          SELECT id, folder_id_source, folder_id_dest
+          SELECT id, source_folder_id, dest_folder_id
           FROM message_receive_command_insert($1, $2, $3, $4);
         SQL
         id, message_folder_source_id, message_folder_destination_id = db.query_one(
@@ -34,10 +34,10 @@ module MEGAUNI
     getter id               : Int64
     getter owner_id         : Int64
     getter sender_id        : Int64
-    getter folder_id_source : Int64
-    getter folder_id_dest   : Int64
+    getter source_folder_id : Int64
+    getter dest_folder_id   : Int64
 
-    def initialize(@id, @owner_id, @sender_id, @folder_id_source, @folder_id_dest)
+    def initialize(@id, @owner_id, @sender_id, @source_folder_id, @dest_folder_id)
     end # === def initialize
 
   end # === struct Message_Receive_Command

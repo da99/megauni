@@ -235,7 +235,7 @@ ALTER FUNCTION public.message_folder_insert(raw_owner_id bigint, raw_name charac
 -- Name: message_receive_command_insert(bigint, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, raw_sender character varying, raw_folder_source character varying, raw_folder_dest character varying) RETURNS TABLE(id bigint, folder_id_source bigint, folder_id_dest bigint)
+CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, raw_sender character varying, raw_folder_source character varying, raw_folder_dest character varying) RETURNS TABLE(id bigint, source_folder_id bigint, dest_folder_id bigint)
     LANGUAGE plpgsql
     AS $$
 DECLARE
@@ -249,9 +249,9 @@ BEGIN
 
   RETURN QUERY
   INSERT INTO
-  message_receive_command AS mrc ("id", "owner_id", "sender_id", "folder_id_source", "folder_id_dest")
+  message_receive_command AS mrc ("id", "owner_id", "sender_id", "source_folder_id", "dest_folder_id")
   VALUES (DEFAULT, owner_id, sender.id, source_folder.id, dest_folder.id)
-  RETURNING mrc.id, mrc.folder_id_source, mrc.folder_id_dest;
+  RETURNING mrc.id, mrc.source_folder_id, mrc.dest_folder_id;
 END
 $$;
 
@@ -620,8 +620,8 @@ CREATE TABLE public.message_receive_command (
     id bigint NOT NULL,
     owner_id bigint NOT NULL,
     sender_id bigint NOT NULL,
-    folder_id_source bigint NOT NULL,
-    folder_id_dest bigint NOT NULL
+    source_folder_id bigint NOT NULL,
+    dest_folder_id bigint NOT NULL
 );
 
 
@@ -813,11 +813,11 @@ ALTER TABLE ONLY public.message
 
 
 --
--- Name: message_receive_command message_receive_command_owner_id_sender_id_folder_id_source_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+-- Name: message_receive_command message_receive_command_owner_id_sender_id_source_folder_id_key; Type: CONSTRAINT; Schema: public; Owner: production_user
 --
 
 ALTER TABLE ONLY public.message_receive_command
-    ADD CONSTRAINT message_receive_command_owner_id_sender_id_folder_id_source_key UNIQUE (owner_id, sender_id, folder_id_source);
+    ADD CONSTRAINT message_receive_command_owner_id_sender_id_source_folder_id_key UNIQUE (owner_id, sender_id, source_folder_id);
 
 
 --
