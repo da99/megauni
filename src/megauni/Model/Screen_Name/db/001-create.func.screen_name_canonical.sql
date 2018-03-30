@@ -2,7 +2,8 @@
 CREATE OR REPLACE FUNCTION screen_name_canonical(INOUT sn varchar)
 AS $$
   DECLARE
-    valid_chars VARCHAR;
+    valid_pattern VARCHAR := '[A-Z\d\-\_\^]+';
+    invalid_chars VARCHAR;
   BEGIN
     -- screen_name
     IF sn IS NULL THEN
@@ -18,16 +19,15 @@ AS $$
       RAISE EXCEPTION 'invalid screen_name: too long: 30';
     END IF;
 
-    valid_chars := 'A-Z\d\-\_\^';
-    IF sn !~ ('\A[' || valid_chars || ']+\Z') THEN
-      RAISE EXCEPTION 'invalid screen_name: invalid chars: %', regexp_replace(sn, ('[' || valid_chars || ']+'), '', 'ig');
+    invalid_chars := regexp_replace(sn, valid_pattern, '', 'g');
+    IF bit_length(invalid_chars) > 0 THEN
+      RAISE EXCEPTION 'invalid screen_name: invalid chars: %', invalid_chars;
     END IF;
 
   END
 $$
 LANGUAGE plpgsql
-IMMUTABLE
-;
+IMMUTABLE;
 
 
 

@@ -160,6 +160,90 @@ $$;
 ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) OWNER TO production_user;
 
 --
+-- Name: message_receive_command_insert(bigint, bigint, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, sender_id bigint, message_type character varying, folder character varying, OUT id bigint, OUT message_type_id smallint, OUT message_folder_id smallint) RETURNS record
+    LANGUAGE plpgsql
+    AS $$
+  DECLARE
+  temp RECORD;
+  BEGIN
+    message_type_id   := message_type_id_create(sender_id, message_type);
+    message_folder_id := message_folder_id_create(owner_id, folder);
+
+    INSERT INTO message_receive_command ("id", "owner_id", "sender_id", "message_type_id", "message_folder_id")
+    VALUES (DEFAULT, owner_id, sender_id, message_type_id, message_folder_id)
+    RETURNING "id" INTO id;
+  END
+$$;
+
+
+ALTER FUNCTION public.message_receive_command_insert(owner_id bigint, sender_id bigint, message_type character varying, folder character varying, OUT id bigint, OUT message_type_id smallint, OUT message_folder_id smallint) OWNER TO production_user;
+
+--
+-- Name: message_type_canonical(character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.message_type_canonical(raw_name character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  semi_clean    VARCHAR;
+  invalid_chars VARCHAR;
+  pattern       VARCHAR  := '[A-Z0-9\_\-\.\ \@\!\#\%\^\&\+\~]+';
+  max_length    SMALLINT := 140;
+BEGIN
+
+  semi_clean := squeeze_whitespace(upper(raw_name));
+
+  IF char_length(semi_clean) > max_length THEN
+    RAISE EXCEPTION 'invalid message type: too long: %', max_length;
+  END IF;
+
+  invalid_chars := regexp_replace(semi_clean, pattern, '', 'ig');
+  IF bit_length(invalid_chars) > 0 THEN
+    RAISE EXCEPTION 'invalid message type: invalid chars: %', invalid_chars;
+  END IF;
+
+  RETURN semi_clean;
+END
+$$;
+
+
+ALTER FUNCTION public.message_type_canonical(raw_name character varying) OWNER TO production_user;
+
+--
+-- Name: message_type_id_create(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.message_type_id_create(raw_owner_id bigint, raw_name character varying) RETURNS bigint
+    LANGUAGE plpgsql
+    AS $$
+  DECLARE
+    the_id BIGINT;
+    canonical_name VARCHAR;
+  BEGIN
+    canonical_name := message_type_canonical(raw_name);
+    SELECT id
+    INTO the_id
+    FROM message_type
+    WHERE "owner_id" = raw_owner_id AND name = canonical_name;
+
+    IF NOT FOUND THEN
+      INSERT INTO message_type(id, "owner_id", "name")
+      VALUES (DEFAULT, raw_owner_id, canonical_name)
+      RETURNING id INTO the_id;
+    END IF;
+
+    RETURN the_id;
+  END
+$$;
+
+
+ALTER FUNCTION public.message_type_id_create(raw_owner_id bigint, raw_name character varying) OWNER TO production_user;
+
+--
 -- Name: privacy_id(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
@@ -197,7 +281,8 @@ CREATE FUNCTION public.screen_name_canonical(INOUT sn character varying) RETURNS
     LANGUAGE plpgsql IMMUTABLE
     AS $$
   DECLARE
-    valid_chars VARCHAR;
+    valid_pattern VARCHAR := '[A-Z\d\-\_\^]+';
+    invalid_chars VARCHAR;
   BEGIN
     -- screen_name
     IF sn IS NULL THEN
@@ -213,9 +298,9 @@ CREATE FUNCTION public.screen_name_canonical(INOUT sn character varying) RETURNS
       RAISE EXCEPTION 'invalid screen_name: too long: 30';
     END IF;
 
-    valid_chars := 'A-Z\d\-\_\^';
-    IF sn !~ ('\A[' || valid_chars || ']+\Z') THEN
-      RAISE EXCEPTION 'invalid screen_name: invalid chars: %', regexp_replace(sn, ('[' || valid_chars || ']+'), '', 'ig');
+    invalid_chars := regexp_replace(sn, valid_pattern, '', 'g');
+    IF bit_length(invalid_chars) > 0 THEN
+      RAISE EXCEPTION 'invalid screen_name: invalid chars: %', invalid_chars;
     END IF;
 
   END
@@ -246,6 +331,24 @@ $$;
 
 
 ALTER FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying, OUT new_screen_name_id bigint) OWNER TO production_user;
+
+--
+-- Name: squeeze_whitespace(character varying); Type: FUNCTION; Schema: public; Owner: production_user
+--
+
+CREATE FUNCTION public.squeeze_whitespace(raw_string character varying) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+DECLARE
+  fin_string VARCHAR;
+BEGIN
+  fin_string := regexp_replace(trim(from raw_string), '\s+', ' ', 'g');
+  RETURN fin_string;
+END
+$$;
+
+
+ALTER FUNCTION public.squeeze_whitespace(raw_string character varying) OWNER TO production_user;
 
 --
 -- Name: type_id(character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -475,6 +578,78 @@ ALTER SEQUENCE public.message_id_seq OWNED BY public.message.id;
 
 
 --
+-- Name: message_receive_command; Type: TABLE; Schema: public; Owner: production_user
+--
+
+CREATE TABLE public.message_receive_command (
+    id bigint NOT NULL,
+    owner_id bigint NOT NULL,
+    sender_id bigint NOT NULL,
+    message_type_id smallint NOT NULL,
+    message_folder_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.message_receive_command OWNER TO production_user;
+
+--
+-- Name: message_receive_command_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user
+--
+
+CREATE SEQUENCE public.message_receive_command_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.message_receive_command_id_seq OWNER TO production_user;
+
+--
+-- Name: message_receive_command_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: production_user
+--
+
+ALTER SEQUENCE public.message_receive_command_id_seq OWNED BY public.message_receive_command.id;
+
+
+--
+-- Name: message_type; Type: TABLE; Schema: public; Owner: production_user
+--
+
+CREATE TABLE public.message_type (
+    id bigint NOT NULL,
+    owner_id bigint NOT NULL,
+    name character varying(140),
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT message_type_name_check CHECK (((name)::text = (public.message_type_canonical(name))::text))
+);
+
+
+ALTER TABLE public.message_type OWNER TO production_user;
+
+--
+-- Name: message_type_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user
+--
+
+CREATE SEQUENCE public.message_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.message_type_id_seq OWNER TO production_user;
+
+--
+-- Name: message_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: production_user
+--
+
+ALTER SEQUENCE public.message_type_id_seq OWNED BY public.message_type.id;
+
+
+--
 -- Name: screen_name; Type: TABLE; Schema: public; Owner: production_user
 --
 
@@ -569,6 +744,20 @@ ALTER TABLE ONLY public.message_folder ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: message_receive_command id; Type: DEFAULT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_receive_command ALTER COLUMN id SET DEFAULT nextval('public.message_receive_command_id_seq'::regclass);
+
+
+--
+-- Name: message_type id; Type: DEFAULT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_type ALTER COLUMN id SET DEFAULT nextval('public.message_type_id_seq'::regclass);
+
+
+--
 -- Name: screen_name id; Type: DEFAULT; Schema: public; Owner: production_user
 --
 
@@ -629,6 +818,38 @@ ALTER TABLE ONLY public.message_folder
 
 ALTER TABLE ONLY public.message
     ADD CONSTRAINT message_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: message_receive_command message_receive_command_owner_id_sender_id_message_type_id_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_receive_command
+    ADD CONSTRAINT message_receive_command_owner_id_sender_id_message_type_id_key UNIQUE (owner_id, sender_id, message_type_id);
+
+
+--
+-- Name: message_receive_command message_receive_command_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_receive_command
+    ADD CONSTRAINT message_receive_command_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: message_type message_type_owner_id_name_key; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_type
+    ADD CONSTRAINT message_type_owner_id_name_key UNIQUE (owner_id, name);
+
+
+--
+-- Name: message_type message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: production_user
+--
+
+ALTER TABLE ONLY public.message_type
+    ADD CONSTRAINT message_type_pkey PRIMARY KEY (id);
 
 
 --

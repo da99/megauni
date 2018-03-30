@@ -1,5 +1,4 @@
 
--- UP
 CREATE OR REPLACE FUNCTION screen_name_insert(
   IN  owner_id        BIGINT,
   IN  raw_screen_name VARCHAR,
