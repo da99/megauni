@@ -1,20 +1,20 @@
 
 CREATE OR REPLACE FUNCTION message_receive_command_insert(
-  IN  owner_id          BIGINT, -- screen name id
+  IN  owner_id          message_receive_command.id%TYPE, -- screen name id
   IN  raw_sender        VARCHAR, -- screen name
   IN  raw_folder_source VARCHAR,
   IN  raw_folder_dest   VARCHAR
 )
 RETURNS TABLE(
-  id BIGINT,
-  source_folder_id BIGINT,
-  dest_folder_id BIGINT
+  id               message_receive_command.id%TYPE,
+  source_folder_id message_receive_command.source_folder_id%TYPE,
+  dest_folder_id   message_receive_command.dest_folder_id%TYPE
 )
 AS $$
 DECLARE
+  sender        RECORD;
   source_folder RECORD;
   dest_folder   RECORD;
-  sender        RECORD;
 BEGIN
   sender        := screen_name(owner_id, raw_sender);
   source_folder := message_folder(owner_id, sender.screen_name, raw_folder_source);

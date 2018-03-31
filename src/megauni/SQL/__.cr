@@ -58,13 +58,11 @@ module MEGAUNI
         files("src/megauni/Model/Mail/db/*.sql"),
         files("src/megauni/Model/Readable/db/*.sql"),
         files("src/megauni/Model/Writeable/db/*.sql")
-      ].each { |files|
-        files.each { |x|
-          DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
-          system("psql", "-v ON_ERROR_STOP=1 #{MEGAUNI::SQL.db_name} -f #{x}".split)
-          DA_Process.success! $?
-          DA_Dev.green! "=== {{#{x}}} ==="
-        }
+      ].flatten.sort_by { |x| File.basename(x.split('-').first.not_nil!).to_i }.each { |x|
+        DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
+        system("psql", "-v ON_ERROR_STOP=1 #{MEGAUNI::SQL.db_name} -f #{x}".split)
+        DA_Process.success! $?
+        DA_Dev.green! "=== {{#{x}}} ==="
       }
       migrate_dump
     end # === def migrate_force

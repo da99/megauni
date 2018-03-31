@@ -39,7 +39,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 -- Name: clean_new_label(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.clean_new_label(INOUT raw_label character varying) RETURNS character varying
+CREATE FUNCTION public.clean_new_label(raw_label character varying) RETURNS character varying
     LANGUAGE plpgsql IMMUTABLE
     AS $_$
 DECLARE
@@ -62,22 +62,25 @@ BEGIN
     RAISE EXCEPTION 'invalid label: invalid chars: %', regexp_replace(raw_label, ('[' || valid_chars || ']+'), '', 'ig');
   END IF;
 
+  RETURN raw_label;
 
 END
 $_$;
 
 
-ALTER FUNCTION public.clean_new_label(INOUT raw_label character varying) OWNER TO production_user;
+ALTER FUNCTION public.clean_new_label(raw_label character varying) OWNER TO production_user;
 
 --
 -- Name: clean_new_screen_name(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.clean_new_screen_name(INOUT sn character varying) RETURNS character varying
+CREATE FUNCTION public.clean_new_screen_name(raw_name character varying) RETURNS character varying
     LANGUAGE plpgsql IMMUTABLE
     AS $_$
+  DECLARE
+    sn VARCHAR;
   BEGIN
-    sn := screen_name_canonical(sn);
+    sn := screen_name_canonical(raw_name);
 
     -- Banned screen names:
     IF sn ~* '(SCREEN[\_\.\-\+]+NAME|MEGAUNI|MINIUNI|OKDOKI|okjak|okjon|XXX)' OR
@@ -85,21 +88,23 @@ CREATE FUNCTION public.clean_new_screen_name(INOUT sn character varying) RETURNS
     THEN
       RAISE EXCEPTION 'invalid screen_name: not_available';
     END IF;
+
+    RETURN sn;
   END
 $_$;
 
 
-ALTER FUNCTION public.clean_new_screen_name(INOUT sn character varying) OWNER TO production_user;
+ALTER FUNCTION public.clean_new_screen_name(raw_name character varying) OWNER TO production_user;
 
 --
 -- Name: member_insert(character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) RETURNS record
+CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying) RETURNS TABLE(id bigint, screen_name_id bigint, screen_name character varying)
     LANGUAGE plpgsql
     AS $$
   DECLARE
-    temp_rec RECORD;
+    new_member RECORD;
   BEGIN
     IF pswd_hash IS NULL THEN
       RAISE EXCEPTION 'programmer_error: pswd_hash not set';
@@ -112,21 +117,19 @@ CREATE FUNCTION public.member_insert(sn_name character varying, pswd_hash charac
     INSERT INTO
     "member" ( id, pswd_hash )
     VALUES ( DEFAULT, pswd_hash::BYTEA )
-    RETURNING id INTO temp_rec;
+    RETURNING * INTO new_member;
 
-    new_member_id := temp_rec.id;
-
-    SELECT *
-    INTO temp_rec
-    FROM screen_name_insert(new_member_id, sn_name);
-
-    new_screen_name := temp_rec.new_screen_name;
-    new_screen_name_id := temp_rec.new_screen_name_id;
+    RETURN QUERY
+    SELECT
+    new_member.id    AS id,
+    sn_i.id          AS screen_name_id,
+    sn_i.screen_name AS screen_name
+    FROM screen_name_insert(new_member.id, sn_name) AS sn_i;
   END
 $$;
 
 
-ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying, OUT new_member_id bigint, OUT new_screen_name text, OUT new_screen_name_id bigint) OWNER TO production_user;
+ALTER FUNCTION public.member_insert(sn_name character varying, pswd_hash character varying) OWNER TO production_user;
 
 --
 -- Name: message_folder(bigint, character varying, character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -140,7 +143,7 @@ DECLARE
   owner          RECORD;
 BEGIN
   canonical_name := message_folder_canonical(raw_name);
-  owner := screen_name(raw_viewer_id, raw_owner_name);
+  owner          := screen_name(raw_viewer_id, raw_owner_name);
 
   RETURN QUERY
   SELECT mf.id, mf.name, mf.display_name
@@ -164,13 +167,12 @@ CREATE FUNCTION public.message_folder_canonical(raw_name character varying) RETU
     LANGUAGE plpgsql IMMUTABLE
     AS $$
 DECLARE
-  original      VARCHAR;
+  original      CONSTANT VARCHAR NOT NULL := raw_name;
   invalid_chars VARCHAR;
-  pattern       VARCHAR  := '[a-zA-Z0-9\_\-\.\ \@\!\#\%\^\&\+\~]+';
-  max_length    SMALLINT := 30;
+  pattern       CONSTANT VARCHAR  NOT NULL := '[a-zA-Z0-9\_\-\.\ \@\!\#\%\^\&\+\~]+';
+  min_length    CONSTANT SMALLINT NOT NULL := 1;
+  max_length    CONSTANT SMALLINT NOT NULL := 30;
 BEGIN
-
-  original := raw_name;
 
   IF raw_name IS NULL THEN
     RAISE EXCEPTION 'programmer_error: NULL VALUE';
@@ -178,8 +180,8 @@ BEGIN
 
   raw_name := squeeze_whitespace(upper(raw_name));
 
-  IF char_length(raw_name) < 1 THEN
-    RAISE EXCEPTION 'invalid message folder: too short: 1';
+  IF char_length(raw_name) < min_length THEN
+    RAISE EXCEPTION 'invalid message folder: too short: %', min_length;
   END IF;
 
   IF char_length(raw_name) > max_length THEN
@@ -206,7 +208,6 @@ CREATE FUNCTION public.message_folder_insert(raw_owner_id bigint, raw_name chara
     LANGUAGE plpgsql
     AS $$
 DECLARE
-  temp_rec RECORD;
   canonical_name VARCHAR;
 BEGIN
 
@@ -239,9 +240,9 @@ CREATE FUNCTION public.message_receive_command_insert(owner_id bigint, raw_sende
     LANGUAGE plpgsql
     AS $$
 DECLARE
+  sender        RECORD;
   source_folder RECORD;
   dest_folder   RECORD;
-  sender        RECORD;
 BEGIN
   sender        := screen_name(owner_id, raw_sender);
   source_folder := message_folder(owner_id, sender.screen_name, raw_folder_source);
@@ -299,7 +300,7 @@ DECLARE
 
 BEGIN
   RETURN QUERY
-  SELECT sn.id, sn.screen_name
+  SELECT sn.id AS id, sn.screen_name AS screen_name
   FROM screen_name sn
   WHERE sn.screen_name = screen_name_canonical(raw_screen_name);
 END
@@ -312,25 +313,29 @@ ALTER FUNCTION public.screen_name(raw_view_id bigint, raw_screen_name character 
 -- Name: screen_name_canonical(character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.screen_name_canonical(INOUT sn character varying) RETURNS character varying
+CREATE FUNCTION public.screen_name_canonical(raw_name character varying) RETURNS character varying
     LANGUAGE plpgsql IMMUTABLE
     AS $$
   DECLARE
-    valid_pattern VARCHAR := '[A-Z\d\-\_\^]+';
+    sn VARCHAR;
+    valid_pattern CONSTANT VARCHAR NOT NULL:= '[A-Z\d\-\_\^]+';
     invalid_chars VARCHAR;
+    min_length    CONSTANT SMALLINT NOT NULL := 3;
+    max_length    CONSTANT SMALLINT NOT NULL := 30;
   BEGIN
-    -- screen_name
-    IF sn IS NULL THEN
+
+    IF raw_name IS NULL THEN
       RAISE EXCEPTION 'programmer_error: NULL value';
     END IF;
-    sn := regexp_replace(upper(sn), '^\@|[\s[:cntrl:]]+', '', 'ig');
 
-    IF char_length(sn) < 3 THEN
-      RAISE EXCEPTION 'invalid screen_name: too short: 3';
+    sn := regexp_replace(upper(raw_name), '^\@|[\s[:cntrl:]]+', '', 'ig');
+
+    IF char_length(sn) < min_length THEN
+      RAISE EXCEPTION 'invalid screen_name: too short: %', min_length;
     END IF;
 
-    IF char_length(sn) > 30 THEN
-      RAISE EXCEPTION 'invalid screen_name: too long: 30';
+    IF char_length(sn) > max_length THEN
+      RAISE EXCEPTION 'invalid screen_name: too long: %', max_length;
     END IF;
 
     invalid_chars := regexp_replace(sn, valid_pattern, '', 'g');
@@ -338,17 +343,19 @@ CREATE FUNCTION public.screen_name_canonical(INOUT sn character varying) RETURNS
       RAISE EXCEPTION 'invalid screen_name: invalid chars: %', invalid_chars;
     END IF;
 
+    RETURN sn;
+
   END
 $$;
 
 
-ALTER FUNCTION public.screen_name_canonical(INOUT sn character varying) OWNER TO production_user;
+ALTER FUNCTION public.screen_name_canonical(raw_name character varying) OWNER TO production_user;
 
 --
 -- Name: screen_name_insert(bigint, character varying); Type: FUNCTION; Schema: public; Owner: production_user
 --
 
-CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying, OUT new_screen_name_id bigint) RETURNS record
+CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying) RETURNS TABLE(id bigint, screen_name character varying)
     LANGUAGE plpgsql
     AS $$
   DECLARE
@@ -357,15 +364,17 @@ CREATE FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name chara
 
   BEGIN
     clean_screen_name := screen_name_canonical(raw_screen_name);
-    INSERT INTO screen_name (owner_id, owner_type_id, screen_name)
+
+    RETURN QUERY
+    INSERT INTO
+    screen_name (owner_id, owner_type_id, screen_name)
     VALUES (owner_id, type_id('Member'), clean_screen_name)
-    RETURNING "screen_name".screen_name, "screen_name".id
-    INTO new_screen_name, new_screen_name_id;
+    RETURNING "screen_name".id, "screen_name".screen_name;
   END
 $$;
 
 
-ALTER FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying, OUT new_screen_name character varying, OUT new_screen_name_id bigint) OWNER TO production_user;
+ALTER FUNCTION public.screen_name_insert(owner_id bigint, raw_screen_name character varying) OWNER TO production_user;
 
 --
 -- Name: squeeze_whitespace(character varying); Type: FUNCTION; Schema: public; Owner: production_user
@@ -666,25 +675,6 @@ CREATE TABLE public.screen_name (
 
 
 ALTER TABLE public.screen_name OWNER TO production_user;
-
---
--- Name: readable_screen_name; Type: VIEW; Schema: public; Owner: production_user
---
-
-CREATE VIEW public.readable_screen_name AS
- SELECT screen_name.id,
-    screen_name.owner_id,
-    screen_name.owner_type_id,
-    screen_name.privacy,
-    screen_name.screen_name,
-    screen_name.nick_name,
-    screen_name.created_at,
-    screen_name.trashed_at
-   FROM (public.screen_name
-     JOIN public.member ON ((screen_name.owner_id = member.id)));
-
-
-ALTER TABLE public.readable_screen_name OWNER TO production_user;
 
 --
 -- Name: screen_name_id_seq; Type: SEQUENCE; Schema: public; Owner: production_user

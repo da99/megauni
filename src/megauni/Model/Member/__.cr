@@ -24,10 +24,13 @@ module MEGAUNI
       new_screen_name_id = 0.to_i64
 
       MEGAUNI::SQL.run { |db|
-        new_member_id, new_screen_name, new_screen_name_id = db.query_one(
-          %[SELECT new_member_id, new_screen_name, new_screen_name_id FROM member_insert($1, $2);],
+        new_member_id, new_screen_name_id, new_screen_name = db.query_one(
+          %[
+            SELECT m.id, m.screen_name_id, m.screen_name
+            FROM member_insert($1, $2) AS m;
+          ],
           raw_user_name, pass_word,
-          as: {Int64, String, Int64}
+          as: {Int64, Int64, String}
         )
       }
       if new_member_id == 0.to_i64

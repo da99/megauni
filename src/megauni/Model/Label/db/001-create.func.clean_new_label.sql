@@ -1,5 +1,6 @@
 
-CREATE OR REPLACE FUNCTION clean_new_label(INOUT raw_label VARCHAR)
+CREATE OR REPLACE FUNCTION clean_new_label(IN raw_label VARCHAR)
+RETURNS VARCHAR
 AS $$
 DECLARE
   valid_chars VARCHAR;
@@ -21,6 +22,7 @@ BEGIN
     RAISE EXCEPTION 'invalid label: invalid chars: %', regexp_replace(raw_label, ('[' || valid_chars || ']+'), '', 'ig');
   END IF;
 
+  RETURN raw_label;
 
 END
 $$
