@@ -5,9 +5,6 @@ module MEGAUNI
   class Error < Exception
   end
 
-  class Query_Error < Error
-  end
-
   SECRET      = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
   COOKIE_NAME = "mu_session"
 
@@ -23,8 +20,22 @@ module MEGAUNI
     "megaUNI.com"
   end
 
-  def self.dev?
-    ENV["IS_DEV"]?
+  def self.web_app_user
+    "web_app_user"
+  end
+
+  def self.production_user
+    "production_user"
+  end
+
+  def self.development?
+    ENV["IS_DEVELOPMENT"]?
+  end
+
+  def self.development!
+    return true if development?
+    DA_Dev.red! "!!! Not in {{development}} env."
+    exit 1
   end
 
   def self.route_name(file : String)
@@ -37,11 +48,23 @@ module MEGAUNI
     "Route/#{route_name}/#{name}"
   end
 
-  def self.production_user!
-    if `whoami`.chomp != "production_user"
-      DA_Dev.red! "!!! Run as BOLD{{production_user}}"
+  def self.who_am_i
+    `whoami`.chomp
+  end
+
+  def self.who_am_i!(name : String)
+    if who_am_i != name
+      DA_Dev.red! "!!! Run as BOLD{{#{name}}}"
       exit 1
     end
+  end
+
+  def self.web_app_user!
+    who_am_i! "web_app_user"
+  end
+
+  def self.production_user!
+    who_am_i! "production_user"
   end # === def self.production_user
 
 end # === module MEGAUNI
@@ -77,7 +100,7 @@ require "./megauni/CSS"
 require "./megauni/Route"
 require "./megauni/Server"
 
-{% if env("IS_DEV") %}
+{% if env("IS_DEVELOPMENT") %}
   require "./megauni/Route/Public_Files/__"
 {% end %}
 require "./megauni/Route/Stranger_Root/__"

@@ -24,7 +24,7 @@ module MEGAUNI
       ctx = route.ctx
       ctx.response.status_code = 404
       ctx.response << "Not found: #{ ctx.request.method } #{ctx.request.path}"
-      {% if env("IS_DEV") %}
+      {% if env("IS_DEVELOPMENT") %}
         DA_Dev.red! "!!! \{{Not found}}: BOLD\{{#{ctx.request.method}}} #{ctx.request.path}"
       {% end %}
 

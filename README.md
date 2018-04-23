@@ -9,7 +9,7 @@ https://www.iamcal.com/misc/fonts/
 ```sql
   CREATE USER os_user WITH NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE;
   CREATE USER web_app WITH NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE;
-  CREATE DATABASE megauni_db WITH ORDER = os_user;
+  CREATE DATABASE megauni_db WITH OWNER = os_user;
 ```
 
 ```zsh

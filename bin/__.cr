@@ -11,10 +11,6 @@ cmd      = args.shift
 THIS_DIR = File.expand_path(File.join(__DIR__, ".."))
 APP_NAME = File.basename(THIS_DIR)
 
-if cmd == "migrate" && args.first? != "reset"
-  MEGAUNI.production_user!
-end
-
 if cmd == "compile"
   if File.expand_path(Dir.current) != THIS_DIR
     DA_Dev.red! "!!! {{Invalid current directory}}: BOLD{{#{Dir.current}}}"
@@ -22,7 +18,7 @@ if cmd == "compile"
   end
 end
 
-{% if env("IS_DEV") %}
+{% if env("IS_DEVELOPMENT") %}
   ENV["HTTP_SERVER_SESSION_SECRET"]="a key FOR development ONLY $(date)$(date)"
 {% end %}
 
@@ -94,6 +90,7 @@ when cmd == "compile" && args.size == 1 && args.first[/.(jspp|sass|styl)$/]?
 
 when full_cmd == "migrate reset tables"
   # === {{CMD}} migrate reset tables
+  MEGAUNI.development!
   MEGAUNI::SQL.reset_tables!
 
 when full_cmd == "migrate"
@@ -106,14 +103,12 @@ when full_cmd == "migrate dump"
 
 when full_cmd == "migrate force"
   # === {{CMD}} migrate force
+  MEGAUNI.development!
   MEGAUNI::SQL.migrate_force
 
 when full_cmd == "migrate reset"
   # === {{CMD}} migrate reset
-  if !MEGAUNI.dev?
-    STDERR.puts "!!! Not in dev. env."
-    exit 1
-  end
+  MEGAUNI.development!
   MEGAUNI::SQL.reset!
 
 when full_cmd == "hex colors"

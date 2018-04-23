@@ -8,23 +8,6 @@ module MEGAUNI
   @@SQL_DB : DB::Database? = nil
   @@HTTP_SERVER : Server? = nil
 
-  def self.sql_db?
-    @@SQL_DB.nil?
-  end
-
-  def self.sql_db!
-    sql_db = @@SQL_DB
-    if !sql_db
-      sql_connect
-    end
-    sql_db.not_nil!
-  end
-
-  def self.sql_connect
-    # @@SQL_DB = DB.open("postgres:///megauni_db?max_pool_size=25&max_idle_pool_size=5")
-    @@SQL_DB = DB.open("postgres:///#{MEGAUNI::SQL.db_name}")
-    @@SQL_DB.not_nil!
-  end
 
   def self.http_server(s : Server)
     @@HTTP_SERVER = s
@@ -179,13 +162,14 @@ module MEGAUNI
       end
 
       DA_Dev.orange! "=== Connecting to {{database}}..."
-      MEGAUNI.sql_connect
+      MEGAUNI::SQL.up!
+
       MEGAUNI.http_server(self)
 
       Signal::INT.trap { MEGAUNI.exit }
       Signal::TERM.trap { MEGAUNI.exit }
 
-      DA_Dev.orange! "=== User: BOLD{{#{proc_user}}}, production?: BOLD{{#{!ENV["IS_DEV"]?}}}"
+      DA_Dev.orange! "=== User: BOLD{{#{proc_user}}}, production?: BOLD{{#{!ENV["IS_DEVELOPMENT"]?}}}"
       DA_Dev.orange! "=== {{Starting}} server on port BOLD{{#{port}}}, pid BOLD{{#{Process.pid}}}"
       @server.listen
     end # === def listen
