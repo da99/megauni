@@ -2,6 +2,7 @@
 require "da_server"
 require "./megauni/HTTP_Handlers/Megauni_Archive"
 require "./megauni/HTTP_Handlers/Surfer_Hearts"
+require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
 
 module MEGAUNI
@@ -40,8 +41,10 @@ module MEGAUNI
     port = DA.is_development? ? 4567 : 340
     user = DA.is_development? ? `whoami`.strip : "www-deployer"
     public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
+
     DA.orange! "=== Using public dir: #{public_dir}"
     DA_Server.new(host, port, user, [
+      Index_File.new,
       Surfer_Hearts.new,
       HTTP::StaticFileHandler.new(
         public_dir,
