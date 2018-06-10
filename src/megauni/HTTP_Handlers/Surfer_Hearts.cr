@@ -19,7 +19,7 @@ module MEGAUNI
       when old_path == "/"
         old_path = "/index.html"
 
-      when old_path[-1] == "/"
+      when old_path[-1] == '/'
         old_path = "#{old_path.rstrip('/')}.html"
 
       end # case
