@@ -1,6 +1,6 @@
+---
 name: megauni
-version: 0.1.0
-
+version: 0.2.0
 dependencies:
   da_dev:
     github: da99/da_dev
@@ -16,7 +16,6 @@ dependencies:
     github: da99/da_html.cr
   pg:
     github: will/crystal-pg
-
 development_dependencies:
   my_js:
     github: da99/my_js
