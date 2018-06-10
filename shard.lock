@@ -1,12 +1,16 @@
 version: 1.0
 shards:
+  da:
+    github: da99/da
+    version: 1.10.3
+
   da_css:
     github: da99/da_css.cr
     version: 4.1.1
 
   da_dev:
     github: da99/da_dev
-    version: 0.3.0
+    version: 0.3.2
 
   da_html:
     github: da99/da_html.cr
@@ -22,7 +26,7 @@ shards:
 
   da_path:
     github: da99/da_path.cr
-    version: 0.1.1
+    version: 0.2.0
 
   da_process:
     github: da99/da_process.cr
@@ -31,6 +35,10 @@ shards:
   da_redis:
     github: da99/da_redis.cr
     version: 0.2.2
+
+  da_server:
+    github: da99/da_server
+    version: 0.1.7
 
   da_session:
     github: da99/da_session.cr
@@ -54,7 +62,7 @@ shards:
 
   inspect_bang:
     github: da99/inspect_bang.cr
-    version: 1.0.1
+    version: 1.0.2
 
   my_css:
     github: da99/my_css
@@ -66,7 +74,7 @@ shards:
 
   myhtml:
     github: kostya/myhtml
-    version: 0.27
+    version: 0.28
 
   pg:
     github: will/crystal-pg

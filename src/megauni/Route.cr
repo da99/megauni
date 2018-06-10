@@ -30,9 +30,6 @@ module MEGAUNI
     end # === def initialize
 
     def run
-      {% if env("IS_DEVELOPMENT") %}
-        return true if Public_Files.route!(self)
-      {% end %}
       MODELS.find { |x| x.route!(self) }
     end
 

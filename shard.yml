@@ -4,6 +4,8 @@ version: 0.1.0
 dependencies:
   da_dev:
     github: da99/da_dev
+  da_server:
+    github: da99/da_server
   da_session:
     github: da99/da_session.cr
   da_path:

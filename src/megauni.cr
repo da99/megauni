@@ -1,4 +1,9 @@
 
+require "da_server"
+require "./megauni/HTTP_Handlers/Megauni_Archive"
+require "./megauni/HTTP_Handlers/Surfer_Hearts"
+require "./megauni/HTTP_Handlers/Not_Found"
+
 module MEGAUNI
 
   THIS_DIR = File.expand_path("#{__DIR__}/..")
@@ -20,24 +25,6 @@ module MEGAUNI
     "megaUNI.com"
   end
 
-  def self.web_app_user
-    "web_app_user"
-  end
-
-  def self.production_user
-    "production_user"
-  end
-
-  def self.development?
-    ENV["IS_DEVELOPMENT"]?
-  end
-
-  def self.development!
-    return true if development?
-    DA_Dev.red! "!!! Not in {{development}} env."
-    exit 1
-  end
-
   def self.route_name(file : String)
     return File.basename(File.dirname(file))
   end
@@ -48,63 +35,38 @@ module MEGAUNI
     "Route/#{route_name}/#{name}"
   end
 
-  def self.who_am_i
-    `whoami`.chomp
-  end
-
-  def self.who_am_i!(name : String)
-    if who_am_i != name
-      DA_Dev.red! "!!! Run as BOLD{{#{name}}}"
-      exit 1
-    end
-  end
-
-  def self.web_app_user!
-    who_am_i! "web_app_user"
-  end
-
-  def self.production_user!
-    who_am_i! "production_user"
-  end # === def self.production_user
+  def self.service_run
+    host = DA.is_development? ? "localhost" : "0.0.0.0"
+    port = DA.is_development? ? 4567 : 340
+    user = DA.is_development? ? `whoami`.strip : "www-deployer"
+    DA_Server.new(host, port, user, [
+      Surfer_Hearts.new,
+      HTTP::StaticFileHandler.new(
+        File.join(__DIR__, "../Public"),
+        fallthrough: false,
+        directory_listing: false
+      ),
+      Not_Found.new
+    ]).listen
+  end # === def self.service_run
 
 end # === module MEGAUNI
 
-lib LibC
-  fun setuid(uid_t : Int)
-  fun getuid : Int
-end
 
-module MEGAUNI
+# require "./megauni/SQL/__"
 
-  def self.uid(username : String)
-    proc = DA_Process.new("id", ["-u", username])
-    if proc.success?
-      proc.output.to_s.strip.to_i
-    else
-      DA_Dev.red! proc.error.to_s
-      exit proc.stat.exit_code
-    end
-  end # === def uid
-
-end # === module MEGAUNI
-
-require "./megauni/SQL/__"
-
-require "./megauni/Model/Member/__"
-require "./megauni/Model/Screen_Name/__"
-require "./megauni/Model/Message_Folder/__"
-require "./megauni/Model/Message_Receive_Command/__"
+# require "./megauni/Model/Member/__"
+# require "./megauni/Model/Screen_Name/__"
+# require "./megauni/Model/Message_Folder/__"
+# require "./megauni/Model/Message_Receive_Command/__"
 require "./megauni/HTML"
 require "./megauni/CSS"
 
-require "./megauni/Route"
-require "./megauni/Server"
+# require "./megauni/Route"
+# require "./megauni/Server"
 
-{% if env("IS_DEVELOPMENT") %}
-  require "./megauni/Route/Public_Files/__"
-{% end %}
-require "./megauni/Route/Stranger_Root/__"
-require "./megauni/Route/Inbox_All/__"
-require "./megauni/Route/Not_Found/__"
+# require "./megauni/Route/Stranger_Root/__"
+# require "./megauni/Route/Inbox_All/__"
+
 
 
