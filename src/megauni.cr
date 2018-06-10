@@ -10,7 +10,7 @@ module MEGAUNI
   class Error < Exception
   end
 
-  SECRET      = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
+  # SECRET      = "#{ENV["HTTP_SERVER_SESSION_SECRET"]}"
   COOKIE_NAME = "mu_session"
 
   MIN_SCREEN_NAME = 3
