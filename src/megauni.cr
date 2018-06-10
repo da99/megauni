@@ -39,7 +39,7 @@ module MEGAUNI
     host = DA.is_development? ? "localhost" : "0.0.0.0"
     port = DA.is_development? ? 4567 : 340
     user = DA.is_development? ? `whoami`.strip : "www-deployer"
-    public_dir = File.join(__DIR__, "../Public")
+    public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
     DA.orange! "=== Using public dir: #{public_dir}"
     DA_Server.new(host, port, user, [
       Surfer_Hearts.new,
