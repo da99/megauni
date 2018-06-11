@@ -1,6 +1,6 @@
 ---
 name: megauni
-version: 0.2.0
+version: 0.2.1
 dependencies:
   da_deploy:
     github: da99/da_deploy
