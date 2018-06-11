@@ -9,22 +9,32 @@ module MEGAUNI
 
     def call(ctx)
       host = ctx.request.host
-      if host != "www.surferhearts.com"
-        return call_next(ctx)
+      path = ctx.request.path
+
+      if host == "www.surferhearts.com"
+        new_address = File.join("http://www.megauni.com/surferhearts", path)
+        ctx.response.headers["Location"] = new_address
+        ctx.response.status_code = 302
+        return ctx
       end
 
-      old_path = ctx.request.path
+      if path.index("/surferhearts") == 0
+        path = ctx.request.path
 
-      case
-      when old_path == "/"
-        old_path = "/index.html"
+        case
+        when path == "/"
+          path = "/index.html"
 
-      when old_path[-1] == '/'
-        old_path = "#{old_path.rstrip('/')}.html"
+        when path == "/surferhearts" || path == "/surferhearts/"
+          path = "/surferhearts/index.html"
 
-      end # case
+        when path[-1] == '/'
+          path = "#{path.rstrip('/')}.html"
 
-      ctx.request.path = File.join("/surferhearts", old_path)
+        end # case
+
+        ctx.request.path = path
+      end
 
       return call_next(ctx)
     end # === def call
