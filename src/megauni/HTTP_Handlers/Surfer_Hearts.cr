@@ -14,7 +14,7 @@ module MEGAUNI
       if host == "www.surferhearts.com"
         new_address = File.join("http://www.megauni.com/surferhearts", path)
         ctx.response.headers["Location"] = new_address
-        ctx.response.status_code = 302
+        ctx.response.status_code = 301
         return ctx
       end
 
