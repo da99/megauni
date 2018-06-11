@@ -48,7 +48,7 @@ module MEGAUNI
     public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
 
     DA.orange! "=== Using public dir: #{public_dir}"
-    DA_Server.new(host, port, user, [
+    s = DA_Server.new(host, port, user, [
       Index_File.new,
       Surfer_Hearts.new,
       HTTP::StaticFileHandler.new(
@@ -57,7 +57,8 @@ module MEGAUNI
         directory_listing: false
       ),
       Not_Found.new
-    ]).listen
+    ])
+    s.listen
   end # === def self.service_run
 
 end # === module MEGAUNI
