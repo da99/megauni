@@ -12,7 +12,7 @@ module MEGAUNI
       end
 
       def self.my_jspp
-        my_jspp = File.expand_path("#{THIS_DIR}/../my_jspp/bin/my_jspp")
+        my_jspp = File.expand_path("#{MEGAUNI.app_dir}/../my_jspp/bin/my_jspp")
       end
 
       # =============================================================================

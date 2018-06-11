@@ -9,15 +9,7 @@ require "../src/megauni"
 full_cmd = ARGV.join(' ')
 args     = ARGV.dup
 cmd      = args.shift
-THIS_DIR = File.expand_path(File.join(__DIR__, ".."))
-APP_NAME = File.basename(THIS_DIR)
 
-if cmd == "compile"
-  if File.expand_path(Dir.current) != THIS_DIR
-    DA_Dev.red! "!!! {{Invalid current directory}}: BOLD{{#{Dir.current}}}"
-    exit 1
-  end
-end
 
 {% if env("IS_DEVELOPMENT") %}
   ENV["HTTP_SERVER_SESSION_SECRET"]="a key FOR development ONLY $(date)$(date)"
@@ -47,17 +39,6 @@ when full_cmd == "service run"
 #   # === {{CMD}} compile all
 #   MEGAUNI::Dev.compile_all
 
-when full_cmd == "dev permissions"
-  # === {{CMD}} dev permissions
-  p1 = DA_Process.new("chmod", "-R g+wX #{THIS_DIR}".split)
-  p2 = DA_Process.new("chown", "production_user -R #{THIS_DIR}".split)
-  if !(p1.success? && p2.success?)
-    DA_Dev.orange! "=== Finish with: BOLD{{chmod -R g+wX .}}"
-    DA_Dev.orange! "=== Finish with: BOLD{{chown production_user -R .}}"
-    exit 1
-  end
-  p1.success!
-  p2.success!
 
 
 # when cmd == "compile" && args.first? == "shard.yml"

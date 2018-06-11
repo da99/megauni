@@ -1,4 +1,5 @@
 
+require "da_deploy"
 require "da_server"
 require "./megauni/HTTP_Handlers/Megauni_Archive"
 require "./megauni/HTTP_Handlers/Surfer_Hearts"
@@ -7,7 +8,6 @@ require "./megauni/HTTP_Handlers/Not_Found"
 
 module MEGAUNI
 
-  THIS_DIR = File.expand_path("#{__DIR__}/..")
   class Error < Exception
   end
 
@@ -22,6 +22,11 @@ module MEGAUNI
   # =============================================================================
   # Module:
   # =============================================================================
+
+  def self.app_dir
+    File.dirname(File.dirname(Process.executable_path.not_nil!))
+  end # === def self.app_dir
+
   def self.site_name
     "megaUNI.com"
   end

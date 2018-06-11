@@ -40,7 +40,7 @@ module MEGAUNI
     end
 
     def migrate
-      Dir.cd THIS_DIR
+      Dir.cd MEGAUNI.app_dir
       if !File.exists?(PG_DUMP)
         STDERR.puts "!!! File not found: #{PG_DUMP}"
         exit 1
@@ -57,7 +57,7 @@ module MEGAUNI
     end # === def migrate
 
     def migrate_force
-      Dir.cd THIS_DIR
+      Dir.cd MEGAUNI.app_dir
       [
         files("src/megauni/Model/Common/db/*.sql"),
         files("src/megauni/Model/Member/db/*.sql"),
@@ -84,7 +84,7 @@ module MEGAUNI
         STDERR.puts "!!! migrate dump: can only be run on a dev machine."
         exit 1
       end
-      Dir.cd THIS_DIR
+      Dir.cd MEGAUNI.app_dir
       File.write(PG_DUMP, dump)
       DA_Dev.green! "=== {{Wrote}}: BOLD{{PG_DUMP}}"
     end # === def migrate_dump

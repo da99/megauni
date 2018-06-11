@@ -8,6 +8,10 @@ shards:
     github: da99/da_css.cr
     version: 4.1.1
 
+  da_deploy:
+    github: da99/da_deploy
+    version: 0.4.0
+
   da_dev:
     github: da99/da_dev
     version: 0.3.2
