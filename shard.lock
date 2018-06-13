@@ -42,7 +42,7 @@ shards:
 
   da_server:
     github: da99/da_server
-    version: 0.1.17
+    version: 0.2.0
 
   da_session:
     github: da99/da_session.cr

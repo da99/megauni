@@ -49,13 +49,9 @@ module MEGAUNI
 
     DA.orange! "=== Using public dir: #{public_dir}"
     s = DA_Server.new(host, port, user, [
-      Index_File.new,
+      DA_Server::No_Slash_Tail.new,
       Surfer_Hearts.new,
-      HTTP::StaticFileHandler.new(
-        public_dir,
-        fallthrough: false,
-        directory_listing: false
-      ),
+      DA_Server::Public_Files.new(public_dir),
       Not_Found.new
     ])
     s.listen

@@ -5,14 +5,15 @@ module MEGAUNI
     include HTTP::Handler
 
     @public_file_handler : HTTP::Handler
+    @dir : String
 
     def initialize
-      dir = if DA.is_development?
+      @dir = if DA.is_development?
               "/apps/surferhearts/Public"
             else
               DA_Deploy::App.new("surferhearts").public_dir
             end
-      @public_file_handler = HTTP::StaticFileHandler.new(dir)
+      @public_file_handler = DA_Server::Public_Files.new(@dir)
     end # === def initialize
 
     def call(ctx)
@@ -26,21 +27,24 @@ module MEGAUNI
         return ctx
       end
 
-      if path.index("/surferhearts") == 0
+      case
+      when path == "/surferhearts"
+        path = "/index"
+      when path.index("/surferhearts") == 0
         path = path.sub("/surferhearts", "")
-
-        case
-        when path == "/"
-          path = "/index.html"
-
-        when path[-1] == '/'
-          path = "#{path.rstrip('/')}.html"
-
-        end # case
-
-        ctx.request.path = path
-        return @public_file_handler.call(ctx)
       end
+
+      if path == "/rss"
+        path = "/rss.xml"
+        return DA_Server.redirect_to(302, "/rss.xml", ctx)
+      end
+
+      if !File.file?(File.join(@dir, path))
+        path = "#{path}.html"
+      end
+
+      ctx.request.path = path
+      return @public_file_handler.call(ctx)
 
       return call_next(ctx)
     end # === def call
