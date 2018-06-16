@@ -2,18 +2,16 @@
 name: megauni
 version: 0.2.1
 dependencies:
+  da:
+    git: file:///apps/da
   da_deploy:
     github: da99/da_deploy
-  da_dev:
-    github: da99/da_dev
   da_server:
     github: da99/da_server
   da_session:
     github: da99/da_session.cr
   da_path:
     github: da99/da_path.cr
-  da_css:
-    github: da99/da_css.cr
   da_html:
     github: da99/da_html.cr
   pg:
@@ -24,6 +22,4 @@ development_dependencies:
   my_css:
     github: da99/my_css
   da_spec:
-    github: da99/da_spec.cr
-  inspect_bang:
-    github: da99/inspect_bang.cr
+    github: file:///apps/da_spec
