@@ -5,3 +5,4 @@ CREATE TABLE IF NOT EXISTS "member" (
   pswd_hash            BYTEA NOT NULL,
   created_at           timestamptz NOT NULL DEFAULT NOW()
 );
+COMMIT;

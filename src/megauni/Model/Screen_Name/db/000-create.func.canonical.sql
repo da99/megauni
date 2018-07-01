@@ -36,6 +36,6 @@ $$
 LANGUAGE plpgsql
 IMMUTABLE;
 
-
+COMMIT;
 
 

@@ -16,3 +16,4 @@ CREATE TABLE IF NOT EXISTS "screen_name" (
 
 );
 
+COMMIT;

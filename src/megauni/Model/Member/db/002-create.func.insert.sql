@@ -32,4 +32,4 @@ CREATE OR REPLACE FUNCTION member_insert(
   END
 $$ LANGUAGE plpgsql;
 
-
+COMMIT;

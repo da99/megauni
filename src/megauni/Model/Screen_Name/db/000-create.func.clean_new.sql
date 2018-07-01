@@ -18,4 +18,4 @@ AS $$
   END
 $$
 LANGUAGE plpgsql IMMUTABLE;
-
+COMMIT;

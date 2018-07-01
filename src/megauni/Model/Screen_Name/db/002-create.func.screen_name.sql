@@ -16,3 +16,4 @@ BEGIN
   WHERE sn.screen_name = screen_name_canonical(raw_screen_name);
 END
 $$ LANGUAGE plpgsql;
+COMMIT;

@@ -21,5 +21,5 @@ CREATE OR REPLACE FUNCTION screen_name_insert(
   END
 $$ LANGUAGE plpgsql;
 
-
+COMMIT;
 

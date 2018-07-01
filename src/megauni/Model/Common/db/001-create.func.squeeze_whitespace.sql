@@ -13,3 +13,4 @@ END
 $$
 LANGUAGE plpgsql
 IMMUTABLE;
+COMMIT;
