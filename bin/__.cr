@@ -21,6 +21,27 @@ when {"-h", "help", "--help"}.includes?(full_cmd)
   # === {{CMD}} help|-h|--help
   DA_Dev::Documentation.print_help([__FILE__])
 
+  # =============================================================================
+  # === Postgresql ==============================================================
+  # =============================================================================
+
+  when full_cmd == "migrate"
+    Dir.cd DA.app_dir
+    DA.orange! "=== {{migrating}}..."
+
+    # current = %w[role database enum function table].reduce({} of String => Array(String)) { |acc, t|
+    #   acc[t] = case
+    #            when t == "function"
+    #              [] of String
+    #            else
+    #              Megauni_PG.psql("template1", "sql/#{t}.sql").split.map(&.strip).reject(&.empty?)
+    #            end
+    #   acc
+    # }
+    cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
+    cluster.migrate("migrate/megauni_db")
+
+
 when full_cmd == "service run"
   # === {{CMD}} service run
   MEGAUNI.service_run
@@ -49,7 +70,7 @@ when full_cmd == "service run"
 
 # when full_cmd == "migrate reset tables"
 #   # === {{CMD}} migrate reset tables
-#   exit 1 if !DA.is_development?
+#   exit 1 if !DA.development?
 #   MEGAUNI::SQL.reset_tables!
 
 # when full_cmd == "migrate"
@@ -80,7 +101,10 @@ when full_cmd == "service run"
 
 
 else
-  DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
+  Dir.cd DA.app_dir
+  DA.orange! "=== in #{Dir.current}"
+  Process.exec("sh/__.sh", ARGV)
+  # DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
   exit 1
 
 end # === case

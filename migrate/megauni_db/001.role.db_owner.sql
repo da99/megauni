@@ -1,0 +1,17 @@
+
+
+-- RUN: ---------------------------------
+
+BEGIN;
+
+  CREATE ROLE db_owner
+  NOSUPERUSER
+  NOCREATEDB
+  NOCREATEROLE
+  NOBYPASSRLS
+  NOINHERIT
+  NOLOGIN
+  NOREPLICATION ;
+
+COMMIT;
+

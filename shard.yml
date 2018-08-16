@@ -22,4 +22,4 @@ development_dependencies:
   my_css:
     github: da99/my_css
   da_spec:
-    github: file:///apps/da_spec
+    git: file:///apps/da_spec

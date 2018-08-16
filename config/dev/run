@@ -1,0 +1,35 @@
+#!/bin/sh
+# PostgreSQL's database directory
+
+app_name="megauni_pg"
+pg_user="pg-megauni"
+pg_conf="/apps/$app_name/config/dev/postgresql.conf"
+pg_hba="/apps/$app_name/config/dev/pg_hba.conf"
+PREFIX="/apps/${app_name}/postgresql-10.4"
+pg_bin="$PREFIX/bin"
+
+exec 2>&1
+set -u -e
+
+cd "$PREFIX"
+
+export PGROOT="$PREFIX"
+export PGDATA="$PREFIX/data"
+export PGLOG="$PGDATA/log.log"
+
+export PATH="$PREFIX/bin:$PATH"
+
+# Extra options to run postmaster with, e.g.:
+# -N is the maximal number of client connections
+# -B is the number of shared buffers and has to be at least 2x the value for -N
+echo "=== in $PWD: $(date): $(postgres --version)"
+set -x
+exec \
+  chpst -u $pg_user:$pg_user \
+  $pg_bin/postgres \
+   --config_file="$pg_conf" \
+   --hba_file="$pg_hba" \
+   --data_directory="$PGDATA" \
+    -N 10 -B 20 2>&1
+
+

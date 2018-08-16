@@ -8,7 +8,7 @@ module MEGAUNI
     @dir : String
 
     def initialize
-      @dir = if DA.is_development?
+      @dir = if DA.development?
               "/apps/surferhearts/Public"
             else
               DA_Deploy::App.new("surferhearts").public_dir

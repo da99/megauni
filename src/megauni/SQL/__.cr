@@ -108,7 +108,7 @@ module MEGAUNI
     end # === def migrate_dump
 
     def reset_tables!
-      if !DA.is_development?
+      if !DA.development?
         STDERR.puts "!!! reset_tables! can only be run in dev. env."
         exit 1
       end

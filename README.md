@@ -17,3 +17,12 @@ https://www.iamcal.com/misc/fonts/
   da_dev bin compile
   sudo --preserve-env bin/megauni server start 3000
 ```
+# === Postgresql
+
+* duplicated, specific activities
+* cross-postings among activities
+* re-posting
+* posting to your own "folders" and custom (not customized) activities
+* default settings:
+  * "subsbcribe to this person"
+    - What to subscribe? Which activities in the future?

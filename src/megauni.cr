@@ -5,6 +5,7 @@ require "./megauni/HTTP_Handlers/Megauni_Archive"
 require "./megauni/HTTP_Handlers/Surfer_Hearts"
 require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
+require "./megauni/PostgreSQL/PostgreSQL"
 
 module MEGAUNI
 
@@ -42,9 +43,9 @@ module MEGAUNI
   end
 
   def self.service_run
-    host = DA.is_development? ? "localhost" : "0.0.0.0"
-    port = DA.is_development? ? 4567 : 340
-    user = DA.is_development? ? `whoami`.strip : "www-deployer"
+    host = DA.development? ? "localhost" : "0.0.0.0"
+    port = DA.development? ? 4567 : 340
+    user = DA.development? ? `whoami`.strip : "www-deployer"
     public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
 
     DA.orange! "=== Using public dir: #{public_dir}"
@@ -67,7 +68,7 @@ end # === module MEGAUNI
 # require "./megauni/Model/Message_Folder/__"
 # require "./megauni/Model/Message_Receive_Command/__"
 require "./megauni/HTML"
-require "./megauni/CSS"
+# require "./megauni/CSS"
 
 # require "./megauni/Route"
 # require "./megauni/Server"
