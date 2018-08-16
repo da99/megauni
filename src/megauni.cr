@@ -42,16 +42,14 @@ module MEGAUNI
     "Route/#{route_name}/#{name}"
   end
 
-  def self.service_run
+  def self.server_start(port : Int32 = 4567)
     host = DA.development? ? "localhost" : "0.0.0.0"
-    port = DA.development? ? 4567 : 340
     user = DA.development? ? `whoami`.strip : "www-deployer"
     public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
 
     DA.orange! "=== Using public dir: #{public_dir}"
     s = DA_Server.new(host, port, user, [
       DA_Server::No_Slash_Tail.new,
-      Surfer_Hearts.new,
       DA_Server::Public_Files.new(public_dir),
       Not_Found.new
     ])

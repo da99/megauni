@@ -42,9 +42,9 @@ when {"-h", "help", "--help"}.includes?(full_cmd)
     cluster.migrate("migrate/megauni_db")
 
 
-when full_cmd == "service run"
-  # === {{CMD}} service run
-  MEGAUNI.service_run
+when full_cmd == "server start"
+  # === {{CMD}} server_start
+  MEGAUNI.server_start
 
 # when cmd == "server" && args.first? == "check" && args.size == 2
 #   # === {{CMD}} server check port
