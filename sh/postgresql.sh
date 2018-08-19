@@ -34,7 +34,7 @@ case "$@" in
     user="$1"
     histfile="/tmp/${user}.histfile"
     shift
-    exec sudo -u $user $PREFIX/bin/psql --set=HISTFILE="$histfile" --port=311 $@
+    exec sudo -u $user $PREFIX/bin/psql --set=HISTFILE="$histfile" --port=3111 $@
     ;;
 
   compile)
@@ -128,6 +128,7 @@ case "$@" in
 
   *)
     cd "tmp/$folder"
+    echo "=== running: $@"
     exec $@
     ;;
 

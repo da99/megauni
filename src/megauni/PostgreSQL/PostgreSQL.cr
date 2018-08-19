@@ -7,6 +7,39 @@ module MEGAUNI
   module PostgreSQL
     extend self
 
+    SUPER_USER = "pg-megauni"
+
+    def start
+      app_dir = DA.app_dir
+      Dir.cd app_dir
+      prefix = File.expand_path "postgresql-10.4"
+      ENV["PGROOT"] = prefix
+      ENV["PGDATA"] = File.join(prefix, "data")
+      ENV["PGLOG"]  = File.join( ENV["PGDATA"], "log.log" )
+      ENV["PATH"]   = "#{prefix}/bin:#{ENV["PATH"]}"
+      Dir.cd prefix
+      # Extra options to run postmaster with, e.g.:
+      # -N is the maximal number of client connections
+      # -B is the number of shared buffers and has to be at least 2x the value for -N
+      puts "=== in #{Dir.current}: #{Time.now}: #{`postgres --version`.strip}"
+
+      user = `whoami`.strip
+      if user != SUPER_USER
+        STDERR.puts "!!! Not running as user: #{SUPER_USER}"
+        Process.exit 1
+      end
+
+      cmd = "#{prefix}/bin/postgres"
+      args = %<
+        --config_file=#{app_dir}/config/postgresql/postgresql.conf
+        --hba_file=#{app_dir}/config/postgresql/pg_hba.conf
+        --data_directory=#{ENV["PGDATA"]} \
+        -N 10 -B 20
+      >.split
+      DA.orange! "=== Running as #{user}: {{#{cmd}}} BOLD{{#{args.join ' '}}}"
+      Process.exec(cmd, args)
+    end # === def
+
     def compile
       # --with-python
       # --with-pam

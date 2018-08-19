@@ -6,6 +6,9 @@ require "../src/megauni"
 # require "../src/megauni/Dev/*"
 # require "../src/megauni/SQL/*"
 
+POSTGRESQL_PREFIX = File.join(DA.app_dir, "postgresql-10.4")
+POSTGRESQL_PORT   = 3111
+
 full_cmd = ARGV.join(' ')
 args     = ARGV.dup
 cmd      = args.shift
@@ -19,32 +22,32 @@ case
 
 when {"-h", "help", "--help"}.includes?(full_cmd)
   # === {{CMD}} help|-h|--help
-  DA_Dev::Documentation.print_help([__FILE__])
+  DA::CLI.print_doc
 
-  # =============================================================================
-  # === Postgresql ==============================================================
-  # =============================================================================
+when full_cmd == "migrate"
+  Dir.cd DA.app_dir
+  DA.orange! "=== {{migrating}}..."
 
-  when full_cmd == "migrate"
-    Dir.cd DA.app_dir
-    DA.orange! "=== {{migrating}}..."
+  # current = %w[role database enum function table].reduce({} of String => Array(String)) { |acc, t|
+  #   acc[t] = case
+  #            when t == "function"
+  #              [] of String
+  #            else
+  #              Megauni_PG.psql("template1", "sql/#{t}.sql").split.map(&.strip).reject(&.empty?)
+  #            end
+  #   acc
+  # }
+  cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
+  cluster.migrate("migrate/megauni_db")
 
-    # current = %w[role database enum function table].reduce({} of String => Array(String)) { |acc, t|
-    #   acc[t] = case
-    #            when t == "function"
-    #              [] of String
-    #            else
-    #              Megauni_PG.psql("template1", "sql/#{t}.sql").split.map(&.strip).reject(&.empty?)
-    #            end
-    #   acc
-    # }
-    cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
-    cluster.migrate("migrate/megauni_db")
+when full_cmd[/^postgresql start$/]?
+  # === {{CMD}} postgresql start
+  MEGAUNI::PostgreSQL.start
 
 
-when full_cmd == "server start"
-  # === {{CMD}} server_start
-  MEGAUNI.server_start
+when full_cmd[/http start \d+/]?
+  # === {{CMD}} http start PORT
+  MEGAUNI.http_start(ARGV.last.not_nil!.to_i)
 
 # when cmd == "server" && args.first? == "check" && args.size == 2
 #   # === {{CMD}} server check port
@@ -99,12 +102,20 @@ when full_cmd == "server start"
 # when full_cmd == "upgrade"
 #   MEGAUNI::Dev.upgrade
 
+when full_cmd[/^as [a-zA-Z\_\-0-9]+ psql( .+)?/]?
+  # === {{CMD}} psql USER cmd ...
+  Dir.cd DA.app_dir
+  args     = ARGV[3..-1]
+  username = ARGV[1]
+  histfile = "/tmp/#{username}.psql.histfile"
+
+  args = "-u #{username} #{POSTGRESQL_PREFIX}/bin/psql --set=HISTFILE=#{histfile} --port=#{POSTGRESQL_PORT}".split.concat(args)
+
+  DA.orange! "=== in #{Dir.current}: {{sudo}} BOLD{{#{args.join ' '}}}"
+  Process.exec("sudo", args)
 
 else
-  Dir.cd DA.app_dir
-  DA.orange! "=== in #{Dir.current}"
-  Process.exec("sh/__.sh", ARGV)
-  # DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
+  DA_Dev.red! "!!! {{Invalid arguments}}: BOLD{{#{ARGV.map(&.inspect).join ' '}}}"
   exit 1
 
 end # === case

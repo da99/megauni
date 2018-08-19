@@ -2,7 +2,7 @@ version: 1.0
 shards:
   da:
     git: file:///apps/da
-    version: 4.5.2
+    version: 4.6.0
 
   da_deploy:
     github: da99/da_deploy

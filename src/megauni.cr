@@ -42,7 +42,7 @@ module MEGAUNI
     "Route/#{route_name}/#{name}"
   end
 
-  def self.server_start(port : Int32 = 4567)
+  def self.http_start(port : Int32 = 4567)
     host = DA.development? ? "localhost" : "0.0.0.0"
     user = DA.development? ? `whoami`.strip : "www-deployer"
     public_dir = File.join(File.dirname(Process.executable_path.not_nil!), "../Public")
