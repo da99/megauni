@@ -6,17 +6,9 @@ require "../src/megauni"
 # require "../src/megauni/Dev/*"
 # require "../src/megauni/SQL/*"
 
-POSTGRESQL_PREFIX = File.join(DA.app_dir, "postgresql-10.4")
-POSTGRESQL_PORT   = 3111
-
 full_cmd = ARGV.join(' ')
 args     = ARGV.dup
 cmd      = args.shift
-
-
-{% if env("IS_DEVELOPMENT") %}
-  ENV["HTTP_SERVER_SESSION_SECRET"]="a key FOR development ONLY $(date)$(date)"
-{% end %}
 
 case
 
@@ -24,9 +16,9 @@ when {"-h", "help", "--help"}.includes?(full_cmd)
   # === {{CMD}} help|-h|--help
   DA::CLI.print_doc
 
-when full_cmd == "migrate"
+when full_cmd == "migrate up"
   Dir.cd DA.app_dir
-  DA.orange! "=== {{migrating}}..."
+  DA.orange! "=== {{migrating}} up..."
 
   # current = %w[role database enum function table].reduce({} of String => Array(String)) { |acc, t|
   #   acc[t] = case
@@ -37,8 +29,9 @@ when full_cmd == "migrate"
   #            end
   #   acc
   # }
-  cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
-  cluster.migrate("migrate/megauni_db")
+  # cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
+  # cluster.migrate("migrate/megauni_db")
+  MEGAUNI::PostgreSQL.migrate_up
 
 when full_cmd[/^postgresql start$/]?
   # === {{CMD}} postgresql start
@@ -109,7 +102,7 @@ when full_cmd[/^as [a-zA-Z\_\-0-9]+ psql( .+)?/]?
   username = ARGV[1]
   histfile = "/tmp/#{username}.psql.histfile"
 
-  args = "-u #{username} #{POSTGRESQL_PREFIX}/bin/psql --set=HISTFILE=#{histfile} --port=#{POSTGRESQL_PORT}".split.concat(args)
+  args = "-u #{username} #{MEGAUNI::PostgreSQL.prefix}/bin/psql --set=HISTFILE=#{histfile} --port=#{MEGAUNI::PostgreSQL.port}".split.concat(args)
 
   DA.orange! "=== in #{Dir.current}: {{sudo}} BOLD{{#{args.join ' '}}}"
   Process.exec("sudo", args)

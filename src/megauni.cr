@@ -6,6 +6,39 @@ require "./megauni/HTTP_Handlers/Surfer_Hearts"
 require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
 require "./megauni/PostgreSQL/PostgreSQL"
+require "./megauni/Base/Base"
+
+module DA
+  def each_non_empty_line(raw)
+    raw.each_line { |raw_line|
+      line = raw_line.chomp
+      next if line.empty?
+      yield line
+    }
+  end # === def
+
+  def each_non_empty_string(arr : Array(String))
+    arr.each { |raw_string|
+      s = raw_string.chomp
+      next if s.empty?
+      yield s
+    }
+  end # === def
+
+  def capture_output(cmd : String, args : Array(String)) : IO::Memory
+    io_out = IO::Memory.new
+    DA.success!(
+      Process.run(
+        cmd, args, 
+        input: Process::Redirect::Inherit,
+        output: io_out,
+        error: Process::Redirect::Inherit
+      )
+    )
+    io_out.rewind
+    io_out
+  end # === def
+end # === module DA
 
 module MEGAUNI
 

@@ -1,18 +1,39 @@
 
 require "da"
-require "./Database_Cluster"
-ENV["PATH"] = "#{ENV["PATH"]}:#{DA.app_dir}/postgresql-10.4/bin"
+# require "./Database_Cluster"
+require "./Role"
+require "./Table"
+require "./Database"
+require "./User_Defined_Type"
+require "./Schema"
 
 module MEGAUNI
   module PostgreSQL
     extend self
 
-    SUPER_USER = "pg-megauni"
+    def database_name
+      "megauni_db"
+    end
+
+    def super_user
+      "pg-megauni"
+    end # === def
+
+    def prefix : String
+      File.join(DA.app_dir, "postgresql-10.4")
+    end
+
+    def prefix(*args : String) : String
+      File.join(prefix, *args)
+    end
+
+    def port
+      3111
+    end
 
     def start
       app_dir = DA.app_dir
       Dir.cd app_dir
-      prefix = File.expand_path "postgresql-10.4"
       ENV["PGROOT"] = prefix
       ENV["PGDATA"] = File.join(prefix, "data")
       ENV["PGLOG"]  = File.join( ENV["PGDATA"], "log.log" )
@@ -24,8 +45,8 @@ module MEGAUNI
       puts "=== in #{Dir.current}: #{Time.now}: #{`postgres --version`.strip}"
 
       user = `whoami`.strip
-      if user != SUPER_USER
-        STDERR.puts "!!! Not running as user: #{SUPER_USER}"
+      if user != super_user
+        STDERR.puts "!!! Not running as user: #{super_user}"
         Process.exit 1
       end
 
@@ -84,6 +105,109 @@ module MEGAUNI
         libuuid-devel
       ]
     end # def
+
+    def histfile(user)
+      "/tmp/#{user}.histfile"
+    end
+
+    def psql_output(cmd  : String)
+      DA.capture_output(
+        "sudo",
+        %<
+          -u #{PostgreSQL.super_user}
+          #{PostgreSQL.prefix("/bin/psql")}
+          --set=HISTFILE=/dev/null
+          --port=#{PostgreSQL.port}
+          --dbname=template1
+          --no-align
+          --set ON_ERROR_STOP=on
+          --set AUTOCOMMIT=off
+          #{cmd}
+        >.split
+      )
+    end
+
+    def psql_tuples(cmd  : String)
+      DA.capture_output(
+        "sudo",
+        %<
+          -u #{PostgreSQL.super_user}
+          #{PostgreSQL.prefix("/bin/psql")}
+          --set=HISTFILE=/dev/null
+          --port=#{PostgreSQL.port}
+          --dbname=template1
+          --tuples-only
+          --no-align
+          --set ON_ERROR_STOP=on
+          --set AUTOCOMMIT=off
+          #{cmd}
+        >.split
+      )
+    end
+
+
+    def psql(cmd  : String)
+      DA.capture_output(
+        "sudo",
+        %<
+          -u #{PostgreSQL.super_user}
+          #{PostgreSQL.prefix("/bin/psql")}
+          --set=HISTFILE=/dev/null
+          --port=#{PostgreSQL.port}
+          --dbname=template1
+          --no-align
+          --set ON_ERROR_STOP=on
+          --set AUTOCOMMIT=off
+          #{cmd}
+        >.split
+      )
+    end
+
+    # Roles are common across an entire Database cluster,
+    # so they are defined on PostgreSQL, and not on the Database struct.
+    def roles
+      roles = Deque(PostgreSQL::Role).new
+      output = psql_tuples("-c \\du")
+      output.each_line.each { |raw_line|
+        line = raw_line.chomp
+        next if line.empty?
+        roles.push Role.new(line)
+      }
+      roles
+    end
+
+    def role?(name : String)
+      roles.find { |x| x.name == name }
+    end # def
+
+
+    def databases
+      sep = "~!~"
+      databases = Deque(PostgreSQL::Database).new
+      DA.each_non_empty_string( psql_tuples("--record-separator=#{sep} -c \\list").to_s.split(sep) ) { |line|
+        databases.push Database.new(line)
+      }
+      databases
+    end # === def
+
+    def database : PostgreSQL::Database
+      database(database_name)
+    end # === def
+
+    def database(name : String)
+      db = databases.find { |db| db.name == name }
+      if db
+        return db
+      else
+        raise Exception.new("Database not found: #{name.inspect}")
+      end
+    end # === def
+
+    def migrate_up
+      MEGAUNI::Base.migrate_before_head
+      MEGAUNI::Base.migrate_head
+      DA.green! "=== {{Done}}: BOLD{{migrating up}}"
+    end # === def
 
   end # === module Postgresql
 end # === module Megauni
