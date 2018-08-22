@@ -53,12 +53,17 @@ module MEGAUNI
         types
       end # === def
 
+      def psql_command(cmd : String)
+        DA.orange! "=== Running: psql command on database {{#{name}}}: BOLD{{#{cmd.split.join(' ')[0..25]}...}}"
+        PostgreSQL.psql("--dbname=#{name}", "-c", cmd)
+      end # === def
+
       def psql_file(path : String)
-        if File.exists?(path)
+        if !File.exists?(path)
           raise Exception.new("File does not exist: #{path}")
         end
         DA.orange! "=== Running: psql file on database {{#{name}}}: BOLD{{#{path}}}"
-        PostgreSQL.psql("--dbname=#{name} --file=#{path}")
+        PostgreSQL.psql("--dbname=#{name}", "--file=#{path}")
       end # === def
 
     end # === struct Database

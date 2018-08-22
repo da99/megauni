@@ -146,7 +146,7 @@ module MEGAUNI
     end
 
 
-    def psql(cmd  : String)
+    def psql(*cmd_and_args : String)
       DA.capture_output(
         "sudo",
         %<
@@ -158,8 +158,7 @@ module MEGAUNI
           --no-align
           --set ON_ERROR_STOP=on
           --set AUTOCOMMIT=off
-          #{cmd}
-        >.split
+        >.split.concat(cmd_and_args)
       )
     end
 
@@ -180,7 +179,6 @@ module MEGAUNI
       roles.find { |x| x.name == name }
     end # def
 
-
     def databases
       sep = "~!~"
       databases = Deque(PostgreSQL::Database).new
@@ -195,12 +193,20 @@ module MEGAUNI
     end # === def
 
     def database(name : String)
-      db = databases.find { |db| db.name == name }
+      db = database?(name)
       if db
         return db
       else
         raise Exception.new("Database not found: #{name.inspect}")
       end
+    end # === def
+
+    def database?
+      database?(PostgreSQL.database_name)
+    end # === def
+
+    def database?(name : String)
+      databases.find { |db| db.name == PostgreSQL.database_name }
     end # === def
 
     def migrate_up
