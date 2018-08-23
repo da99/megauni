@@ -6,6 +6,7 @@ require "./megauni/HTTP_Handlers/Surfer_Hearts"
 require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
 require "./megauni/Screen_Name/__"
+require "./megauni/Member/__"
 require "./megauni/PostgreSQL/PostgreSQL"
 require "./megauni/Base/Base"
 

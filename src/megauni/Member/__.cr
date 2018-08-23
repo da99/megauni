@@ -9,6 +9,10 @@ module MEGAUNI
     class Invalid < Exception
     end # === class Invalid
 
+    # =============================================================================
+    # Class:
+    # =============================================================================
+
     def self.crypt_cost
       10
     end # === def crypt_cost
@@ -38,6 +42,40 @@ module MEGAUNI
       end
       Screen_Name.new(new_member_id, new_screen_name, new_screen_name_id)
     end # === def self.create
+
+    def self.pgsql(file_name : String)
+      File.join "src/megauni/Member/postgresql", file_name
+    end # === def
+
+    def self.migrate_head
+      database = PostgreSQL.database
+      if !database.schema?("member")
+        database.psql_command(%< SET ROLE db_owner; CREATE SCHEMA member ; COMMIT; >)
+      end
+
+      database.psql_command(
+        %<
+          GRANT CREATE, USAGE ON SCHEMA member TO www_definer ;
+          COMMIT;
+        >
+      );
+
+      if !database.table?("member", "member")
+        database.psql_file(pgsql "table.member.sql")
+      end
+      database.psql_command(
+        %<
+          GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON member.member TO www_definer;
+          COMMIT;
+        >
+      );
+
+      database.psql_file(pgsql "function.insert_member.sql")
+    end # === def
+
+    # =============================================================================
+    # Instance:
+    # =============================================================================
 
   end # === class Member
 end # === module MEGAUNI

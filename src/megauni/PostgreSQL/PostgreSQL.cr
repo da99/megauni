@@ -230,6 +230,7 @@ module MEGAUNI
 
       MEGAUNI::Base.migrate_head
       MEGAUNI::Screen_Name.migrate_head
+      MEGAUNI::Member.migrate_head
 
       # === BODY: ========================================
 

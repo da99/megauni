@@ -1,7 +1,7 @@
 
 SET ROLE www_definer;
 
-CREATE OR REPLACE FUNCTION insert_member(
+CREATE OR REPLACE FUNCTION member.insert(
   IN  sn_name   varchar,
   IN  pswd_hash varchar
 ) RETURNS TABLE(
@@ -30,7 +30,7 @@ CREATE OR REPLACE FUNCTION insert_member(
     new_member.id    AS id,
     sn_i.id          AS screen_name_id,
     sn_i.screen_name AS screen_name
-    FROM insert_screen_name(new_member.id, sn_name) AS sn_i;
+    FROM screen_name.insert(new_member.id, sn_name) AS sn_i;
   END
 $$
 LANGUAGE plpgsql

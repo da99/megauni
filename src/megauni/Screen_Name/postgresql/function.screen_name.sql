@@ -5,9 +5,9 @@ CREATE OR REPLACE FUNCTION screen_name(
   IN raw_screen_name VARCHAR
 )
 RETURNS TABLE (
-  id          screen_name.id%TYPE,
-  owner_id    screen_name.owner_id%TYPE,
-  screen_name screen_name.screen_name%TYPE
+  id          screen_name.screen_name.id%TYPE,
+  owner_id    screen_name.screen_name.owner_id%TYPE,
+  screen_name screen_name.screen_name.screen_name%TYPE
 ) AS $$
 DECLARE
 

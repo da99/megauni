@@ -1,7 +1,5 @@
 
-
 SET ROLE db_owner;
-
 
 CREATE TABLE screen_name."screen_name" (
 

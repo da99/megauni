@@ -1,12 +1,12 @@
 
 SET ROLE www_definer;
 
-CREATE OR REPLACE FUNCTION insert_screen_name(
-  IN  owner_id           member.id%TYPE,
+CREATE OR REPLACE FUNCTION screen_name.insert(
+  IN  owner_id           member.member.id%TYPE,
   IN  raw_screen_name    VARCHAR
 ) RETURNS TABLE(
-  id          screen_name.id%TYPE,
-  screen_name screen_name.screen_name%TYPE
+  id          screen_name.screen_name.id%TYPE,
+  screen_name screen_name.screen_name.screen_name%TYPE
 ) AS $$
   DECLARE
     new_screen_name_record RECORD;

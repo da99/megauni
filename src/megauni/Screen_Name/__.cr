@@ -59,12 +59,26 @@ module MEGAUNI
       end
 
       database.psql_file(pgsql "reset.sql")
-      database.psql_file(pgsql "function.screen_name.clean_new.sql")
-      database.psql_file(pgsql "function.screen_name.canonical.sql")
+      database.psql_command(
+        %<
+          GRANT CREATE, USAGE ON SCHEMA screen_name TO www_definer ;
+          COMMIT;
+        >
+      );
+
+      database.psql_file(pgsql "function.clean_new.sql")
+      database.psql_file(pgsql "function.canonical.sql")
 
       if !database.table?("screen_name", "screen_name")
         database.psql_file(pgsql "table.screen_name.sql")
       end
+
+      database.psql_command(
+        %<
+          GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON screen_name.screen_name TO www_definer;
+          COMMIT;
+        >
+      );
     end # === def
 
     # =============================================================================
