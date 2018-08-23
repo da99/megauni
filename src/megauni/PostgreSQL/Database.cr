@@ -43,9 +43,41 @@ module MEGAUNI
         schemas
       end
 
+      def roles
+        sep = "!!!"
+        roles = Deque(PostgreSQL::Role).new
+        raw = PostgreSQL.psql_tuples("--dbname=#{name}", "--record-separator=#{sep}",  "-c", "\\du").to_s.split(sep)
+        DA.each_non_empty_string(raw) { |line|
+          roles.push Role.new(line)
+        }
+        roles
+      end
+
+      def role(name : String)
+        r = role?(name)
+        if r
+          return r
+        else
+          raise Exception.new("Role not found: #{name.inspect}")
+        end
+      end # === def
+
+      def role?(name : String)
+        roles.find { |r| r.name == name }
+      end
+
       def schema?(name : String)
         schemas.find { |x| x.name == name }
       end # def
+
+      def schema(name : String)
+        s = schema?(name)
+        if s
+          return s
+        else
+          raise Exception.new("Schema not found in #{name}: #{name.inspect}")
+        end
+      end # === def
 
       def user_defined_types
         sep = "~!~"
@@ -72,6 +104,24 @@ module MEGAUNI
         DA.orange! "=== Running: psql file on database {{#{name}}}: BOLD{{#{path}}}"
         PostgreSQL.psql("--dbname=#{name}", "--file=#{path}")
       end # === def
+
+      def create_or_update_definer_for(schema : PostgreSQL::Schema)
+        role_name = "#{schema.name}_definer"
+        if !role?(role_name)
+          psql_command(%<
+            CREATE ROLE #{role_name}
+              NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
+            COMMIT;
+                       >)
+        end
+        psql_command(%<
+            ALTER ROLE #{role_name} WITH
+              NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
+            GRANT CREATE, USAGE
+              ON SCHEMA #{schema.name} TO #{role_name};
+            COMMIT;
+                     >)
+      end
 
     end # === struct Database
   end # === module PostgreSQL

@@ -226,7 +226,6 @@ module MEGAUNI
 
     def migrate_up
       # === HEAD: ========================================
-      MEGAUNI::Base.migrate_before_head
 
       MEGAUNI::Base.migrate_head
       MEGAUNI::Screen_Name.migrate_head
@@ -235,7 +234,7 @@ module MEGAUNI
       # === BODY: ========================================
 
       # === TAIL: ========================================
-      MEGAUNI::Base.migrate_after_tail
+      MEGAUNI::Base.migrate_tail
 
       DA.green! "=== {{Done}}: BOLD{{migrating up}}"
     end # === def

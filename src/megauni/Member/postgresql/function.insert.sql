@@ -1,5 +1,5 @@
 
-SET ROLE www_definer;
+SET ROLE member_definer;
 
 CREATE OR REPLACE FUNCTION member.insert(
   IN  sn_name   varchar,

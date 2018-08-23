@@ -33,7 +33,11 @@ when full_cmd == "migrate up"
   # cluster.migrate("migrate/megauni_db")
   MEGAUNI::PostgreSQL.migrate_up
 
-when full_cmd[/^postgresql start$/]?
+when full_cmd == "postgresql start dev"
+  # === {{CMD}} postgresql start dev
+  Process.exec("sudo", "chpst -u pg-megauni:pg-megauni bin/megauni postgresql start".split);
+
+when full_cmd == "postgresql start"
   # === {{CMD}} postgresql start
   MEGAUNI::PostgreSQL.start
 

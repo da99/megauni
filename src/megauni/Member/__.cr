@@ -49,28 +49,16 @@ module MEGAUNI
 
     def self.migrate_head
       database = PostgreSQL.database
-      if !database.schema?("member")
-        database.psql_command(%< SET ROLE db_owner; CREATE SCHEMA member ; COMMIT; >)
+      database.psql_command(%< CREATE SCHEMA IF NOT EXISTS member AUTHORIZATION db_owner; COMMIT; >)
+
+      schema = database.schema("member")
+      database.create_or_update_definer_for(schema)
+
+      if !database.table?("member", "tbl")
+        database.psql_file(pgsql "tbl.sql")
       end
 
-      database.psql_command(
-        %<
-          GRANT CREATE, USAGE ON SCHEMA member TO www_definer ;
-          COMMIT;
-        >
-      );
-
-      if !database.table?("member", "member")
-        database.psql_file(pgsql "table.member.sql")
-      end
-      database.psql_command(
-        %<
-          GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON member.member TO www_definer;
-          COMMIT;
-        >
-      );
-
-      database.psql_file(pgsql "function.insert_member.sql")
+      database.psql_file(pgsql "function.insert.sql")
     end # === def
 
     # =============================================================================

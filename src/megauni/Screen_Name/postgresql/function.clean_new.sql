@@ -1,5 +1,5 @@
 
-SET ROLE www_definer;
+SET ROLE screen_name_definer;
 
 CREATE OR REPLACE FUNCTION screen_name.clean_new(IN raw_name VARCHAR)
 RETURNS VARCHAR

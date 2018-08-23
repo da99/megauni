@@ -1,5 +1,5 @@
 
-SET ROLE www_definer;
+SET ROLE screen_name_definer;
 
 CREATE OR REPLACE FUNCTION screen_name.insert(
   IN  owner_id           member.member.id%TYPE,

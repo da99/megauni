@@ -1,5 +1,7 @@
 
 
+SET ROLE db_owner;
+
 CREATE OR REPLACE FUNCTION base.squeeze_whitespace(
   IN raw_string VARCHAR
 )

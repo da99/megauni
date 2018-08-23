@@ -1,7 +1,7 @@
 
 SET ROLE db_owner;
 
-CREATE TABLE screen_name."screen_name" (
+CREATE TABLE screen_name.tbl (
 
   id            BIGSERIAL     PRIMARY KEY,
   owner_id      BIGINT        NOT NULL, -- Refers to "Member" id or screen_name id
@@ -16,5 +16,11 @@ CREATE TABLE screen_name."screen_name" (
   trashed_at  timestamp                NULL
 
 );
+
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE
+ON screen_name.tbl TO screen_name_definer;
+
+GRANT USAGE, SELECT
+ON screen_name.tbl_id_seq TO screen_name_definer;
 
 COMMIT;
