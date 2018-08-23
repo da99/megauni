@@ -1,11 +1,11 @@
 
-CREATE OR REPLACE FUNCTION clean_new_screen_name(IN raw_name VARCHAR)
+CREATE OR REPLACE FUNCTION screen_name.clean_new(IN raw_name VARCHAR)
 RETURNS VARCHAR
 AS $$
   DECLARE
     sn VARCHAR;
   BEGIN
-    sn := screen_name_canonical(raw_name);
+    sn := screen_name.canonical(raw_name);
 
     -- Banned screen names:
     IF sn ~* '(SCREEN[\_\.\-\+]+NAME|MEGAUNI|MINIUNI|OKDOKI|okjak|okjon|XXX)' OR

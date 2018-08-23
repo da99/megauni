@@ -1,5 +1,5 @@
 
-CREATE OR REPLACE FUNCTION screen_name_canonical(IN raw_name VARCHAR)
+CREATE OR REPLACE FUNCTION screen_name.canonical(IN raw_name VARCHAR)
 RETURNS VARCHAR
 AS $$
   DECLARE

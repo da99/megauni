@@ -41,6 +41,12 @@ module MEGAUNI
 
       database.psql_file(pgsql "alter.roles.sql")
       database.psql_file(pgsql "function.squeeze_whitespace.sql")
+
+      {"base.object_type", "base.privacy_level"}.each { |t|
+        if !database.user_defined_type?(t)
+          database.psql_file(pgsql "enum.#{t}.sql")
+        end
+      }
     end # === def
 
     def migrate_head

@@ -18,7 +18,7 @@ BEGIN
   sn.owner_id AS owner_id,
   sn.screen_name AS screen_name
   FROM screen_name sn
-  WHERE sn.screen_name = screen_name_canonical(raw_screen_name)
+  WHERE sn.screen_name = screen_name.canonical(raw_screen_name)
   AND sn.owner_type_id = 'member'
   ;
 END

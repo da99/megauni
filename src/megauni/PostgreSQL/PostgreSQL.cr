@@ -127,7 +127,7 @@ module MEGAUNI
       )
     end
 
-    def psql_tuples(cmd  : String)
+    def psql_tuples(*cmd : String)
       DA.capture_output(
         "sudo",
         %<
@@ -140,11 +140,9 @@ module MEGAUNI
           --no-align
           --set ON_ERROR_STOP=on
           --set AUTOCOMMIT=off
-          #{cmd}
-        >.split
+        >.split.concat(cmd)
       )
     end
-
 
     def psql(*cmd_and_args : String)
       DA.capture_output(
@@ -162,11 +160,28 @@ module MEGAUNI
       )
     end
 
+    def exec_psql
+      Process.exec(
+        "sudo",
+        %<
+          -u #{PostgreSQL.super_user}
+          #{PostgreSQL.prefix("/bin/psql")}
+          --set=HISTFILE=/tmp/psql.super.sql
+          --port=#{PostgreSQL.port}
+          --dbname=#{PostgreSQL.database_name}
+          --no-align
+          --set ON_ERROR_STOP=on
+          --set AUTOCOMMIT=off
+        >.split
+      )
+    end
+
+
     # Roles are common across an entire Database cluster,
     # so they are defined on PostgreSQL, and not on the Database struct.
     def roles
       roles = Deque(PostgreSQL::Role).new
-      output = psql_tuples("-c \\du")
+      output = psql_tuples("-c", "\\du")
       output.each_line.each { |raw_line|
         line = raw_line.chomp
         next if line.empty?
@@ -182,7 +197,7 @@ module MEGAUNI
     def databases
       sep = "~!~"
       databases = Deque(PostgreSQL::Database).new
-      DA.each_non_empty_string( psql_tuples("--record-separator=#{sep} -c \\list").to_s.split(sep) ) { |line|
+      DA.each_non_empty_string( psql_tuples("--record-separator=#{sep}", "-c", "\\list").to_s.split(sep) ) { |line|
         databases.push Database.new(line)
       }
       databases
@@ -212,7 +227,9 @@ module MEGAUNI
     def migrate_up
       # === HEAD: ========================================
       MEGAUNI::Base.migrate_before_head
+
       MEGAUNI::Base.migrate_head
+      MEGAUNI::Screen_Name.migrate_head
 
       # === BODY: ========================================
 

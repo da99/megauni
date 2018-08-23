@@ -5,6 +5,7 @@ require "./megauni/HTTP_Handlers/Megauni_Archive"
 require "./megauni/HTTP_Handlers/Surfer_Hearts"
 require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
+require "./megauni/Screen_Name/__"
 require "./megauni/PostgreSQL/PostgreSQL"
 require "./megauni/Base/Base"
 
@@ -95,7 +96,6 @@ end # === module MEGAUNI
 # require "./megauni/SQL/__"
 
 # require "./megauni/Member/__"
-# require "./megauni/Screen_Name/__"
 # require "./megauni/Message_Folder/__"
 # require "./megauni/Message_Receive_Command/__"
 require "./megauni/HTML"

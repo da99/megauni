@@ -37,7 +37,7 @@ module MEGAUNI
           %[
             SELECT owner_id, screen_name, id AS screen_name_id
             FROM screen_name
-            WHERE screen_name = screen_name_canonical($1)
+            WHERE screen_name = screen_name.canonical($1)
             LIMIT 1;
           ], raw, as: {Int64, String, Int64}
         )
@@ -47,6 +47,29 @@ module MEGAUNI
       end
       raise Query_Error.new("Screen name not found: #{raw.inspect}")
     end # === def self.find_by_screen_name
+
+    def self.pgsql(file : String)
+      File.join "src/megauni/Screen_Name/postgresql", file
+    end # === def
+
+    def self.migrate_head
+      database = PostgreSQL.database
+      if !database.schema?("screen_name")
+        database.psql_command(%< SET ROLE db_owner; CREATE SCHEMA screen_name ; COMMIT; >)
+      end
+
+      database.psql_file(pgsql "reset.sql")
+      database.psql_file(pgsql "function.screen_name.clean_new.sql")
+      database.psql_file(pgsql "function.screen_name.canonical.sql")
+
+      if !database.table?("screen_name", "screen_name")
+        database.psql_file(pgsql "table.screen_name.sql")
+      end
+    end # === def
+
+    # =============================================================================
+    # Instance:
+    # =============================================================================
 
     getter member_id      : Int64
     getter screen_name    : String

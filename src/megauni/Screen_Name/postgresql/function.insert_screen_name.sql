@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION insert_screen_name(
     clean_screen_name VARCHAR;
 
   BEGIN
-    clean_screen_name := screen_name_canonical(raw_screen_name);
+    clean_screen_name := screen_name.canonical(raw_screen_name);
 
     RETURN QUERY
     INSERT INTO

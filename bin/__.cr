@@ -95,6 +95,10 @@ when full_cmd[/http start \d+/]?
 # when full_cmd == "upgrade"
 #   MEGAUNI::Dev.upgrade
 
+when full_cmd == "psql" && DA.development?
+  # === {{CMD}} psql # Only when run on a development machine.
+  MEGAUNI::PostgreSQL.exec_psql
+
 when full_cmd[/^as [a-zA-Z\_\-0-9]+ psql( .+)?/]?
   # === {{CMD}} psql USER cmd ...
   Dir.cd DA.app_dir
