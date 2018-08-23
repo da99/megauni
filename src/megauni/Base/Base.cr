@@ -4,11 +4,15 @@ module MEGAUNI
 
     extend self
 
+    def pgsql(file : String)
+      File.join "src/megauni/Base/postgresql/", file
+    end
+
     def migrate_before_head
       template1 = PostgreSQL.database("template1")
 
       if template1.schema?("public")
-        template1.psql_file("src/megauni/Base/sql.drop.public.schema.sql")
+        template1.psql_file(pgsql "drop.public.schema.sql")
       else
         DA.orange! "=== {{public}} schema already removed from BOLD{{#{template1.name}}}"
       end
@@ -31,11 +35,12 @@ module MEGAUNI
         if PostgreSQL.role?(name)
           DA.orange! "=== role already created: {{#{name}}}"
         else
-          database.psql_file("src/megauni/Base/sql.role.#{name}.sql")
+          database.psql_file(pgsql "role.#{name}.sql")
         end
       }
 
-      database.psql_file("src/megauni/Base/sql.alter.roles.sql")
+      database.psql_file(pgsql "alter.roles.sql")
+      database.psql_file(pgsql "function.squeeze_whitespace.sql")
     end # === def
 
     def migrate_head
@@ -51,9 +56,14 @@ module MEGAUNI
       end
 
       if database.schema?("megauni_schema")
-        database.psql_command(%< DROP SCHEMA megauni_schema; COMMIT; >);
+        database.psql_command(%< DROP SCHEMA megauni_schema CASCADE; COMMIT; >);
       end
     end # === def
+
+    def migrate_after_tail
+      database = PostgreSQL.database
+      database.psql_file(pgsql "grant.sql")
+    end
 
   end # === module Base
 end # === module MEGAUNI

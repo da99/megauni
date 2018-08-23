@@ -49,7 +49,7 @@ module MEGAUNI
         AND n.nspname <> 'pg_catalog'
         AND n.nspname <> 'information_schema'
         AND pg_catalog.pg_type_is_visible(t.oid)
-        AND n.nspname = 'megauni_schema'
+        AND n.nspname = 'base'
         ORDER BY "name";
              ]);
       end # === def

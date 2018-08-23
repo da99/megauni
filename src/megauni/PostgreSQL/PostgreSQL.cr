@@ -210,8 +210,15 @@ module MEGAUNI
     end # === def
 
     def migrate_up
+      # === HEAD: ========================================
       MEGAUNI::Base.migrate_before_head
       MEGAUNI::Base.migrate_head
+
+      # === BODY: ========================================
+
+      # === TAIL: ========================================
+      MEGAUNI::Base.migrate_after_tail
+
       DA.green! "=== {{Done}}: BOLD{{migrating up}}"
     end # === def
 

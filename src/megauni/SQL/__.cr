@@ -59,17 +59,17 @@ module MEGAUNI
     def migrate_force
       Dir.cd MEGAUNI.app_dir
       [
-        files("src/megauni/Model/Common/db/*.sql"),
-        files("src/megauni/Model/Member/db/*.sql"),
-        files("src/megauni/Model/Screen_Name/db/*.sql"),
-        files("src/megauni/Model/Member_Block/db/*.sql"),
-        files("src/megauni/Model/Message_Folder/db/*.sql"),
-        files("src/megauni/Model/Label/db/*.sql"),
-        files("src/megauni/Model/Message/db/*.sql"),
-        files("src/megauni/Model/Message_Receive_Command/db/*.sql"),
-        files("src/megauni/Model/Mail/db/*.sql"),
-        files("src/megauni/Model/Readable/db/*.sql"),
-        files("src/megauni/Model/Writeable/db/*.sql")
+        files("src/megauni/Common/db/*.sql"),
+        files("src/megauni/Member/db/*.sql"),
+        files("src/megauni/Screen_Name/db/*.sql"),
+        files("src/megauni/Member_Block/db/*.sql"),
+        files("src/megauni/Message_Folder/db/*.sql"),
+        files("src/megauni/Label/db/*.sql"),
+        files("src/megauni/Message/db/*.sql"),
+        files("src/megauni/Message_Receive_Command/db/*.sql"),
+        files("src/megauni/Mail/db/*.sql"),
+        files("src/megauni/Readable/db/*.sql"),
+        files("src/megauni/Writeable/db/*.sql")
       ].flatten.sort_by { |x| File.basename(x.split('-').first.not_nil!).to_i }.each { |x|
         DA_Dev.orange! "=== {{Running SQL}}: BOLD{{#{x}}}"
         system("psql", "-v ON_ERROR_STOP=1 #{MEGAUNI::SQL.db_name} -f #{x}".split)

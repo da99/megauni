@@ -94,10 +94,10 @@ end # === module MEGAUNI
 
 # require "./megauni/SQL/__"
 
-# require "./megauni/Model/Member/__"
-# require "./megauni/Model/Screen_Name/__"
-# require "./megauni/Model/Message_Folder/__"
-# require "./megauni/Model/Message_Receive_Command/__"
+# require "./megauni/Member/__"
+# require "./megauni/Screen_Name/__"
+# require "./megauni/Message_Folder/__"
+# require "./megauni/Message_Receive_Command/__"
 require "./megauni/HTML"
 # require "./megauni/CSS"
 

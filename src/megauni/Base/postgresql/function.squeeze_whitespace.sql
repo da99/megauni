@@ -1,6 +1,6 @@
 
 
-CREATE OR REPLACE FUNCTION squeeze_whitespace(
+CREATE OR REPLACE FUNCTION base.squeeze_whitespace(
   IN raw_string VARCHAR
 )
 RETURNS VARCHAR
@@ -15,7 +15,7 @@ $$
 LANGUAGE plpgsql
 IMMUTABLE
 SECURITY INVOKER
-SET search_path = megauni_schema , pg_temp
+SET search_path = base , pg_temp
 ;
 
 COMMIT;

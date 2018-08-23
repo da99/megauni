@@ -29,7 +29,7 @@ when full_cmd == "migrate up"
   #            end
   #   acc
   # }
-  # cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "megauni_schema")
+  # cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "base")
   # cluster.migrate("migrate/megauni_db")
   MEGAUNI::PostgreSQL.migrate_up
 

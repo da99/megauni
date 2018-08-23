@@ -19,7 +19,7 @@ struct SPECS
   getter cluster : PostgreSQL::Database_Cluster
 
   def initialize
-    @cluster = PostgreSQL::Database_Cluster.new(311, "pg-meguani", "megauni_db", "megauni_schema")
+    @cluster = PostgreSQL::Database_Cluster.new(311, "pg-meguani", "megauni_db", "base")
   end # === def
 
   def reset_tables!

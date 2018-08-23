@@ -5,8 +5,8 @@ REVOKE ALL PRIVILEGES ON DATABASE megauni_db FROM PUBLIC CASCADE;
 ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
 GRANT CONNECT ON DATABASE megauni_db TO www_group ;
-GRANT CREATE, USAGE ON SCHEMA megauni_schema TO www_definer ;
-GRANT         USAGE ON SCHEMA megauni_schema TO www_group ;
+GRANT CREATE, USAGE ON SCHEMA base TO www_definer ;
+GRANT         USAGE ON SCHEMA base TO www_group ;
 
 GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE
 ON screen_name, member, post, post_permit, activity_permit, conversation, "comment", comment_permit

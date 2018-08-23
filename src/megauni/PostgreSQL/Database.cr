@@ -33,7 +33,7 @@ module MEGAUNI
       def schemas(options : String = "")
         sep = "~!~"
         schemas = Deque(PostgreSQL::Schema).new
-        raw = PostgreSQL.psql_tuples("#{options} --record-separator=#{sep} -c \\dnS+").to_s.split(sep)
+        raw = PostgreSQL.psql_tuples("#{options} --dbname=#{name} --record-separator=#{sep} -c \\dnS+").to_s.split(sep)
         DA.each_non_empty_string(raw) { |line|
           schemas.push Schema.new(line)
         }
