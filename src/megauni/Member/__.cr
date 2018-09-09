@@ -43,22 +43,15 @@ module MEGAUNI
       Screen_Name.new(new_member_id, new_screen_name, new_screen_name_id)
     end # === def self.create
 
-    def self.pgsql(file_name : String)
-      File.join "src/megauni/Member/postgresql", file_name
-    end # === def
-
     def self.migrate_head
-      database = PostgreSQL.database
-      database.psql_command(%< CREATE SCHEMA IF NOT EXISTS member AUTHORIZATION db_owner; COMMIT; >)
+      database = MEGAUNI.postgresql.database
+      schema = database.create_schema?("member")
 
-      schema = database.schema("member")
-      database.create_or_update_definer_for(schema)
-
-      if !database.table?("member", "tbl")
-        database.psql_file(pgsql "tbl.sql")
+      if !database.table?("member.tbl")
+        database.psql_file(self, "tbl")
       end
 
-      database.psql_file(pgsql "function.insert.sql")
+      database.psql_file(self, "function.insert")
     end # === def
 
     # =============================================================================

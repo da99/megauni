@@ -5,7 +5,7 @@ require "pg"
 module MEGAUNI
   PQ::ConnInfo::SOCKET_SEARCH.push("/tmp/.s.PGSQL.311")
 
-  module PostgreSQL
+  struct Postgresql
 
     struct Connection
 

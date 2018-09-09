@@ -1,13 +1,14 @@
 
 module MEGAUNI
-  module PostgreSQL
+  struct Postgresql
     struct Role
 
-      getter name : String
+      getter cluster    : Postgresql
+      getter name       : String
       getter attributes : Array(String) = [] of String
-      getter member_of : Array(String) = [] of String
+      getter member_of  : Array(String) = [] of String
 
-      def initialize(raw_line : String)
+      def initialize(@cluster, raw_line : String)
         pieces = raw_line.chomp.split('|')
         @name = pieces.shift
 
@@ -23,5 +24,5 @@ module MEGAUNI
       end # === def
 
     end # === struct Role
-  end # === module PostgreSQL
+  end # === struct Postgresql
 end # === module MEGAUNI

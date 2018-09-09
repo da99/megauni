@@ -12,26 +12,9 @@ cmd      = args.shift
 
 case
 
-when {"-h", "help", "--help"}.includes?(full_cmd)
+when full_cmd[/^(-h|help|--help)( .+)?/]?
   # === {{CMD}} help|-h|--help
-  DA::CLI.print_doc
-
-when full_cmd == "migrate up"
-  Dir.cd DA.app_dir
-  DA.orange! "=== {{migrating}} up..."
-
-  # current = %w[role database enum function table].reduce({} of String => Array(String)) { |acc, t|
-  #   acc[t] = case
-  #            when t == "function"
-  #              [] of String
-  #            else
-  #              Megauni_PG.psql("template1", "sql/#{t}.sql").split.map(&.strip).reject(&.empty?)
-  #            end
-  #   acc
-  # }
-  # cluster = MEGAUNI::PostgreSQL::Database_Cluster.new(311, "pg-megauni", "megauni_db", "base")
-  # cluster.migrate("migrate/megauni_db")
-  MEGAUNI::PostgreSQL.migrate_up
+  DA.print_help
 
 when full_cmd == "postgresql start dev"
   # === {{CMD}} postgresql start dev
@@ -39,8 +22,18 @@ when full_cmd == "postgresql start dev"
 
 when full_cmd == "postgresql start"
   # === {{CMD}} postgresql start
-  MEGAUNI::PostgreSQL.start
+  MEGAUNI.postgresql.start
 
+when full_cmd == "postgresql migrate up"
+  # == {{CMD}} postgresql migrate up
+  Dir.cd DA.app_dir
+  DA.orange! "=== {{migrating}} up..."
+  MEGAUNI.postgresql.migrate_up
+
+when full_cmd == "postgresql reset database"
+  # === {{CMD}} postgresql reset database
+  # Runs only on a development machine.
+  MEGAUNI.postgresql.reset_database!
 
 when full_cmd[/http start \d+/]?
   # === {{CMD}} http start PORT
@@ -99,9 +92,11 @@ when full_cmd[/http start \d+/]?
 # when full_cmd == "upgrade"
 #   MEGAUNI::Dev.upgrade
 
-when full_cmd == "psql" && DA.development?
-  # === {{CMD}} psql # Only when run on a development machine.
-  MEGAUNI::PostgreSQL.exec_psql
+when full_cmd[/^psql( [a-z0-9\_]{1,15})?$/]? && DA.development?
+  # === {{CMD}} psql
+  # === {{CMD}} psql name
+  # Only when run on a development machine.
+  MEGAUNI.postgresql.exec_psql(ARGV[1]? || MEGAUNI.postgresql.database_name)
 
 when full_cmd[/^as [a-zA-Z\_\-0-9]+ psql( .+)?/]?
   # === {{CMD}} psql USER cmd ...
@@ -110,7 +105,12 @@ when full_cmd[/^as [a-zA-Z\_\-0-9]+ psql( .+)?/]?
   username = ARGV[1]
   histfile = "/tmp/#{username}.psql.histfile"
 
-  args = "-u #{username} #{MEGAUNI::PostgreSQL.prefix}/bin/psql --set=HISTFILE=#{histfile} --port=#{MEGAUNI::PostgreSQL.port}".split.concat(args)
+  args = %<
+    -u #{username}
+    #{MEGAUNI.postgresql.prefix}/bin/psql
+    --set=HISTFILE=#{histfile}
+    --port=#{MEGAUNI.postgresql.port}
+  >.split.concat(args)
 
   DA.orange! "=== in #{Dir.current}: {{sudo}} BOLD{{#{args.join ' '}}}"
   Process.exec("sudo", args)

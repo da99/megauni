@@ -48,23 +48,16 @@ module MEGAUNI
       raise Query_Error.new("Screen name not found: #{raw.inspect}")
     end # === def self.find_by_screen_name
 
-    def self.pgsql(file : String)
-      File.join "src/megauni/Screen_Name/postgresql", file
-    end # === def
-
     def self.migrate_head
-      database = PostgreSQL.database
+      database = MEGAUNI.postgresql.database
       database.psql_command(%< CREATE SCHEMA IF NOT EXISTS screen_name AUTHORIZATION db_owner; COMMIT; >)
 
       schema = database.schema("screen_name")
-      database.create_or_update_definer_for(schema)
 
-      database.psql_file(pgsql "function.clean_new.sql")
-      database.psql_file(pgsql "function.canonical.sql")
+      database.psql_file(self, "function.clean_new")
+      database.psql_file(self, "function.canonical")
 
-      if !database.table?("screen_name", "tbl")
-        database.psql_file(pgsql "tbl.sql")
-      end
+      database.create_table?("screen_name.tbl", self, "tbl.sql")
     end # === def
 
     # =============================================================================

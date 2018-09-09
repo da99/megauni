@@ -1,8 +1,9 @@
 
 module MEGAUNI
-  module PostgreSQL
+  struct Postgresql
     struct User_Defined_Type
 
+      getter database          : Database
       getter schema            : String
       getter name              : String
       getter internal_name     : String
@@ -12,11 +13,11 @@ module MEGAUNI
       getter access_privileges : String
       getter description       : String
 
-      def initialize(raw : String)
+      def initialize(@database, raw : String)
         @schema, @name, @internal_name, @size, raw_elements, @owner, @access_privileges, @description = raw.split('|')
         @elements = raw_elements.split('\n')
       end # def
 
     end # === struct User_Defined_Type
-  end # === module PostgreSQL
+  end # === struct Postgresql
 end # === module MEGAUNI

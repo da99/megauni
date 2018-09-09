@@ -8,27 +8,19 @@ require "./User_Defined_Type"
 require "./Schema"
 
 module MEGAUNI
-  module PostgreSQL
-    extend self
 
-    def database_name
-      "megauni_db"
-    end
+  struct Postgresql
 
-    def super_user
-      "pg-megauni"
-    end # === def
+    getter port          : Int32
+    getter prefix        : String
+    getter database_name : String
+    getter super_user    : String
 
-    def prefix : String
-      File.join(DA.app_dir, "postgresql-10.4")
-    end
+    def initialize(@port, @prefix, @super_user, @database_name)
+    end # def
 
     def prefix(*args : String) : String
       File.join(prefix, *args)
-    end
-
-    def port
-      3111
     end
 
     def start
@@ -36,7 +28,7 @@ module MEGAUNI
       Dir.cd app_dir
       ENV["PGROOT"] = prefix
       ENV["PGDATA"] = File.join(prefix, "data")
-      ENV["PGLOG"]  = File.join( ENV["PGDATA"], "log.log" )
+      ENV["PGLOG"]  = File.join(ENV["PGDATA"], "log.log")
       ENV["PATH"]   = "#{prefix}/bin:#{ENV["PATH"]}"
       Dir.cd prefix
       # Extra options to run postmaster with, e.g.:
@@ -114,10 +106,10 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{PostgreSQL.super_user}
-          #{PostgreSQL.prefix("/bin/psql")}
+          -u #{super_user}
+          #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
-          --port=#{PostgreSQL.port}
+          --port=#{port}
           --dbname=template1
           --no-align
           --set ON_ERROR_STOP=on
@@ -131,10 +123,10 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{PostgreSQL.super_user}
-          #{PostgreSQL.prefix("/bin/psql")}
+          -u #{super_user}
+          #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
-          --port=#{PostgreSQL.port}
+          --port=#{port}
           --dbname=template1
           --tuples-only
           --no-align
@@ -148,10 +140,10 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{PostgreSQL.super_user}
-          #{PostgreSQL.prefix("/bin/psql")}
+          -u #{super_user}
+          #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
-          --port=#{PostgreSQL.port}
+          --port=#{port}
           --dbname=template1
           --no-align
           --set ON_ERROR_STOP=on
@@ -160,15 +152,15 @@ module MEGAUNI
       )
     end
 
-    def exec_psql
+    def exec_psql(x : String = "template1")
       Process.exec(
         "sudo",
         %<
-          -u #{PostgreSQL.super_user}
-          #{PostgreSQL.prefix("/bin/psql")}
+          -u #{super_user}
+          #{prefix("/bin/psql")}
           --set=HISTFILE=/tmp/psql.super.sql
-          --port=#{PostgreSQL.port}
-          --dbname=#{PostgreSQL.database_name}
+          --port=#{port}
+          --dbname=#{Database::Name.new(x).name}
           --no-align
           --set ON_ERROR_STOP=on
           --set AUTOCOMMIT=off
@@ -178,14 +170,14 @@ module MEGAUNI
 
 
     # Roles are common across an entire Database cluster,
-    # so they are defined on PostgreSQL, and not on the Database struct.
+    # so they are defined on Postgresql, and not on the Database struct.
     def roles
-      roles = Deque(PostgreSQL::Role).new
+      roles = Deque(Postgresql::Role).new
       output = psql_tuples("-c", "\\du")
       output.each_line.each { |raw_line|
         line = raw_line.chomp
         next if line.empty?
-        roles.push Role.new(line)
+        roles.push Role.new(self, line)
       }
       roles
     end
@@ -194,16 +186,27 @@ module MEGAUNI
       roles.find { |x| x.name == name }
     end # def
 
+    def reset_database!
+      if !DA.development?
+        raise Exception.new("This can only be run in a development environment.")
+      end
+      if database?(database_name)
+        psql("-c", %< DROP DATABASE "#{database_name}"; >)
+      else
+        DA.orange! "=== Database already dropped: #{database_name}"
+      end
+    end # === def
+
     def databases
       sep = "~!~"
-      databases = Deque(PostgreSQL::Database).new
+      databases = Deque(Postgresql::Database).new
       DA.each_non_empty_string( psql_tuples("--record-separator=#{sep}", "-c", "\\list").to_s.split(sep) ) { |line|
-        databases.push Database.new(line)
+        databases.push Database.new(self, line)
       }
       databases
     end # === def
 
-    def database : PostgreSQL::Database
+    def database : Postgresql::Database
       database(database_name)
     end # === def
 
@@ -217,11 +220,11 @@ module MEGAUNI
     end # === def
 
     def database?
-      database?(PostgreSQL.database_name)
+      database?(database_name)
     end # === def
 
     def database?(name : String)
-      databases.find { |db| db.name == PostgreSQL.database_name }
+      databases.find { |db| db.name == name }
     end # === def
 
     def migrate_up
@@ -232,6 +235,7 @@ module MEGAUNI
       MEGAUNI::Member.migrate_head
 
       # === BODY: ========================================
+      # MEGAUNI::News.migrate
 
       # === TAIL: ========================================
       MEGAUNI::Base.migrate_tail
@@ -239,6 +243,6 @@ module MEGAUNI
       DA.green! "=== {{Done}}: BOLD{{migrating up}}"
     end # === def
 
-  end # === module Postgresql
+  end # === struct Postgresql
 end # === module Megauni
 

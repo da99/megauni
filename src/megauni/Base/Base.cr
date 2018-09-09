@@ -4,30 +4,27 @@ module MEGAUNI
 
     extend self
 
-    def pgsql(file : String)
-      File.join "src/megauni/Base/postgresql/", file
-    end
-
     def migrate_head
-      template1 = PostgreSQL.database("template1")
+      postgresql = MEGAUNI.postgresql
+      template1 = postgresql.database("template1")
 
       if template1.schema?("public")
-        template1.psql_file(pgsql "drop.public.schema.sql")
+        template1.psql_file(self, "drop.public.schema")
       else
         DA.orange! "=== {{public}} schema already removed from BOLD{{#{template1.name}}}"
       end
 
-      if !PostgreSQL.database?
-        template1.psql_command(%<CREATE DATABASE "#{PostgreSQL.database_name}";>)
+      if !postgresql.database?
+        template1.psql_command(%<CREATE DATABASE "#{postgresql.database_name}";>)
       end
 
-      database = PostgreSQL.database
+      database = postgresql.database
 
       {"db_owner", "www_group", "www_app"}.each { |name|
-        if PostgreSQL.role?(name)
+        if postgresql.role?(name)
           DA.orange! "=== role already created: {{#{name}}}"
         else
-          database.psql_file(pgsql "role.#{name}.sql")
+          database.psql_file(self, "role.#{name}")
         end
       }
 
@@ -38,7 +35,7 @@ module MEGAUNI
         COMMIT;
                             >);
 
-      database.psql_file(pgsql "alter.roles.sql")
+      database.psql_file(self, "alter.roles")
 
       database.psql_command(%<
         CREATE SCHEMA IF NOT EXISTS base AUTHORIZATION db_owner;
@@ -47,18 +44,17 @@ module MEGAUNI
 
       {"base.object_type", "base.privacy_level"}.each { |t|
         if !database.user_defined_type?(t)
-          database.psql_file(pgsql "enum.#{t.split('.')[1..-1].join('.')}.sql")
+          database.psql_file(self, "enum.#{t.split('.')[1..-1].join('.')}")
         end
       }
 
       schema = database.schema("base")
-      database.create_or_update_definer_for(schema);
-      database.psql_file(pgsql "function.squeeze_whitespace.sql")
+      database.psql_file(self, "function.squeeze_whitespace")
     end # === def
 
     def migrate_tail
-      database = PostgreSQL.database
-      database.psql_file(pgsql "grant.sql")
+      database = MEGAUNI.postgresql.database
+      database.psql_file(self, "grant.sql")
     end
 
   end # === module Base

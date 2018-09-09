@@ -7,7 +7,8 @@ require "./megauni/HTTP_Handlers/Index_File"
 require "./megauni/HTTP_Handlers/Not_Found"
 require "./megauni/Screen_Name/__"
 require "./megauni/Member/__"
-require "./megauni/PostgreSQL/PostgreSQL"
+require "./megauni/News/__"
+require "./megauni/Postgresql/__"
 require "./megauni/Base/Base"
 
 module DA
@@ -90,6 +91,15 @@ module MEGAUNI
     ])
     s.listen
   end # === def self.service_run
+
+  def self.postgresql
+    Postgresql.new(
+      port: 3111,
+      prefix: File.join(DA.app_dir, "postgresql-10.4"),
+      super_user: "pg-megauni",
+      database_name: "megauni_db"
+    )
+  end
 
 end # === module MEGAUNI
 
