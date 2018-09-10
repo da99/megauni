@@ -11,12 +11,14 @@ module MEGAUNI
 
   struct Postgresql
 
-    getter port          : Int32
-    getter prefix        : String
-    getter database_name : String
-    getter super_user    : String
+    getter port            : Int32
+    getter prefix          : String
+    getter database_name   : String
+    getter super_user_name : String
 
-    def initialize(@port, @prefix, @super_user, @database_name)
+    def initialize(@port, @prefix, super_user_name : String, database_name : String)
+      @super_user_name = Role::Name.valid!(super_user_name)
+      @database_name   = Database::Name.valid!(database_name)
     end # def
 
     def prefix(*args : String) : String
@@ -37,8 +39,8 @@ module MEGAUNI
       puts "=== in #{Dir.current}: #{Time.now}: #{`postgres --version`.strip}"
 
       user = `whoami`.strip
-      if user != super_user
-        STDERR.puts "!!! Not running as user: #{super_user}"
+      if user != super_user_name
+        STDERR.puts "!!! Not running as user: #{super_user_name}"
         Process.exit 1
       end
 
@@ -106,7 +108,7 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{super_user}
+          -u #{super_user_name}
           #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
           --port=#{port}
@@ -123,7 +125,7 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{super_user}
+          -u #{super_user_name}
           #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
           --port=#{port}
@@ -140,7 +142,7 @@ module MEGAUNI
       DA.capture_output(
         "sudo",
         %<
-          -u #{super_user}
+          -u #{super_user_name}
           #{prefix("/bin/psql")}
           --set=HISTFILE=/dev/null
           --port=#{port}
@@ -156,7 +158,7 @@ module MEGAUNI
       Process.exec(
         "sudo",
         %<
-          -u #{super_user}
+          -u #{super_user_name}
           #{prefix("/bin/psql")}
           --set=HISTFILE=/tmp/psql.super.sql
           --port=#{port}
@@ -186,16 +188,26 @@ module MEGAUNI
       roles.find { |x| x.name == name }
     end # def
 
-    def reset_database!
-      if !DA.development?
-        raise Exception.new("This can only be run in a development environment.")
-      end
+    # Drops the database.
+    # Remove all roles except super user.
+    def reset!
+      DA.development!
+
       if database?(database_name)
-        psql("-c", %< DROP DATABASE "#{database_name}"; >)
+        template1.psql_command(%< DROP DATABASE "#{database_name}"; >)
       else
         DA.orange! "=== Database already dropped: #{database_name}"
       end
+      t1 = template1
+      roles.each { |r|
+        next if r.super_user?
+        t1.psql_command(%< DROP ROLE "#{r.name}"; >)
+      }
     end # === def
+
+    def template1
+      database("template1")
+    end
 
     def databases
       sep = "~!~"
@@ -225,6 +237,76 @@ module MEGAUNI
 
     def database?(name : String)
       databases.find { |db| db.name == name }
+    end # === def
+
+    def create_database?(raw : String)
+      db_name = Database::Name.valid!(raw)
+      if !database?(db_name)
+        template1.psql_command(%< CREATE DATABASE "#{db_name}"; >)
+      else
+        DA.orange! "=== Already created database: #{db_name}"
+      end
+      database(db_name)
+    end # === def
+
+    def create_definer?(raw : String)
+      schema_name = Schema::Name.valid!(raw)
+      role_name = "#{schema_name}_definer"
+      if !role?(role_name)
+        template1.psql_command("
+          CREATE ROLE #{role_name}
+            NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
+          COMMIT;
+        ")
+      end
+      role?(role_name).not_nil!
+    end # === def
+
+    def roles
+      sep = "!!!"
+      roles = Deque(Postgresql::Role).new
+      raw = psql_tuples("--dbname=template1", "--record-separator=#{sep}",  "-c", "\\du").to_s.split(sep)
+      DA.each_non_empty_string(raw) { |line|
+        roles.push Role.new(self, line)
+      }
+      roles
+    end
+
+    def role(name : String)
+      r = role?(name)
+      if r
+        return r
+      else
+        raise Exception.new("Role not found: #{name.inspect}")
+      end
+    end # === def
+
+    def role?(raw : String)
+      role_name = Role::Name.valid!(raw)
+      roles.find { |r| r.name == role_name }
+    end
+
+
+    def create_role?(raw : String)
+      role_name = Role::Name.valid!(raw)
+      current = role?(role_name)
+      if current
+        return current
+      else
+        template1.psql_command(%<
+          BEGIN;
+            CREATE ROLE #{role_name}
+            NOSUPERUSER
+            NOCREATEDB
+            NOCREATEROLE
+            NOBYPASSRLS
+            NOINHERIT
+            NOLOGIN
+            NOREPLICATION ;
+          COMMIT;
+        >)
+        role?(role_name).not_nil!
+      end
     end # === def
 
     def migrate_up

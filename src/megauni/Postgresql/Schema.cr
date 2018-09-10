@@ -28,24 +28,6 @@ module MEGAUNI
         }
       end # def
 
-      def create_definer
-        role_name = "#{name}_definer"
-        if !role?(role_name)
-          psql_command(%<
-            CREATE ROLE #{role_name}
-              NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
-            COMMIT;
-                       >)
-        end
-        psql_command(%<
-            ALTER ROLE #{role_name} WITH
-              NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
-            GRANT CREATE, USAGE
-              ON SCHEMA #{schema.name} TO #{role_name};
-            COMMIT;
-                     >)
-      end # === def
-
     end # === struct Schema
   end # === struct Postgresql
 end # === module MEGAUNI

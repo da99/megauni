@@ -14,12 +14,12 @@ module MEGAUNI
         end # === def
       end # === struct Name
 
-      getter cluster : Postgresql
-      getter name : String
-      getter owner : String
-      getter encoding : String
-      getter collate : String
-      getter ctype : String
+      getter cluster           : Postgresql
+      getter name              : String
+      getter owner             : String
+      getter encoding          : String
+      getter collate           : String
+      getter ctype             : String
       getter access_privileges : Array(String) = [] of String
 
       def initialize(@cluster, raw_line : String)
@@ -30,6 +30,14 @@ module MEGAUNI
           access_privileges << x unless !x || x.empty?
         }
       end # def
+
+      def create_table?(schema_table : String, *args)
+        file = sql_file_path(*args)
+        if !table?(schema_table)
+          psql_file(file)
+        end
+        table?(schema_table).not_nil!
+      end # === def
 
       def tables
         tables = Deque(Postgresql::Table).new
@@ -57,45 +65,45 @@ module MEGAUNI
         schemas
       end
 
-      def roles
-        sep = "!!!"
-        roles = Deque(Postgresql::Role).new
-        raw = cluster.psql_tuples("--dbname=#{name}", "--record-separator=#{sep}",  "-c", "\\du").to_s.split(sep)
-        DA.each_non_empty_string(raw) { |line|
-          roles.push Role.new(line)
-        }
-        roles
-      end
-
-      def role(name : String)
-        r = role?(name)
-        if r
-          return r
+      def drop_schema?(raw : String)
+        schema_name = Schema::Name.valid!(raw)
+        if schema?(schema_name)
+          psql_command(%<
+            BEGIN;
+              DROP SCHEMA IF EXISTS public CASCADE;
+            COMMIT;
+          >)
         else
-          raise Exception.new("Role not found: #{name.inspect}")
+          DA.orange! "=== {{#{schema_name}}} schema already removed from BOLD{{#{name}}}"
         end
       end # === def
 
-      def role?(name : String)
-        roles.find { |r| r.name == name }
-      end
+      def create_schema?(raw : String)
+        schema_name = Schema::Name.valid!(raw)
+        definer = cluster.create_definer?(schema_name)
 
-      def create_schema?(name : String)
-        psql_command(%< CREATE SCHEMA IF NOT EXISTS #{Schema::Name.new(name).name} AUTHORIZATION db_owner; COMMIT; >)
-        schema(name)
+        psql_command("
+          CREATE SCHEMA IF NOT EXISTS #{schema_name} AUTHORIZATION #{definer.name};
+          COMMIT;
+        ")
+
+        psql_command("
+          ALTER ROLE #{definer.name} WITH
+            NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT NOLOGIN NOREPLICATION;
+          GRANT CREATE, USAGE
+            ON SCHEMA #{schema_name} TO #{definer.name};
+          COMMIT;
+        ")
+
+        schema(schema_name)
       end # === def
 
-      def schema?(name : String)
-        schemas.find { |x| x.name == name }
+      def schema?(raw : String)
+        schemas.find { |x| x.name == raw }
       end # def
 
       def schema(name : String)
-        s = schema?(name)
-        if s
-          return s
-        else
-          raise Exception.new("Schema not found in #{name}: #{name.inspect}")
-        end
+        schema?(name).not_nil!
       end # === def
 
       def user_defined_types
@@ -112,7 +120,7 @@ module MEGAUNI
       end # === def
 
       def psql_command(cmd : String)
-        DA.orange! "=== Running: psql command on database {{#{name}}}: BOLD{{#{cmd.split.join(' ')[0..25]}...}}"
+        DA.orange! "=== Running: psql command on database {{#{name}}}: BOLD{{#{cmd.split.join(' ')}...}}"
         cluster.psql("--dbname=#{name}", "-c", cmd)
       end # === def
 
@@ -130,14 +138,6 @@ module MEGAUNI
         end
         DA.orange! "=== Running: psql file on database {{#{name}}}: BOLD{{#{path}}}"
         cluster.psql("--dbname=#{name}", "--file=#{path}")
-      end # === def
-
-      def create_table?(schema_table : String, *args)
-        file = sql_file_path(*args)
-        if !table?(schema_table)
-          psql_file(file)
-        end
-        table?(schema_table).not_nil!
       end # === def
 
     end # === struct Database

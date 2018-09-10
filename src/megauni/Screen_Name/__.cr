@@ -50,9 +50,7 @@ module MEGAUNI
 
     def self.migrate_head
       database = MEGAUNI.postgresql.database
-      database.psql_command(%< CREATE SCHEMA IF NOT EXISTS screen_name AUTHORIZATION db_owner; COMMIT; >)
-
-      schema = database.schema("screen_name")
+      schema = database.create_schema?("screen_name")
 
       database.psql_file(self, "function.clean_new")
       database.psql_file(self, "function.canonical")

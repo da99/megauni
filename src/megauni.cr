@@ -10,8 +10,14 @@ require "./megauni/Member/__"
 require "./megauni/News/__"
 require "./megauni/Postgresql/__"
 require "./megauni/Base/Base"
+require "./megauni/Dev/__"
 
 module DA
+  def development!
+    return true if DA.development?
+    raise Exception.new("This can only be run in a development environment.")
+  end
+
   def each_non_empty_line(raw)
     raw.each_line { |raw_line|
       line = raw_line.chomp
@@ -96,27 +102,12 @@ module MEGAUNI
     Postgresql.new(
       port: 3111,
       prefix: File.join(DA.app_dir, "postgresql-10.4"),
-      super_user: "pg-megauni",
+      super_user_name: "pg-megauni",
       database_name: "megauni_db"
     )
   end
 
 end # === module MEGAUNI
 
-
-# require "./megauni/SQL/__"
-
-# require "./megauni/Member/__"
-# require "./megauni/Message_Folder/__"
-# require "./megauni/Message_Receive_Command/__"
 require "./megauni/HTML"
-# require "./megauni/CSS"
-
-# require "./megauni/Route"
-# require "./megauni/Server"
-
-# require "./megauni/Route/Stranger_Root/__"
-# require "./megauni/Route/Inbox_All/__"
-
-
 

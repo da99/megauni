@@ -1,5 +1,5 @@
 
-SET ROLE db_owner;
+SET ROLE screen_name_definer;
 
 CREATE TABLE screen_name.tbl (
 

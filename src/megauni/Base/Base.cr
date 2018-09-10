@@ -8,39 +8,23 @@ module MEGAUNI
       postgresql = MEGAUNI.postgresql
       template1 = postgresql.database("template1")
 
-      if template1.schema?("public")
-        template1.psql_file(self, "drop.public.schema")
-      else
-        DA.orange! "=== {{public}} schema already removed from BOLD{{#{template1.name}}}"
-      end
+      template1.drop_schema?("public")
 
-      if !postgresql.database?
-        template1.psql_command(%<CREATE DATABASE "#{postgresql.database_name}";>)
-      end
+      database = postgresql.create_database?(postgresql.database_name)
 
-      database = postgresql.database
+      postgresql.create_role?("db_owner")
+      postgresql.create_role?("www_group")
+      postgresql.create_role?("www_app")
+      database.psql_file(self, "role.www_app")
 
-      {"db_owner", "www_group", "www_app"}.each { |name|
-        if postgresql.role?(name)
-          DA.orange! "=== role already created: {{#{name}}}"
-        else
-          database.psql_file(self, "role.#{name}")
-        end
-      }
-
-      database.psql_command(%<
+      database.psql_command("
         BEGIN;
           ALTER DATABASE megauni_db OWNER TO db_owner ;
           ALTER DATABASE megauni_db WITH CONNECTION LIMIT = 5;
         COMMIT;
-                            >);
+      ");
 
-      database.psql_file(self, "alter.roles")
-
-      database.psql_command(%<
-        CREATE SCHEMA IF NOT EXISTS base AUTHORIZATION db_owner;
-        COMMIT;
-                            >);
+      database.create_schema?("base")
 
       {"base.object_type", "base.privacy_level"}.each { |t|
         if !database.user_defined_type?(t)

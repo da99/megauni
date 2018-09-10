@@ -1,5 +1,5 @@
 
-SET ROLE db_owner;
+SET ROLE base_definer;
 
 CREATE TYPE base.privacy_level AS ENUM (
   'me_only',
