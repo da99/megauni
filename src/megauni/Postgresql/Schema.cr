@@ -28,6 +28,10 @@ module MEGAUNI
         }
       end # def
 
+      def role_definer
+        database.cluster.role("#{name}_definer")
+      end # === def
+
     end # === struct Schema
   end # === struct Postgresql
 end # === module MEGAUNI

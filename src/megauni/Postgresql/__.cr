@@ -163,7 +163,6 @@ module MEGAUNI
           --set=HISTFILE=/tmp/psql.super.sql
           --port=#{port}
           --dbname=#{Database::Name.new(x).name}
-          --no-align
           --set ON_ERROR_STOP=on
           --set AUTOCOMMIT=off
         >.split

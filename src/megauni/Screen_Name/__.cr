@@ -49,8 +49,13 @@ module MEGAUNI
     end # === def self.find_by_screen_name
 
     def self.migrate_head
+      postgresql = MEGAUNI.postgresql
       database = MEGAUNI.postgresql.database
+
       schema = database.create_schema?("screen_name")
+      definer = schema.role_definer
+      definer.alter_with(:INHERIT)
+      postgresql.role("definer_group").grant_to(definer)
 
       database.psql_file(self, "function.clean_new")
       database.psql_file(self, "function.canonical")

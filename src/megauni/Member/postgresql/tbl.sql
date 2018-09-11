@@ -1,5 +1,5 @@
 
-SET ROLE db_owner;
+SET ROLE member_definer;
 
 
 CREATE TABLE member.tbl (

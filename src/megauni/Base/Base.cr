@@ -14,6 +14,7 @@ module MEGAUNI
 
       postgresql.create_role?("db_owner")
       postgresql.create_role?("www_group")
+      postgresql.create_role?("definer_group")
       postgresql.create_role?("www_app")
       database.psql_file(self, "role.www_app")
 
@@ -33,12 +34,11 @@ module MEGAUNI
       }
 
       schema = database.schema("base")
+      database.psql_file(self, "grant.sql")
       database.psql_file(self, "function.squeeze_whitespace")
     end # === def
 
     def migrate_tail
-      database = MEGAUNI.postgresql.database
-      database.psql_file(self, "grant.sql")
     end
 
   end # === module Base

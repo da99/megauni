@@ -40,6 +40,18 @@ module MEGAUNI
         name == cluster.super_user_name
       end
 
+      def grant_to(r : Role)
+        cluster.template1.psql_command("GRANT #{name} TO #{r.name}; COMMIT")
+      end
+
+      def grant_to(raw : String)
+        grant_to(cluster.role(raw))
+      end # === def
+
+      def alter_with(*syms : Symbol)
+        cluster.template1.psql_command("ALTER ROLE #{name} WITH #{syms.join ", "}; COMMIT")
+      end # === def
+
     end # === struct Role
   end # === struct Postgresql
 end # === module MEGAUNI
