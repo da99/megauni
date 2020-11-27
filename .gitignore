@@ -3,7 +3,10 @@
 /.shards/
 /.js_packages/
 /node_modules/
-.crystal
+/.crystal/
 /postgresql-*/
 
 /lib/
+/build/
+/dist/
+/worker/

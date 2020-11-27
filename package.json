@@ -5,12 +5,13 @@
   "description": "Main package for megauni.com",
   "main": "./src/index.js",
   "dependencies": {
-    "@cloudflare/kv-asset-handler": "*",
+    "@cloudflare/kv-asset-handler": "*"
+  },
+  "devDependencies": {
     "@cloudflare/workers-types": "*",
     "@cloudflare/wrangler": "*",
     "typescript": "*"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

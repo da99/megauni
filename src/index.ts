@@ -8,7 +8,7 @@ addEventListener('fetch', event => {
  * Respond with hello worker text
  * @param {Request} request
  */
-async function handleRequest(event) {
+async function handleRequest(event: FetchEvent) {
   const url = new URL(event.request.url);
   const path = url.pathname;
 
@@ -33,6 +33,6 @@ async function handleRequest(event) {
   return new Response(x, {
     headers: { 'content-type': 'text/plain' },
     status: 404,
-    status_text: "not found"
+    statusText: "not found"
   })
 } // function
