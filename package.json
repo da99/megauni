@@ -1,6 +1,23 @@
 {
+  "private": true,
+  "name": "megauni",
+  "version": "0.0.0",
+  "description": "Main package for megauni.com",
+  "main": "./src/index.js",
   "dependencies": {
-    "HTML5-Reset": "murtaugh/HTML5-Reset",
-    "da_standard": "da99/da_standard.jspp"
-  }
+    "@cloudflare/kv-asset-handler": "*",
+    "@cloudflare/workers-types": "*",
+    "@cloudflare/wrangler": "*",
+    "typescript": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://github/da99/megauni.git"
+  },
+  "author": "da99",
+  "license": "MIT"
 }

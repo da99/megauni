@@ -1,0 +1,24 @@
+name = "megauni-dev"
+account_id = "9c4dc75e07b3fd04442ceac71a2532be"
+type = "webpack"
+workers_dev = false
+webpack_config = "webpack.config.js"
+
+[site]
+bucket = "./Public"
+entry-point = "./src"
+
+[dev]
+port = 4567
+local_protocol = "http"
+upstream_protocol = "https"
+
+[env.dev]
+workers_dev = true
+
+
+[env.production]
+workers_dev = false
+name = "megauni"
+zone_id = "d57817bd1be900e7bf67fda056994149"
+route = "www.megauni.com/*"

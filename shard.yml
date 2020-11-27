@@ -1,25 +1,11 @@
 ---
 name: megauni
-version: 0.2.1
+version: 0.0.0
 dependencies:
   da:
-    git: file:///apps/da
-  da_deploy:
-    github: da99/da_deploy
-  da_server:
-    github: da99/da_server
-  da_session:
-    github: da99/da_session.cr
-  da_path:
-    github: da99/da_path.cr
-  da_html:
-    github: da99/da_html.cr
-  pg:
-    github: will/crystal-pg
+    github: da99/da
+    branch: master
 development_dependencies:
-  my_js:
-    github: da99/my_js
-  my_css:
-    github: da99/my_css
   da_spec:
-    git: file:///apps/da_spec
+    github: da99/da_spec
+    branch: master

@@ -1,86 +1,10 @@
-version: 1.0
+version: 2.0
 shards:
   da:
-    git: file:///apps/da
-    version: 4.6.4
-
-  da_deploy:
-    github: da99/da_deploy
-    version: 0.4.1
-
-  da_dev:
-    github: da99/da_dev
-    version: 0.3.3
-
-  da_html:
-    github: da99/da_html.cr
-    version: 3.2.1
-
-  da_html_escape:
-    github: da99/da_html_escape.cr
-    version: 4.0.0
-
-  da_html_unescape:
-    github: da99/da_html_unescape.cr
-    version: 1.0.0
-
-  da_path:
-    github: da99/da_path.cr
-    version: 0.2.0
-
-  da_process:
-    github: da99/da_process.cr
-    version: 1.3.4
-
-  da_redis:
-    github: da99/da_redis.cr
-    version: 0.2.2
-
-  da_server:
-    github: da99/da_server
-    version: 1.0.2
-
-  da_session:
-    github: da99/da_session.cr
-    version: 0.1.3
+    git: https://github.com/da99/da.git
+    version: 0.0.0+git.commit.8a2154c1f34effde3d548498ebd4c7ae7bcfd108
 
   da_spec:
-    git: file:///apps/da_spec
-    version: 0.4.4
-
-  da_string:
-    github: da99/da_string.cr
-    version: 1.0.2
-
-  da_uri:
-    github: da99/da_uri.cr
-    commit: c470e3c8d1d8e8cff2b3f811528a3c2e8a427dc6
-
-  db:
-    github: crystal-lang/crystal-db
-    version: 0.5.0
-
-  inspect_bang:
-    github: da99/inspect_bang.cr
-    version: 1.0.2
-
-  my_css:
-    github: da99/my_css
-    version: 0.2.3
-
-  my_js:
-    github: da99/my_js
-    version: 0.2.2
-
-  myhtml:
-    github: kostya/myhtml
-    version: 1.2.0
-
-  pg:
-    github: will/crystal-pg
-    version: 0.15.0
-
-  terminal_table:
-    github: benoist/terminal_table.cr
-    commit: a14e244219a6a7b804b3491bafcff73f4b74855e
+    git: https://github.com/da99/da_spec.git
+    version: 0.0.0+git.commit.0b60af2b60eea7a6a93099acde1c3dfece384ef9
 
