@@ -1,6 +1,6 @@
 
 module.exports = {
     target: "webworker",
-    entry: "./src/index.js",
+    entry: "./build/index.js",
     mode: "production"
 }

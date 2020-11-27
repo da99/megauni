@@ -6,7 +6,7 @@ webpack_config = "webpack.config.js"
 
 [site]
 bucket = "./Public"
-entry-point = "./src"
+entry-point = "./build"
 
 [dev]
 port = 4567
