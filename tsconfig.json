@@ -6,11 +6,11 @@
     "noImplicitAny": true,
     "removeComments": true,
     "sourceMap": false,
-    "alwaysStrict": true,
+    "strict": true,
     "outDir": "build",
     "lib": ["ES2020", "WebWorker"],
     "types": ["@cloudflare/workers-types"],
-    "moduleResolution": "node"
-  },
-  "include": ["src/*"]
+    "moduleResolution": "node",
+    "rootDir": "./src"
+  }
 }
