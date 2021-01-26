@@ -1,11 +1,12 @@
 ---
 name: megauni
 version: 0.0.0
-dependencies:
+development_dependencies:
   da:
     github: da99/da
     branch: master
-development_dependencies:
   da_spec:
     github: da99/da_spec
     branch: master
+  kemal:
+    github: kemalcr/kemal
